@@ -268,7 +268,7 @@ export default function TeacherDashboard() {
         <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-center md:justify-start">
           <Image src="/images/teacher-icon.png" alt="선생님 아이콘" width={50} height={50} className="md:w-[70px] md:h-[70px] object-contain drop-shadow-md" />
           <h1 className="font-title text-2xl md:text-4xl text-brand-brown drop-shadow-sm pt-2">
-            {className} 관리실
+            {className} 정원 통합 관리실
           </h1>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
