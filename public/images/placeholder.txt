@@ -1,0 +1,5 @@
+i:\document\class_plant_keeper\public\images\monstera.png
+i:\document\class_plant_keeper\public\images\vine-long.png
+i:\document\class_plant_keeper\public\images\vine-short.png
+i:\document\class_plant_keeper\public\images\shovel-bg.png
+i:\document\class_plant_keeper\public\images\vege-box-bg.png

@@ -1,0 +1,1229 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import confetti from 'canvas-confetti';
+import { supabase } from "@/lib/supabaseClient";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ReportModal, { Plant, Record } from "@/components/ReportModal";
+import GardenModal from "@/components/GardenModal";
+
+export default function StudentDashboard() {
+  const router = useRouter();
+  const [studentId, setStudentId] = useState<string | null>(null);
+  const [studentName, setStudentName] = useState("");
+  const [studentGender, setStudentGender] = useState<"boy" | "girl">("boy");
+  const [className, setClassName] = useState("");
+  const [classId, setClassId] = useState<string | null>(null);
+  
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [records, setRecords] = useState<Record[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
+  
+  // Modal States
+  const [isLogOpen, setIsLogOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isCareOpen, setIsCareOpen] = useState(false);
+  const [isGardenOpen, setIsGardenOpen] = useState(false);
+
+  // New Plant Form State
+  const [isAddingPlant, setIsAddingPlant] = useState(false);
+  const [newPlantNickname, setNewPlantNickname] = useState("");
+  const [newPlantType, setNewPlantType] = useState("");
+  const [newPlantDate, setNewPlantDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    const sId = localStorage.getItem("studentId");
+    const sName = localStorage.getItem("studentName");
+    const sGender = localStorage.getItem("studentGender") as "boy" | "girl";
+    const cName = localStorage.getItem("className");
+    const cId = localStorage.getItem("classId");
+
+    if (role !== "student" || !sId) {
+      alert("학생 로그인이 필요합니다.");
+      router.push("/");
+      return;
+    }
+
+    setStudentId(sId);
+    setStudentName(sName || "");
+    setStudentGender(sGender || "boy");
+    setClassName(cName || "");
+    setClassId(cId || null);
+
+    fetchData(sId);
+  }, []);
+
+  const fetchData = async (sId: string) => {
+    setIsLoading(true);
+    
+    try {
+      // 1. Fetch Plants
+      const { data: plantsData } = await supabase
+        .from("plants")
+        .select("*")
+        .eq("student_id", sId)
+        .order("created_at", { ascending: false });
+      
+      setPlants(plantsData || []);
+      if (plantsData && plantsData.length > 0 && !selectedPlantId) {
+        setSelectedPlantId(plantsData[0].id);
+      }
+
+      // 2. Fetch Latest Records
+      if (plantsData && plantsData.length > 0) {
+        const plantIds = plantsData.map(p => p.id);
+        const { data: recordsData } = await supabase
+          .from("records")
+          .select("*")
+          .in("plant_id", plantIds)
+          .order("created_at", { ascending: true });
+        
+        const mappedRecords = recordsData?.map(r => ({
+          ...r,
+          plant_nickname: plantsData.find(p => p.id === r.plant_id)?.plant_nickname || "알 수 없는 식물"
+        })) || [];
+
+        setRecords(mappedRecords);
+      }
+    } catch (error) {
+      console.error("데이터 불러오기 오류:", error);
+    }
+    
+    setIsLoading(false);
+  };
+
+  const handleRegisterPlant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studentId || !newPlantNickname || !newPlantType || !newPlantDate) {
+      alert("모든 정보를 입력해주세요!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("plants")
+        .insert({
+          student_id: studentId,
+          plant_nickname: newPlantNickname,
+          plant_type: newPlantType,
+          planted_at: newPlantDate
+        });
+
+      if (error) {
+        alert(`식물 등록 실패: ${error.message}`);
+        console.error("식물 등록 오류 상세:", error);
+      } else {
+        setNewPlantNickname("");
+        setNewPlantType("");
+        setIsAddingPlant(false);
+        fetchData(studentId);
+      }
+    } catch (err) {
+      console.error("예상치 못한 오류:", err);
+      alert("서버 통신 중 오류가 발생했습니다.");
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleDeletePlant = async (plantId: string, nickname: string) => {
+    if (!studentId) return;
+    
+    if (confirm(`'${nickname}' 식물을 정말 삭제할까요? 모든 관찰 기록도 함께 삭제됩니다.`)) {
+      const { error } = await supabase
+        .from("plants")
+        .delete()
+        .eq("id", plantId);
+
+      if (error) {
+        alert("식물 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      } else {
+        fetchData(studentId);
+      }
+    }
+  };
+
+  const handleDeleteRecord = async (recordId: string) => {
+    if (confirm("이 관찰 기록을 삭제할까요?")) {
+      const { error } = await supabase.from("records").delete().eq("id", recordId);
+      if (error) {
+        alert("삭제 중 오류가 발생했습니다.");
+      } else {
+        fetchData(studentId!);
+      }
+    }
+  };
+  
+  const handleSaveReflection = async (plantId: string, reflection: string) => {
+    const { error } = await supabase
+      .from("plants")
+      .update({ reflection })
+      .eq("id", plantId);
+    
+    if (error) {
+      alert("저장 중 오류가 발생했습니다.");
+    } else {
+      alert("성공적으로 저장되었습니다.");
+      fetchData(studentId!);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push("/");
+  };
+
+  // Plant Image Mapping
+  const getPlantImage = (type: string) => {
+    if (type.includes("선인장")) return "/images/cactus.png";
+    if (type.includes("토마토")) return "/images/tomato.png";
+    if (type.includes("해바라기")) return "/images/sunflower.png";
+    if (type.includes("콩")) return "/images/bean.png";
+    if (type.includes("꽃")) return "/images/flower.png";
+    if (type.includes("관엽")) return "/images/leaf.png";
+    if (type.includes("감자") || type.includes("고구마")) return "/images/potato.png";
+    return "/images/leaf.png"; // Default to leaf
+  };
+
+  // D-Day calculation
+  const getDDay = (dateString: string) => {
+    if (!dateString) return "D+1";
+    const start = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff >= 0 ? `D+${diff + 1}` : `D${diff}`;
+  };
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-title text-2xl bg-[#f9f8f0] text-brand-green">정원 가꾸는 중... 🌱</div>;
+
+  return (
+    <>
+    <div 
+      className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
+      style={{ backgroundImage: "url('/images/bg-student.jpg')" }}
+    >
+      <div className="absolute inset-0 bg-[#f9f8f0]/80 backdrop-blur-[2px]"></div>
+
+      <div className="relative z-10 p-6 max-w-[1200px] mx-auto animate-in fade-in duration-700">
+        
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-center mb-10 bg-white/60 backdrop-blur-md p-6 rounded-[30px] shadow-sm border border-white/50">
+          <div className="flex items-center gap-6 mb-4 md:mb-0">
+            <div className="bg-white p-3 rounded-3xl shadow-md border-2 border-brand-green/20 relative group">
+              <Image 
+                src={studentGender === 'girl' ? "/images/girl.png" : "/images/boy.png"} 
+                alt="student" width={90} height={90} className="object-contain animate-float" 
+              />
+            </div>
+            <div className="flex flex-col items-start text-left ml-2">
+              <h1 className="font-title text-4xl text-brand-brown mb-0 leading-tight">{studentName} 식집사의 정원</h1>
+              <p className="font-body text-gray-500 whitespace-nowrap text-left w-full">
+                {className || "우리 반"}의 자랑스러운 식물 관리사
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+             <button onClick={() => setIsGardenOpen(true)} className="bg-brand-green text-white px-6 py-2 rounded-full text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm">
+                우리 반 정원
+             </button>
+             <button onClick={handleLogout} className="bg-orange-500 text-white px-6 py-2 rounded-full text-lg font-title hover:bg-orange-600 transition-all active:scale-95 shadow-sm">
+                로그아웃
+             </button>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: My Plants */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-[40px] shadow-xl border border-white/80">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-title text-2xl text-brand-brown">나의 반려 식물</h2>
+                <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-sm font-bold">{plants.length}개</span>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {plants.map((plant) => (
+                  <div 
+                    key={plant.id} 
+                    onClick={() => setSelectedPlantId(plant.id)}
+                    className={`bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition-all border group cursor-pointer hover:-translate-y-1 relative ${
+                      selectedPlantId === plant.id ? 'ring-4 ring-brand-green border-transparent' : 'border-gray-50'
+                    }`}
+                  >
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeletePlant(plant.id, plant.plant_nickname);
+                      }}
+                      className="absolute top-3 right-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all z-20 shadow-sm"
+                      title="식물 삭제"
+                    >
+                      ✕
+                    </button>
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 bg-brand-bg rounded-2xl overflow-hidden flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                        <Image src={getPlantImage(plant.plant_type)} alt={plant.plant_nickname} width={60} height={60} className="object-contain" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] text-brand-green font-bold mb-0.5 uppercase tracking-wider">{plant.plant_type}</p>
+                        <h3 className="font-title text-2xl text-brand-text mb-1">{plant.plant_nickname}</h3>
+                        <div className="flex justify-between items-end">
+                          <p className="text-xs text-gray-400 font-body">만난 날: {plant.planted_at}</p>
+                          <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-lg text-[10px] font-bold">
+                            {getDDay(plant.planted_at)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {!isAddingPlant ? (
+                  <button 
+                    onClick={() => setIsAddingPlant(true)}
+                    className="w-full py-6 mt-2 rounded-[30px] border-4 border-dashed border-gray-200 text-gray-400 font-title text-xl hover:border-brand-green hover:text-brand-green hover:bg-brand-green/5 transition-all flex flex-col items-center gap-2 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-colors">
+                      <span className="text-3xl">+</span>
+                    </div>
+                    새 식물 등록하기
+                  </button>
+                ) : (
+                  <form onSubmit={handleRegisterPlant} className="bg-brand-bg rounded-[30px] p-6 border-2 border-brand-green/30 animate-in zoom-in-95 duration-200">
+                    <h3 className="font-title text-xl text-brand-green mb-4 text-center">새로운 초록 친구 등록</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs text-gray-500 ml-2 mb-1 block">식물 종류</label>
+                        <select 
+                          value={newPlantType}
+                          onChange={(e) => setNewPlantType(e.target.value)}
+                          className="w-full bg-white border-none rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all"
+                          required
+                        >
+                          <option value="">선택해주세요</option>
+                          <option value="선인장">선인장 🌵</option>
+                          <option value="토마토">토마토 🍅</option>
+                          <option value="해바라기">해바라기 🌻</option>
+                          <option value="콩">콩 🫛</option>
+                          <option value="감자고구마">감자/고구마 🥔</option>
+                          <option value="꽃">꽃 🌸</option>
+                          <option value="관엽식물">관엽식물 🌿</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 ml-2 mb-1 block">식물 애칭</label>
+                        <input 
+                          type="text" 
+                          placeholder="예: 토리, 초록이" 
+                          value={newPlantNickname}
+                          onChange={(e) => setNewPlantNickname(e.target.value)}
+                          className="w-full bg-white border-none rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 ml-2 mb-1 block">심은 날</label>
+                        <input 
+                          type="date" 
+                          value={newPlantDate}
+                          onChange={(e) => setNewPlantDate(e.target.value)}
+                          className="w-full bg-white border-none rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-6">
+                      <button 
+                        type="button" 
+                        onClick={() => setIsAddingPlant(false)}
+                        className="flex-1 bg-gray-200 text-gray-500 font-title py-3 rounded-2xl hover:bg-gray-300 transition-all"
+                      >
+                        취소
+                      </button>
+                      <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="flex-2 bg-brand-green text-white font-title py-3 rounded-2xl hover:bg-[#5e741e] transition-all shadow-md active:scale-95 disabled:opacity-50"
+                      >
+                        {isSubmitting ? "등록 중..." : "등록하기"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Observations & Logs */}
+          <div className="lg:col-span-8 flex flex-col gap-6">
+            
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div 
+                onClick={() => setIsLogOpen(true)}
+                className="bg-[#fdf3e7] p-6 rounded-[40px] shadow-sm border border-[#f5e1c8] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/log-icon.png" alt="log" width={64} height={64} className="drop-shadow-sm" />
+                </div>
+                <span className="font-title text-lg text-[#5a4a42]">새 관찰일지</span>
+              </div>
+              <div 
+                onClick={() => setIsReportOpen(true)}
+                className="bg-[#e7f3fd] p-6 rounded-[40px] shadow-sm border border-[#c8e1f5] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/report-icon.png" alt="report" width={64} height={64} className="drop-shadow-sm" />
+                </div>
+                <span className="font-title text-lg text-[#424a5a]">활동 보고서</span>
+              </div>
+              <div 
+                onClick={() => setIsAiOpen(true)}
+                className="bg-[#f3fde7] p-6 rounded-[40px] shadow-sm border border-[#e1f5c8] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/ai-icon.png" alt="ai" width={64} height={64} className="drop-shadow-sm" />
+                </div>
+                <span className="font-title text-lg text-[#4a5a42]">AI 식물 진단</span>
+              </div>
+              <div 
+                onClick={() => setIsCareOpen(true)}
+                className="bg-[#fff0f0] p-6 rounded-[40px] shadow-sm border border-[#ffdada] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/plant.png" alt="plant" width={64} height={64} className="drop-shadow-sm" />
+                </div>
+                <span className="font-title text-lg text-pink-700">식물 가꾸기</span>
+              </div>
+            </div>
+
+            {/* Latest Logs */}
+            <div className="bg-white/90 backdrop-blur-md p-8 rounded-[40px] shadow-xl border border-white/80 flex-1">
+              <h2 className="font-title text-2xl text-brand-green mb-8 flex items-center gap-3">
+                📖 {selectedPlantId ? `'${plants.find(p => p.id === selectedPlantId)?.plant_nickname}'의 기록` : "최근 관찰 기록"}
+                <span className="text-sm font-body text-gray-400 font-normal">정성을 담아 기록해 보아요</span>
+              </h2>
+
+              <div className="space-y-6">
+                {[...records]
+                  .filter(r => !selectedPlantId || r.plant_id === selectedPlantId)
+                  .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                  .map((record) => (
+                  <div key={record.id} className="relative pl-10 before:absolute before:left-3 before:top-2 before:bottom-0 before:w-[2px] before:bg-gray-100 last:before:hidden">
+                    <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-brand-green border-4 border-white shadow-sm z-10"></div>
+                    <div className="bg-white rounded-[35px] p-5 shadow-sm border border-gray-100 hover:shadow-lg transition-all relative group/item">
+                      {/* Delete Button */}
+                      <button 
+                        onClick={() => handleDeleteRecord(record.id)}
+                        className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold"
+                      >
+                        ✕
+                      </button>
+
+                      <div className="flex gap-6">
+                        {/* Left: Image */}
+                        <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-[25px] overflow-hidden border-2 border-gray-50 bg-brand-bg flex items-center justify-center p-1">
+                          <img 
+                            src={record.image_url || getPlantImage(plants.find(p => p.id === record.plant_id)?.plant_type || "")} 
+                            alt="observation" 
+                            className="w-full h-full object-cover rounded-[20px]" 
+                          />
+                        </div>
+
+                        {/* Right: Content */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-xs font-bold font-title">
+                              {record.plant_nickname}
+                            </span>
+                            <span className="text-gray-400 text-xs font-body">
+                              {new Date(record.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Stats Grid */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                            <div className="bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100/50 flex items-center justify-center gap-2">
+                              <div className="text-right leading-tight">
+                                <p className="text-[10px] text-orange-400 font-bold">성장</p>
+                                <p className="text-[10px] text-orange-400 font-bold">단계</p>
+                              </div>
+                              <div className="w-10 h-10 shrink-0">
+                                <Image 
+                                  src={
+                                    record.growth_stage === "씨앗" ? "/images/stage-seed.png" :
+                                    record.growth_stage === "새싹" ? "/images/stage-sprout.png" :
+                                    record.growth_stage === "줄기" ? "/images/stage-stem.png" :
+                                    record.growth_stage === "꽃" ? "/images/stage-flower.png" :
+                                    record.growth_stage === "열매" ? "/images/fruit.png" :
+                                    "/images/stage-sprout.png"
+                                  } 
+                                  alt="stage" width={40} height={40} className="object-contain" 
+                                />
+                              </div>
+                            </div>
+                            <div className="bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100/50">
+                              <p className="text-[10px] text-blue-400 font-bold">키 (cm)</p>
+                              <p className="text-sm font-title text-blue-600">{record.height_cm || 0}cm</p>
+                            </div>
+                            <div className="bg-green-50 px-3 py-1.5 rounded-xl border border-green-100/50">
+                              <p className="text-[10px] text-green-500 font-bold">잎 / 꽃 / 열매</p>
+                              <p className="text-sm font-title text-brand-green">
+                                {record.leaf_count || 0} / {record.flower_count || 0} / {record.fruit_count || 0}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                            <p className="font-body text-gray-600 leading-relaxed text-sm italic">
+                              "{record.observation_text}"
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {(selectedPlantId ? records.filter(r => r.plant_id === selectedPlantId) : records).length === 0 && (
+                  <div className="py-20 text-center flex flex-col items-center gap-4">
+                    <Image src="/images/sprout.png" alt="empty" width={80} height={80} className="opacity-20" />
+                    <p className="font-body text-gray-400">아직 기록이 없습니다. 첫 번째 관찰 일지를 써보세요!</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Modals */}
+        {isLogOpen && (
+          <ObservationModal 
+            onClose={() => setIsLogOpen(false)} 
+            plantId={selectedPlantId!} 
+            plantNickname={plants.find(p => p.id === selectedPlantId)?.plant_nickname || ""}
+            onSuccess={() => { fetchData(studentId!); setIsLogOpen(false); }}
+          />
+        )}
+      </div>
+    </div>
+
+    {isReportOpen && (
+      <ReportModal 
+        onClose={() => setIsReportOpen(false)} 
+        plant={plants.find(p => p.id === selectedPlantId)!}
+        records={records.filter(r => r.plant_id === selectedPlantId)}
+        studentName={studentName}
+        studentGender={studentGender}
+        className={className || "우리 반"}
+        mode="student"
+        allPlants={plants}
+        onPlantChange={(p) => setSelectedPlantId(p.id)}
+        onSaveReflection={handleSaveReflection}
+        onDeleteRecord={handleDeleteRecord}
+      />
+    )}
+    {isAiOpen && (
+      <AiModal 
+        onClose={() => setIsAiOpen(false)} 
+        plantNickname={plants.find(p => p.id === selectedPlantId)?.plant_nickname || ""}
+      />
+    )}
+    {isCareOpen && (
+      <CareModal 
+        onClose={() => setIsCareOpen(false)} 
+        plantNickname={plants.find(p => p.id === selectedPlantId)?.plant_nickname || ""}
+      />
+    )}
+    {isGardenOpen && (
+      <GardenModal 
+        className={className || "우리 반"}
+        classId={classId || ""}
+        mode="student"
+        onClose={() => setIsGardenOpen(false)}
+      />
+    )}
+  </>
+);
+}
+
+// Observation Modal Component
+function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onClose: () => void, plantId: string, plantNickname: string, onSuccess: () => void }) {
+  const [text, setText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
+  const [stage, setStage] = useState("씨앗");
+  const [height, setHeight] = useState("");
+  const [leafCount, setLeafCount] = useState("");
+  const [flowerCount, setFlowerCount] = useState("");
+  const [fruitCount, setFruitCount] = useState("");
+  const [isListening, setIsListening] = useState(false);
+
+  const stages = [
+    { name: "씨앗", img: "/images/stage-seed.png" },
+    { name: "새싹", img: "/images/stage-sprout.png" },
+    { name: "줄기", img: "/images/stage-stem.png" },
+    { name: "꽃", img: "/images/stage-flower.png" },
+    { name: "열매", img: "/images/fruit.png" },
+  ];
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+          setImage(dataUrl);
+        };
+        img.src = event.target?.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("이 브라우저는 음성 인식을 지원하지 않습니다.");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "ko-KR";
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setText(prev => prev.trim() + " " + transcript.trim() + ".");
+    };
+    recognition.start();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setIsSubmitting(true);
+    
+    // Note: image_url will store the base64 for now, or you'd upload to Supabase Storage
+    const { error } = await supabase.from("records").insert({
+      plant_id: plantId,
+      observation_text: text.trim(),
+      image_url: image,
+      growth_stage: stage,
+      height_cm: height ? parseInt(height) : null,
+      leaf_count: leafCount ? parseInt(leafCount) : null,
+      flower_count: flowerCount ? parseInt(flowerCount) : null,
+      fruit_count: fruitCount ? parseInt(fruitCount) : null
+    });
+
+    if (error) {
+      console.error(error);
+      alert("저장 중 오류가 발생했습니다. (데이터베이스 컬럼을 확인해주세요)");
+    } else {
+      onSuccess();
+    }
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+      <div className="bg-white w-full max-w-[500px] rounded-[35px] p-6 shadow-2xl animate-in zoom-in-95 duration-300 my-4" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="font-title text-3xl text-brand-green mb-1">새 관찰일지 작성</h3>
+            <p className="text-sm text-gray-500 font-bold font-body">'{plantNickname}'의 오늘을 기록해 주세요.</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl font-bold">✕</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Growth Stage Selection */}
+          <div>
+            <label className="font-title text-base text-brand-brown mb-3 block">현재 성장 단계</label>
+            <div className="grid grid-cols-5 gap-3">
+              {stages.map(s => (
+                <div 
+                  key={s.name}
+                  onClick={() => setStage(s.name)}
+                  className={`flex flex-col items-center p-1.5 rounded-xl border-2 transition-all cursor-pointer ${
+                    stage === s.name ? 'border-brand-green bg-brand-green/5 scale-105' : 'border-gray-100 hover:border-brand-green/20'
+                  }`}
+                >
+                  <div className="w-10 h-10 mb-0.5">
+                    <Image src={s.img} alt={s.name} width={40} height={40} className="object-contain" />
+                  </div>
+                  <span className={`text-xs font-black mt-1 ${stage === s.name ? 'text-brand-green' : 'text-gray-500'}`}>{s.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Photo & Measurements Combined Row */}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="font-title text-base text-brand-brown mb-3 block">식물 사진</label>
+              <div className="flex gap-2">
+                <label className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all">
+                  <span className="text-xl text-gray-400">+</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                </label>
+                {image && (
+                  <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-brand-green relative group">
+                    <img src={image} alt="preview" className="w-full h-full object-cover" />
+                    <button onClick={() => setImage(null)} className="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-black text-gray-500 ml-1">키(cm)</label>
+                <input type="number" min="0" value={height} onChange={e => setHeight(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-gray-500 ml-1">잎(개)</label>
+                <input type="number" min="0" value={leafCount} onChange={e => setLeafCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-gray-500 ml-1">꽃(개)</label>
+                <input type="number" min="0" value={flowerCount} onChange={e => setFlowerCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-gray-500 ml-1">열매(개)</label>
+                <input type="number" min="0" value={fruitCount} onChange={e => setFruitCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+              </div>
+            </div>
+          </div>
+
+          {/* Observation Text */}
+          <div className="relative">
+            <label className="font-title text-base text-brand-brown mb-3 block">관찰 내용</label>
+            <div className="relative group">
+              <textarea 
+                value={text}
+                onChange={e => setText(e.target.value)}
+                className="w-full h-28 bg-gray-50 rounded-[30px] p-6 pr-16 font-body text-lg font-medium text-gray-800 outline-none border border-gray-200 focus:border-brand-green transition-all resize-none placeholder:text-gray-400"
+                placeholder="오늘 식물은 어떤가요?"
+                required
+              />
+              <button 
+                type="button" 
+                onClick={startListening}
+                className="absolute right-4 bottom-4 w-10 h-10 flex items-center justify-center transition-all z-20"
+              >
+                {isListening && (
+                  <span className="absolute inset-0 rounded-full bg-red-100 animate-ping opacity-75"></span>
+                )}
+                <div className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 shadow-lg shadow-red-200' : 'bg-white shadow-md hover:bg-brand-green/10 border border-gray-100'}`}>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor" 
+                    className={`w-4 h-4 ${isListening ? 'text-white' : 'text-gray-500'}`}
+                  >
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10a1 1 0 0 0-1 1v1a6 6 0 1 1-12 0v-1a1 1 0 0 0-2 0v1a8 8 0 0 0 7 7.93V21a1 1 0 1 0 2 0v-2.07A8 8 0 0 0 21 11v-1a1 1 0 0 0-1-1Z" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-center pt-2">
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="px-8 py-2 bg-[#e2e8d0] text-[#4a5a18] font-title text-base rounded-full hover:bg-[#d6dec0] transition-all disabled:opacity-50 shadow-sm border border-[#c5cdb0] active:scale-95"
+            >
+              {isSubmitting ? "저장 중..." : "기록 저장하기"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNickname: string }) {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const diagnosisData = [
+    { id: 1, problem: "잎이 노랗게 변해요", solution: "물을 너무 많이 줬거나 영양분이 부족할 수 있어요. 겉흙이 말랐을 때 물을 주고, 액체 비료를 조금 줘보세요.", icon: "🍂" },
+    { id: 2, problem: "잎 끝이 갈색으로 타요", solution: "공기가 너무 건조하거나 직사광선이 너무 강해요. 분무기로 물을 뿌려 습도를 높여주고 반그늘로 옮겨주세요.", icon: "🔥" },
+    { id: 3, problem: "식물이 시들시들해요", solution: "물이 부족하거나 뿌리가 상했을 수 있어요. 흙을 확인해보고 물을 충분히 주거나, 물 빠짐이 잘 되는지 확인하세요.", icon: "🥀" },
+    { id: 4, problem: "하얀 가루가 생겼어요", solution: "흰가루병일 가능성이 커요. 통풍이 잘 되는 곳으로 옮기고, 심한 잎은 따주거나 전용 약제를 사용하세요.", icon: "❄️" },
+    { id: 5, problem: "벌레가 생겼어요", solution: "진딧물이나 응애일 수 있어요. 잎 뒷면을 잘 닦아주고, 친환경 살충제나 비눗물을 살짝 뿌려주세요.", icon: "🐛" },
+    { id: 6, problem: "성장이 너무 느려요", solution: "햇빛이 부족하거나 화분이 너무 작을 수 있어요. 좀 더 밝은 곳으로 옮기거나 큰 화분으로 분갈이를 해주세요.", icon: "🐢" },
+    { id: 7, problem: "흙에 곰팡이가 생겼어요", solution: "흙이 너무 습하고 통풍이 안 되는 상태예요. 물 주기를 멈추고 흙을 말려주세요. 통풍이 아주 중요해요!", icon: "🍄" },
+    { id: 8, problem: "잎이 툭툭 떨어져요", solution: "갑작스러운 온도 변화나 환경 변화 때문일 수 있어요. 식물을 자주 옮기지 말고 일정한 온도를 유지해 주세요.", icon: "🍃" },
+    { id: 9, problem: "꽃이 피지 않아요", solution: "꽃을 피울 영양(인산)이 부족하거나 햇빛이 더 필요해요. 꽃눈이 생길 때는 햇빛을 충분히 보여주세요.", icon: "🌸" },
+    { id: 10, problem: "줄기가 가늘고 길어요", solution: "햇빛을 보려고 위로만 자란 '웃자람' 현상이에요. 더 밝은 곳으로 옮기고 적절히 가지치기를 해주세요.", icon: "🎋" },
+  ];
+
+  const selectedDiagnosis = diagnosisData.find(d => d.id === selectedId);
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+      <div className="bg-white w-full max-w-[850px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-brand-green/10 rounded-2xl flex items-center justify-center">
+              <Image src="/images/ai-icon.png" alt="ai" width={32} height={32} />
+            </div>
+            <div>
+              <h3 className="font-title text-3xl text-brand-green">AI 식물 진단</h3>
+              <p className="text-sm font-body text-gray-400">'{plantNickname}'의 증상을 선택해 주세요.</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-3xl">✕</button>
+        </div>
+
+        <div className="flex-1">
+          {!selectedId ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+              {diagnosisData.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => setSelectedId(d.id)}
+                  className="bg-brand-bg/30 hover:bg-brand-bg/60 p-4 rounded-3xl flex items-center gap-4 transition-all group text-left border-2 border-transparent hover:border-brand-green/20"
+                >
+                  <span className="text-3xl group-hover:scale-110 transition-transform shrink-0">{d.icon}</span>
+                  <span className="font-body font-bold text-gray-700 whitespace-nowrap">{d.problem}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="bg-brand-green/5 rounded-[35px] p-8 mb-6 border-2 border-brand-green/10 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 text-[120px] opacity-5 rotate-12">{selectedDiagnosis?.icon}</div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="text-5xl">{selectedDiagnosis?.icon}</span>
+                    <h4 className="font-title text-2xl text-brand-brown">진단: {selectedDiagnosis?.problem}</h4>
+                  </div>
+                  
+                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-3xl border border-white shadow-sm">
+                    <p className="font-title text-brand-green mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-brand-green animate-pulse"></span>
+                      AI 처방전
+                    </p>
+                    <p className="font-body text-gray-700 leading-relaxed text-lg break-keep">
+                      {selectedDiagnosis?.solution}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedId(null)}
+                className="w-full py-4 rounded-2xl bg-gray-100 text-gray-500 font-title text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+              >
+                ← 다른 증상 선택하기
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!selectedId && (
+          <div className="mt-8 p-4 bg-gray-50 rounded-2xl">
+            <p className="text-[11px] text-gray-400 font-body text-center leading-tight">
+              * 이 진단은 일반적인 식물 관리 정보를 바탕으로 제공됩니다.<br/>
+              정확한 진단을 위해 식물의 품종과 환경을 고려해 주세요.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickname: string }) {
+  const [step, setStep] = useState(1); // 1: Supplies, 2: Coding, 3: Environment, 4: Final Success
+  const [method, setMethod] = useState<"seed" | "seedling" | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [codingBlocks, setCodingBlocks] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (step === 4) { // Success stage
+      const duration = 3 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 200 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval: any = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+      }, 250);
+
+      return () => clearInterval(interval);
+    }
+  }, [step]);
+  
+  const supplies = [
+    // Essential
+    { id: "pot", name: "화분", img: "/images/plantpot1.png", essential: true },
+    { id: "soil", name: "배양토", img: "/images/soil.png", essential: true },
+    { id: "seed", name: "씨앗", img: "/images/seed.png", essential: true },
+    { id: "trowel", name: "모종삽", img: "/images/trowel1.png", essential: true },
+    { id: "watering", name: "물조리개", img: "/images/watering_can.png", essential: true },
+    { id: "gloves", name: "장갑", img: "/images/gloves.png", essential: true },
+    
+    // Distractors
+    { id: "clock", name: "시계", img: "/images/clock.png", essential: false },
+    { id: "dice", name: "주사위", img: "/images/dice.png", essential: false },
+    { id: "toothbrush", name: "칫솔", img: "/images/toothbrush.png", essential: false },
+    { id: "bell", name: "종", img: "/images/bell.png", essential: false },
+  ];
+
+  // Random positions for irregular layout
+  const positions = [
+    { top: '10%', left: '5%', rotate: '-15deg' },
+    { top: '15%', left: '25%', rotate: '10deg' },
+    { top: '5%', left: '50%', rotate: '-5deg' },
+    { top: '20%', left: '75%', rotate: '20deg' },
+    { top: '45%', left: '10%', rotate: '15deg' },
+    { top: '55%', left: '35%', rotate: '-10deg' },
+    { top: '40%', left: '60%', rotate: '5deg' },
+    { top: '50%', left: '85%', rotate: '-20deg' },
+    { top: '75%', left: '20%', rotate: '12deg' },
+    { top: '80%', left: '70%', rotate: '-8deg' },
+  ];
+
+  const [shuffledSupplies, setShuffledSupplies] = useState<any[]>([]);
+
+  useEffect(() => {
+    setShuffledSupplies([...supplies].sort(() => Math.random() - 0.5));
+  }, []);
+
+  const seedSteps = [
+    { id: "s1", name: "흙 채우기", img: "/images/soil.png" },
+    { id: "s2", name: "구멍 만들기", img: "/images/plantpot1.png" }, 
+    { id: "s3", name: "씨앗 넣기", img: "/images/seed.png" },
+    { id: "s4", name: "흙 덮어주기", img: "/images/trowel1.png" },
+    { id: "s5", name: "물 주기", img: "/images/watering_can.png" }
+  ];
+
+  const seedlingSteps = [
+    { id: "m1", name: "흙 조금 채우기", img: "/images/soil.png" },
+    { id: "m2", name: "모종 옮기기", img: "/images/sprout.png" },
+    { id: "m3", name: "남은 흙 채우기", img: "/images/trowel1.png" },
+    { id: "m4", name: "다져주기", img: "/images/plant.png" }, 
+    { id: "m5", name: "물 주기", img: "/images/watering_can.png" }
+  ];
+
+  const getBlocks = () => {
+    const list = method === "seed" ? [...seedSteps] : [...seedlingSteps];
+    return list.sort(() => Math.random() - 0.5);
+  };
+
+  const [availableBlocks, setAvailableBlocks] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (step === 2) {
+      setAvailableBlocks(getBlocks());
+    }
+  }, [step, method]);
+
+  const toggleItem = (id: string) => {
+    setSelectedItems(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const addBlock = (id: string) => {
+    if (!codingBlocks.includes(id)) {
+      setCodingBlocks([...codingBlocks, id]);
+    }
+  };
+
+  const removeBlock = (index: number) => {
+    setCodingBlocks(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const checkOrder = () => {
+    const correct = method === "seed" ? ["s1", "s2", "s3", "s4", "s5"] : ["m1", "m2", "m3", "m4", "m5"];
+    if (JSON.stringify(codingBlocks) === JSON.stringify(correct)) {
+      setStep(3); // Go to Environment knowledge
+    } else {
+      alert("순서가 조금 틀린 것 같아요! 이미지를 다시 한 번 살펴볼까요? 🤔");
+      setCodingBlocks([]);
+    }
+  };
+
+  const essentialSupplies = supplies.filter(s => s.essential).map(s => s.id);
+  const selectedEssentials = supplies.filter(s => s.essential && selectedItems.includes(s.id));
+  const selectedDistractors = supplies.filter(s => !s.essential && selectedItems.includes(s.id));
+  const hasOnlyEssentials = selectedEssentials.length === essentialSupplies.length && selectedDistractors.length === 0;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 md:p-6 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+      <div className="bg-white w-full max-w-[1000px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col min-h-[700px]" onClick={e => e.stopPropagation()}>
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-pink-50 rounded-2xl flex items-center justify-center text-2xl">✨</div>
+            <div>
+              <h3 className="font-title text-3xl text-pink-500">식물 가꾸기 마스터</h3>
+              <p className="text-sm font-body text-gray-400">정확한 도구와 순서로 식물을 심어보아요!</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-3xl">✕</button>
+        </div>
+
+        <div className="flex-1 relative">
+          {step === 1 && (
+            <div className="h-full flex flex-col">
+              <div className="text-center mb-4">
+                <h4 className="font-title text-2xl text-brand-brown mb-1">Step 1. 식물 심기에 꼭 필요한 <span className="text-pink-500">도구</span>만 골라보세요!</h4>
+                <p className="text-gray-400 font-body text-sm">불필요한 물건을 고르면 안 돼요.</p>
+              </div>
+              
+              <div className="flex-1 relative bg-gray-50/50 rounded-[40px] border-2 border-dashed border-gray-200 overflow-hidden min-h-[450px]">
+                {shuffledSupplies.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleItem(item.id)}
+                    style={{
+                      position: 'absolute',
+                      top: positions[idx].top,
+                      left: positions[idx].left,
+                      transform: `rotate(${positions[idx].rotate})`,
+                    }}
+                    className={`flex flex-col items-center p-3 rounded-[25px] border-4 transition-all hover:scale-110 active:scale-95 ${
+                      selectedItems.includes(item.id) 
+                        ? (item.essential ? 'border-pink-400 bg-pink-50 z-20 shadow-lg' : 'border-red-300 bg-red-50 z-20 shadow-lg') 
+                        : 'border-white bg-white/50 shadow-sm hover:border-pink-100 z-10'
+                    }`}
+                  >
+                    <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl overflow-hidden">
+                      {item.img.startsWith('/') ? (
+                        <Image src={item.img} alt={item.name} width={80} height={80} className="object-contain" />
+                      ) : (
+                        item.img
+                      )}
+                    </div>
+                    <span className={`font-title text-sm mt-1 ${selectedItems.includes(item.id) ? 'text-pink-600 font-bold' : 'text-gray-400'}`}>
+                      {item.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-col items-center mt-6">
+                <button
+                  disabled={!hasOnlyEssentials}
+                  onClick={() => setStep(1.5)}
+                  className={`px-16 py-4 rounded-full font-title text-2xl shadow-xl transition-all ${
+                    hasOnlyEssentials ? 'bg-pink-500 text-white hover:bg-pink-600 active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  준비 완료! 다음으로 →
+                </button>
+                {selectedDistractors.length > 0 && <p className="text-red-400 mt-2 font-body font-bold animate-bounce text-sm">앗! 필요 없는 물건이 섞여 있어요! 🙅‍♂️</p>}
+                {!hasOnlyEssentials && selectedDistractors.length === 0 && <p className="text-xs text-gray-400 mt-2 font-body">* 필수 도구 6가지를 모두 찾아주세요.</p>}
+              </div>
+            </div>
+          )}
+
+          {step === 1.5 && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-10">
+              <h4 className="font-title text-2xl text-brand-brown mb-12">어떤 방법으로 식물을 심을까요?</h4>
+              <div className="flex flex-col md:flex-row gap-8 justify-center">
+                <button 
+                  onClick={() => { setMethod("seed"); setStep(2); }}
+                  className="bg-amber-50 hover:bg-amber-100 p-10 rounded-[50px] border-4 border-amber-200 transition-all hover:scale-105 group"
+                >
+                  <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-sm">🌰</div>
+                  <span className="font-title text-3xl text-amber-700 block mb-2">씨앗 심기</span>
+                  <p className="text-amber-500 font-body">작은 씨앗을 흙 속에 쏙!</p>
+                </button>
+                <button 
+                  onClick={() => { setMethod("seedling"); setStep(2); }}
+                  className="bg-green-50 hover:bg-green-100 p-10 rounded-[50px] border-4 border-green-200 transition-all hover:scale-105 group"
+                >
+                  <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-sm">🌱</div>
+                  <span className="font-title text-3xl text-green-700 block mb-2">모종 심기</span>
+                  <p className="text-green-500 font-body">어린 식물을 화분으로!</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-8">
+                <h4 className="font-title text-2xl text-brand-brown mb-2">
+                  Step 2. {method === "seed" ? "씨앗" : "모종"} 심기 <span className="text-blue-500">이미지 코딩</span>
+                </h4>
+                <p className="text-gray-400 font-body">그림을 보고 순서대로 코드를 완성하세요!</p>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                {/* Available Blocks (Images) */}
+                <div className="flex-1 w-full">
+                  <div className="grid grid-cols-3 gap-3">
+                    {availableBlocks.map((block) => (
+                      <button
+                        key={block.id}
+                        disabled={codingBlocks.includes(block.id)}
+                        onClick={() => addBlock(block.id)}
+                        className={`p-3 rounded-2xl border-4 transition-all flex flex-col items-center gap-2 ${
+                          codingBlocks.includes(block.id)
+                            ? 'bg-gray-100 border-gray-200 grayscale opacity-30'
+                            : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105'
+                        }`}
+                      >
+                        <div className="w-16 h-16 flex items-center justify-center">
+                          <Image src={block.img} alt={block.name} width={64} height={64} className="object-contain" />
+                        </div>
+                        <span className="text-[10px] font-black text-blue-500">{block.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected Flow */}
+                <div className="flex-1 w-full bg-blue-50/50 p-6 md:p-8 rounded-[40px] border-2 border-dashed border-blue-200 min-h-[350px] flex flex-col items-center">
+                  <p className="font-title text-blue-400 mb-6 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">▷</span>
+                    코딩 실행창
+                  </p>
+                  <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                    {codingBlocks.map((blockId, index) => {
+                      const block = (method === "seed" ? seedSteps : seedlingSteps).find(s => s.id === blockId);
+                      return (
+                        <div key={index} className="bg-white p-3 rounded-xl border-l-8 border-blue-500 shadow-sm flex justify-between items-center animate-in slide-in-from-left-2">
+                          <div className="flex items-center gap-3">
+                            <span className="font-black text-blue-500 text-xs">{index + 1}</span>
+                            <Image src={block?.img || ""} width={32} height={32} alt="" className="object-contain" />
+                          </div>
+                          <button onClick={() => removeBlock(index)} className="text-gray-300 hover:text-red-500">✕</button>
+                        </div>
+                      );
+                    })}
+                    {codingBlocks.length === 0 && <p className="text-center text-blue-200 py-20 font-body italic">블록을 순서대로 쌓으세요.</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-center mt-10 gap-4">
+                <button onClick={() => { setStep(1.5); setCodingBlocks([]); }} className="px-8 py-3 rounded-full font-title text-lg bg-white border-2 border-gray-200 text-gray-400">뒤로가기</button>
+                <button
+                  disabled={codingBlocks.length < 5}
+                  onClick={checkOrder}
+                  className={`px-12 py-3 rounded-full font-title text-xl shadow-lg transition-all ${
+                    codingBlocks.length >= 5 ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-400'
+                  }`}
+                >
+                  프로그램 실행 ▶
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300 py-6">
+              <div className="text-center mb-10">
+                <h4 className="font-title text-2xl text-brand-brown mb-2">Step 3. 식물이 자라기 좋은 <span className="text-brand-green">환경</span> 만들기</h4>
+                <p className="text-gray-400 font-body">식물을 어디에 두면 좋을지 함께 고민해봐요!</p>
+              </div>
+
+              <div className="bg-brand-bg/20 rounded-[40px] p-8 max-w-[700px] mx-auto border-2 border-white shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 text-6xl opacity-10 rotate-12">
+                  {method === "seed" ? "☀️" : "🛋️"}
+                </div>
+                
+                {method === "seed" ? (
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-4xl">🌑</div>
+                      <h5 className="font-title text-2xl text-amber-700">씨앗은 빛이 필요할까요?</h5>
+                    </div>
+                    <div className="space-y-4 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                      <p>많은 씨앗들은 싹이 틀 때까지 <span className="font-bold text-amber-600">어둡고 따뜻한 곳</span>을 좋아해요. 이것을 <span className="font-bold text-amber-600">'암발아'</span>라고 불러요.</p>
+                      <p>하지만 상추나 당근처럼 싹이 틀 때 <span className="font-bold text-amber-600">빛이 필요한 '광발아'</span> 씨앗도 있답니다!</p>
+                      <p className="bg-white/60 p-4 rounded-2xl border border-amber-100 mt-6">
+                        💡 <span className="font-title text-amber-800">미션:</span> 내가 심은 식물의 이름을 검색해보고, 빛이 필요한지 어두운 곳이 필요한지 확인하여 알맞은 장소에 놓아주세요!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-4xl">🌿</div>
+                      <h5 className="font-title text-2xl text-green-700">모종은 어디에 두면 좋을까요?</h5>
+                    </div>
+                    <div className="space-y-4 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                      <p>식물마다 좋아하는 햇빛의 양이 달라요!</p>
+                      <ul className="space-y-2 list-disc list-inside ml-2">
+                        <li><span className="font-bold text-green-600">양지 식물</span> (토마토, 고추): 햇빛이 잘 드는 <span className="font-bold text-green-600">창가</span>를 좋아해요.</li>
+                        <li><span className="font-bold text-green-600">음지 식물</span> (스킨답서스, 고사리): 직접적인 햇빛보다는 <span className="font-bold text-green-600">실내 안쪽</span>을 좋아해요.</li>
+                      </ul>
+                      <p className="bg-white/60 p-4 rounded-2xl border border-green-100 mt-6">
+                        💡 <span className="font-title text-green-800">미션:</span> 우리 식물이 햇빛을 얼마나 좋아하는지 확인하고, 가장 기분 좋아할 장소를 찾아주세요!
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={() => setStep(4)}
+                  className="px-16 py-4 bg-brand-green text-white rounded-full font-title text-2xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95 flex items-center gap-3"
+                >
+                  준비 끝! 식물 키우러 가기 🚀
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="animate-in zoom-in duration-500 text-center py-12">
+              <div className="relative inline-block mb-8">
+                <div className="w-32 h-32 bg-pink-100 rounded-full flex items-center justify-center mx-auto relative z-10">
+                  <Image src="/images/stage-sprout.png" alt="success" width={80} height={80} className="animate-bounce" />
+                </div>
+                <div className="absolute -top-4 -right-4 text-4xl">🎉</div>
+                <div className="absolute -bottom-2 -left-4 text-3xl">🌸</div>
+              </div>
+              <h3 className="font-title text-4xl text-brand-brown mb-4">참 잘했어요!</h3>
+              <p className="font-body text-gray-600 text-xl mb-12">당신은 훌륭한 식집사가 될 준비가 되었군요!</p>
+              <button onClick={onClose} className="px-16 py-4 bg-brand-green text-white rounded-full font-title text-2xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95">완료!</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
