@@ -115,10 +115,10 @@ export default function ReportModal({
   };
 
   return (
-    <div id="print-modal-container" className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-start p-4 md:p-10 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:overflow-visible" onClick={onClose}>
+    <div id="print-modal-container" className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-start p-2 md:p-10 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:overflow-visible" onClick={onClose}>
       <div 
         ref={scrollRef} 
-        className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0" 
+        className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[30px] md:rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[4px] md:border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0" 
         onClick={e => e.stopPropagation()}
       >
         
@@ -129,13 +129,13 @@ export default function ReportModal({
           
           <div className="relative p-4 md:px-8 flex justify-between items-start z-10 print:p-0 print:pb-4">
             <div className="text-white text-left flex flex-col w-full print:text-black">
-              <div className="inline-flex items-center gap-2 bg-white/25 px-4 py-1.5 rounded-full text-sm font-title mb-2 backdrop-blur-md border border-white/30 tracking-wide shadow-sm print:bg-white print:border-none print:shadow-none print:mb-1 print:mr-0 print:ml-auto print:text-xs print:font-bold">
+              <div className="inline-flex items-center gap-2 bg-white/25 px-4 py-1.5 rounded-full text-xs md:text-sm font-title mb-2 backdrop-blur-md border border-white/30 tracking-wide shadow-sm print:bg-white print:border-none print:shadow-none print:mb-1 print:mr-0 print:ml-auto print:text-xs print:font-bold">
                 <span className="print:hidden">🍊</span> {className}
               </div>
-              <h3 className="font-title text-3xl drop-shadow-md flex items-center gap-3 print:drop-shadow-none print:text-3xl">
+              <h3 className="font-title text-xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-3xl">
                 <span className="print:text-4xl">{studentName}</span>
-                <span className="text-white text-2xl font-black drop-shadow-sm mt-0.5 print:text-gray-800 print:text-xl">꼬마 식집사의 관찰 보고서</span>
-                <img src="/images/report-icon.png" className="w-12 h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10" alt="report" />
+                <span className="text-white text-lg md:text-2xl font-black drop-shadow-sm print:text-gray-800 print:text-xl">꼬마 식집사의 관찰 보고서</span>
+                <img src="/images/report-icon.png" className="w-8 h-8 md:w-12 md:h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10" alt="report" />
               </h3>
             </div>
             

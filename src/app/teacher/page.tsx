@@ -264,21 +264,21 @@ export default function TeacherDashboard() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-end mb-8 border-b-4 border-brand-green pb-3">
-        <div className="flex items-center gap-4">
-          <Image src="/images/teacher-icon.png" alt="선생님 아이콘" width={70} height={70} className="object-contain drop-shadow-md" />
-          <h1 className="font-title text-4xl text-brand-brown drop-shadow-sm pt-2">
-            {className} 정원 통합 관리실
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-6 md:mb-8 border-b-4 border-brand-green pb-4 md:pb-3 gap-4">
+        <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-center md:justify-start">
+          <Image src="/images/teacher-icon.png" alt="선생님 아이콘" width={50} height={50} className="md:w-[70px] md:h-[70px] object-contain drop-shadow-md" />
+          <h1 className="font-title text-2xl md:text-4xl text-brand-brown drop-shadow-sm pt-2">
+            {className} 관리실
           </h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 w-full md:w-auto">
           <button 
             onClick={() => setIsGardenOpen(true)}
-            className="bg-brand-green text-white px-5 py-2 rounded-full text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm"
+            className="flex-1 md:flex-none bg-brand-green text-white px-4 md:px-5 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm"
           >
             우리 반 정원
           </button>
-          <button onClick={handleLogout} className="bg-[#f5a623] text-white px-5 py-2 rounded-full text-lg font-title hover:bg-[#e0961f] transition-all shadow-sm active:scale-95">
+          <button onClick={handleLogout} className="flex-1 md:flex-none bg-[#f5a623] text-white px-4 md:px-5 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#e0961f] transition-all shadow-sm active:scale-95">
             로그아웃
           </button>
         </div>

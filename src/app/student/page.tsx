@@ -214,26 +214,26 @@ export default function StudentDashboard() {
       <div className="relative z-10 p-6 max-w-[1200px] mx-auto animate-in fade-in duration-700">
         
         {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-center mb-10 bg-white/60 backdrop-blur-md p-6 rounded-[30px] shadow-sm border border-white/50">
-          <div className="flex items-center gap-6 mb-4 md:mb-0">
-            <div className="bg-white p-3 rounded-3xl shadow-md border-2 border-brand-green/20 relative group">
+        <header className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 bg-white/60 backdrop-blur-md p-4 md:p-6 rounded-[25px] md:rounded-[30px] shadow-sm border border-white/50">
+          <div className="flex items-center gap-4 md:gap-6 mb-4 md:mb-0 w-full md:w-auto">
+            <div className="bg-white p-2 md:p-3 rounded-2xl md:rounded-3xl shadow-md border-2 border-brand-green/20 relative group shrink-0">
               <Image 
                 src={studentGender === 'girl' ? "/images/girl.png" : "/images/boy.png"} 
-                alt="student" width={90} height={90} className="object-contain animate-float" 
+                alt="student" width={70} height={70} className="object-contain animate-float md:w-[90px] md:h-[90px]" 
               />
             </div>
-            <div className="flex flex-col items-start text-left ml-2">
-              <h1 className="font-title text-4xl text-brand-brown mb-0 leading-tight">{studentName} 식집사의 정원</h1>
-              <p className="font-body text-gray-500 whitespace-nowrap text-left w-full">
-                {className || "우리 반"}의 자랑스러운 식물 관리사
+            <div className="flex flex-col items-start text-left ml-1">
+              <h1 className="font-title text-2xl md:text-4xl text-brand-brown mb-0 leading-tight">{studentName} 식집사</h1>
+              <p className="font-body text-gray-500 text-sm md:text-base whitespace-nowrap text-left w-full">
+                {className || "우리 반"}의 식물 관리사 🌱
               </p>
             </div>
           </div>
-          <div className="flex gap-4">
-             <button onClick={() => setIsGardenOpen(true)} className="bg-brand-green text-white px-6 py-2 rounded-full text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm">
+          <div className="flex gap-2 md:gap-4 w-full md:w-auto">
+             <button onClick={() => setIsGardenOpen(true)} className="flex-1 md:flex-none bg-brand-green text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm">
                 우리 반 정원
              </button>
-             <button onClick={handleLogout} className="bg-orange-500 text-white px-6 py-2 rounded-full text-lg font-title hover:bg-orange-600 transition-all active:scale-95 shadow-sm">
+             <button onClick={handleLogout} className="flex-1 md:flex-none bg-orange-500 text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-title hover:bg-orange-600 transition-all active:scale-95 shadow-sm">
                 로그아웃
              </button>
           </div>
@@ -369,12 +369,12 @@ export default function StudentDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
                 onClick={() => setIsLogOpen(true)}
-                className="bg-[#fdf3e7] p-6 rounded-[40px] shadow-sm border border-[#f5e1c8] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+                className="bg-[#fdf3e7] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#f5e1c8] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
-                  <Image src="/images/log-icon.png" alt="log" width={64} height={64} className="drop-shadow-sm" />
+                  <Image src="/images/log-icon.png" alt="log" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-lg text-[#5a4a42]">새 관찰일지</span>
+                <span className="font-title text-base md:text-lg text-[#5a4a42]">새 관찰일지</span>
               </div>
               <div 
                 onClick={() => setIsReportOpen(true)}
@@ -428,13 +428,13 @@ export default function StudentDashboard() {
                         ✕
                       </button>
 
-                      <div className="flex gap-6">
+                      <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                         {/* Left: Image */}
-                        <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-[25px] overflow-hidden border-2 border-gray-50 bg-brand-bg flex items-center justify-center p-1">
+                        <div className="w-full md:w-40 h-48 md:h-40 shrink-0 rounded-[20px] md:rounded-[25px] overflow-hidden border-2 border-gray-50 bg-brand-bg flex items-center justify-center p-1">
                           <img 
                             src={record.image_url || getPlantImage(plants.find(p => p.id === record.plant_id)?.plant_type || "")} 
                             alt="observation" 
-                            className="w-full h-full object-cover rounded-[20px]" 
+                            className="w-full h-full object-cover rounded-[15px] md:rounded-[20px]" 
                           />
                         </div>
 
