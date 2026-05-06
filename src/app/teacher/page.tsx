@@ -147,8 +147,8 @@ export default function TeacherDashboard() {
       .eq("id", plantId);
 
     if (error) {
-      alert("피드백 저장 중 오류가 발생했습니다.");
-      console.error(error);
+      console.error("Feedback Save Error:", error);
+      alert(`피드백 저장 중 오류가 발생했습니다: ${error.message}`);
     } else {
       // Refresh local state
       if (selectedPlant && selectedPlant.id === plantId) {
