@@ -377,7 +377,10 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#5a4a42]">새 관찰일지</span>
               </div>
               <div 
-                onClick={() => setIsReportOpen(true)}
+                onClick={async () => {
+                  if (studentId) await fetchData(studentId);
+                  setIsReportOpen(true);
+                }}
                 className="bg-[#e7f3fd] p-6 rounded-[40px] shadow-sm border border-[#c8e1f5] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
