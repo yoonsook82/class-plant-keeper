@@ -404,7 +404,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/plant.png" alt="plant" width={64} height={64} className="drop-shadow-sm" />
                 </div>
-                <span className="font-title text-lg text-pink-700">식물 가꾸기</span>
+                <span className="font-title text-lg text-pink-700">식물 마스터</span>
               </div>
             </div>
 
@@ -913,12 +913,12 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
     { top: '15%', left: '25%', rotate: '10deg' },
     { top: '5%', left: '50%', rotate: '-5deg' },
     { top: '20%', left: '75%', rotate: '20deg' },
-    { top: '45%', left: '10%', rotate: '15deg' },
-    { top: '55%', left: '35%', rotate: '-10deg' },
-    { top: '40%', left: '60%', rotate: '5deg' },
-    { top: '50%', left: '85%', rotate: '-20deg' },
-    { top: '75%', left: '20%', rotate: '12deg' },
-    { top: '80%', left: '70%', rotate: '-8deg' },
+    { top: '40%', left: '10%', rotate: '15deg' },
+    { top: '50%', left: '35%', rotate: '-10deg' },
+    { top: '35%', left: '60%', rotate: '5deg' },
+    { top: '45%', left: '85%', rotate: '-20deg' },
+    { top: '65%', left: '20%', rotate: '12deg' },
+    { top: '60%', left: '70%', rotate: '-8deg' },
   ];
 
   const [shuffledSupplies, setShuffledSupplies] = useState<any[]>([]);
@@ -928,19 +928,21 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   }, []);
 
   const seedSteps = [
-    { id: "s1", name: "흙 채우기", img: "/images/soil.png" },
-    { id: "s2", name: "구멍 만들기", img: "/images/plantpot1.png" }, 
-    { id: "s3", name: "씨앗 넣기", img: "/images/seed.png" },
-    { id: "s4", name: "흙 덮어주기", img: "/images/trowel1.png" },
-    { id: "s5", name: "물 주기", img: "/images/watering_can.png" }
+    { id: "s1", name: "화분에 흙 채우기", img: "/images/seed1.png" },
+    { id: "s2", name: "씨앗 넣기", img: "/images/seed2.png" },
+    { id: "s3", name: "흙 덮어주기", img: "/images/seed3.png" },
+    { id: "s4", name: "물 주기", img: "/images/seed4.png" },
+    { id: "s5", name: "암발아 씨앗이면 신문지 덮기", img: "/images/seed5.png" },
+    { id: "s6", name: "햇빛 보여주기 (광발아/새싹)", img: "/images/seed6.png" }
   ];
 
   const seedlingSteps = [
-    { id: "m1", name: "흙 조금 채우기", img: "/images/soil.png" },
-    { id: "m2", name: "모종 옮기기", img: "/images/sprout.png" },
-    { id: "m3", name: "남은 흙 채우기", img: "/images/trowel1.png" },
-    { id: "m4", name: "다져주기", img: "/images/plant.png" }, 
-    { id: "m5", name: "물 주기", img: "/images/watering_can.png" }
+    { id: "m1", name: "화분에 흙 채우기", img: "/images/grow1.png" },
+    { id: "m2", name: "흙에 구멍파기", img: "/images/grow2.png" },
+    { id: "m3", name: "모종 심기", img: "/images/grow3.png" },
+    { id: "m4", name: "흙덮고 다지기", img: "/images/grow4.png" },
+    { id: "m5", name: "물 주기", img: "/images/grow5.png" },
+    { id: "m6", name: "햇빛 보여주기", img: "/images/grow6.png" }
   ];
 
   const getBlocks = () => {
@@ -973,8 +975,24 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   };
 
   const checkOrder = () => {
-    const correct = method === "seed" ? ["s1", "s2", "s3", "s4", "s5"] : ["m1", "m2", "m3", "m4", "m5"];
-    if (JSON.stringify(codingBlocks) === JSON.stringify(correct)) {
+    let isCorrect = false;
+    
+    if (method === "seed") {
+      const darkGermination = ["s1", "s2", "s3", "s4", "s5", "s6"];
+      const lightGermination = ["s1", "s2", "s3", "s4", "s6"];
+      const current = JSON.stringify(codingBlocks);
+      
+      if (current === JSON.stringify(darkGermination) || current === JSON.stringify(lightGermination)) {
+        isCorrect = true;
+      }
+    } else {
+      const correct = ["m1", "m2", "m3", "m4", "m5", "m6"];
+      if (JSON.stringify(codingBlocks) === JSON.stringify(correct)) {
+        isCorrect = true;
+      }
+    }
+
+    if (isCorrect) {
       setStep(3); // Go to Environment knowledge
     } else {
       alert("순서가 조금 틀린 것 같아요! 이미지를 다시 한 번 살펴볼까요? 🤔");
@@ -1100,16 +1118,16 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         key={block.id}
                         disabled={codingBlocks.includes(block.id)}
                         onClick={() => addBlock(block.id)}
-                        className={`p-3 rounded-2xl border-4 transition-all flex flex-col items-center gap-2 ${
+                        className={`p-3 md:p-4 rounded-3xl border-4 transition-all flex flex-col items-center gap-2 md:gap-3 ${
                           codingBlocks.includes(block.id)
                             ? 'bg-gray-100 border-gray-200 grayscale opacity-30'
-                            : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105'
+                            : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105 shadow-sm'
                         }`}
                       >
-                        <div className="w-16 h-16 flex items-center justify-center">
-                          <Image src={block.img} alt={block.name} width={64} height={64} className="object-contain" />
+                        <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                          <Image src={block.img} alt={block.name} width={80} height={80} className="object-contain w-12 h-12 md:w-16 md:h-16" />
                         </div>
-                        <span className="text-[10px] font-black text-blue-500">{block.name}</span>
+                        <span className="text-xs md:text-sm font-body font-bold text-gray-700 break-keep leading-tight text-center">{block.name}</span>
                       </button>
                     ))}
                   </div>
@@ -1121,20 +1139,48 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                     <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">▷</span>
                     코딩 실행창
                   </p>
-                  <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                  <div className="relative w-full flex-1 min-h-[350px] flex items-center justify-center mt-4">
                     {codingBlocks.map((blockId, index) => {
                       const block = (method === "seed" ? seedSteps : seedlingSteps).find(s => s.id === blockId);
+                      const maxItems = 6;
+                      const angle = (index * (360 / maxItems)) - 90;
+                      const radius = 120; // Distance from center
+                      const x = Math.cos(angle * Math.PI / 180) * radius;
+                      const y = Math.sin(angle * Math.PI / 180) * radius;
+
                       return (
-                        <div key={index} className="bg-white p-3 rounded-xl border-l-8 border-blue-500 shadow-sm flex justify-between items-center animate-in slide-in-from-left-2">
-                          <div className="flex items-center gap-3">
-                            <span className="font-black text-blue-500 text-xs">{index + 1}</span>
-                            <Image src={block?.img || ""} width={32} height={32} alt="" className="object-contain" />
+                        <div 
+                          key={index} 
+                          className="absolute bg-white p-2 md:p-3 rounded-full border-4 border-blue-500 shadow-lg flex items-center justify-center group animate-in zoom-in-50 duration-300"
+                          style={{ 
+                            left: '50%', 
+                            top: '50%',
+                            transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                          }}
+                        >
+                          <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-title text-lg shadow-md z-10">
+                            {index + 1}
                           </div>
-                          <button onClick={() => removeBlock(index)} className="text-gray-300 hover:text-red-500">✕</button>
+                          <button 
+                            onClick={() => removeBlock(index)} 
+                            className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                            title="제거"
+                          >
+                            ✕
+                          </button>
+                          <div className="w-14 h-14 md:w-20 md:h-20 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
+                            <Image src={block?.img || ""} width={64} height={64} alt="" className="object-contain w-10 h-10 md:w-16 md:h-16" />
+                          </div>
                         </div>
                       );
                     })}
-                    {codingBlocks.length === 0 && <p className="text-center text-blue-200 py-20 font-body italic">블록을 순서대로 쌓으세요.</p>}
+                    {codingBlocks.length === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <p className="text-center text-blue-400 text-base md:text-lg font-body font-bold bg-white/60 px-6 py-3 rounded-full backdrop-blur-sm border border-blue-100 shadow-sm">
+                          왼쪽에서 블록을 골라주세요!
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

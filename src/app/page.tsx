@@ -14,11 +14,13 @@ export default function LoginPage() {
   const [classCode, setClassCode] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     if (!className || !studentName || !classCode) {
-      alert("학급 이름, 학생 이름, 학급 코드를 모두 입력해주세요.");
+      setErrorMsg("학급 이름, 학생 이름, 학급 코드를 모두 입력해주세요.");
       return;
     }
     setLoading(true);
@@ -31,13 +33,13 @@ export default function LoginPage() {
         .maybeSingle();
 
       if (classError) {
-        alert("학급 조회 중 오류가 발생했습니다: " + classError.message);
+        setErrorMsg("학급 조회 중 오류가 발생했습니다: " + classError.message);
         setLoading(false);
         return;
       }
 
       if (!classData) {
-        alert("일치하는 학급이 없습니다.");
+        setErrorMsg("일치하는 학급이 없습니다.");
         setLoading(false);
         return;
       }
@@ -50,23 +52,15 @@ export default function LoginPage() {
         .maybeSingle();
 
       if (studentError) {
-        alert("학생 조회 중 오류가 발생했습니다: " + studentError.message);
+        setErrorMsg("학생 조회 중 오류가 발생했습니다: " + studentError.message);
         setLoading(false);
         return;
       }
 
       if (!studentData) {
-        const { data: newStudent, error: insertError } = await supabase
-          .from("students")
-          .insert({ class_id: classData.id, student_name: studentName })
-          .select().single();
-          
-        if (insertError) {
-          alert("새 학생 등록 중 오류가 발생했습니다: " + insertError.message);
-          setLoading(false);
-          return;
-        }
-        studentData = newStudent;
+        setErrorMsg("등록되지 않은 학생입니다. 선생님이 대시보드에 등록한 정확한 이름을 입력해주세요.");
+        setLoading(false);
+        return;
       }
 
       localStorage.setItem("userRole", "student");
@@ -81,22 +75,23 @@ export default function LoginPage() {
       router.push("/student");
     } catch (e: any) { 
       console.error(e);
-      alert("로그인 처리 중 오류가 발생했습니다."); 
+      setErrorMsg("로그인 처리 중 오류가 발생했습니다."); 
     }
     setLoading(false);
   };
 
   const handleTeacherLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     if (!className || !password || !classCode) {
-      alert("모든 정보를 입력해주세요.");
+      setErrorMsg("모든 정보를 입력해주세요.");
       return;
     }
 
     // 비밀번호 유효성 검사 (영문+숫자 6자리)
     const pwRegex = /^[a-zA-Z0-9]{6}$/;
     if (!pwRegex.test(password)) {
-      alert("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
+      setErrorMsg("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
       return;
     }
 
@@ -112,13 +107,13 @@ export default function LoginPage() {
 
       if (error) {
         console.error("Supabase Error:", error);
-        alert("로그인 중 문제가 발생했습니다: " + error.message);
+        setErrorMsg("로그인 중 문제가 발생했습니다: " + error.message);
         setLoading(false);
         return;
       }
 
       if (!data) {
-        alert("학급 이름, 비밀번호 또는 코드가 일치하지 않습니다.");
+        setErrorMsg("학급 이름, 비밀번호 또는 코드가 일치하지 않습니다.");
         setLoading(false);
         return;
       }
@@ -129,21 +124,22 @@ export default function LoginPage() {
       router.push("/teacher");
     } catch (e: any) { 
       console.error("System Error:", e);
-      alert("시스템 오류가 발생했습니다."); 
+      setErrorMsg("시스템 오류가 발생했습니다."); 
     }
     setLoading(false);
   };
 
   const handleCreateClass = async () => {
+    setErrorMsg("");
     if (!className || !password || !classCode) {
-      alert("모든 정보를 입력해주세요.");
+      setErrorMsg("모든 정보를 입력해주세요.");
       return;
     }
 
     // 비밀번호 유효성 검사
     const pwRegex = /^[a-zA-Z0-9]{6}$/;
     if (!pwRegex.test(password)) {
-      alert("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
+      setErrorMsg("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
       return;
     }
 
@@ -156,7 +152,7 @@ export default function LoginPage() {
         
       if (error) { 
         console.error("Create Class Error:", error);
-        alert("학급 개설 중 오류가 발생했습니다: " + error.message); 
+        setErrorMsg("학급 개설 중 오류가 발생했습니다: " + error.message); 
         setLoading(false); 
         return; 
       }
@@ -167,7 +163,7 @@ export default function LoginPage() {
       router.push("/teacher");
     } catch (e: any) { 
       console.error(e);
-      alert("시스템 오류가 발생했습니다."); 
+      setErrorMsg("시스템 오류가 발생했습니다."); 
     }
     setLoading(false);
   };
@@ -247,8 +243,14 @@ export default function LoginPage() {
                     ) : (
                       <InputGroup label="비밀번호" value={password} onChange={setPassword} placeholder="영문+숫자 6자리" type="password" disabled={loading} maxLength={6} />
                     )}
-                    <InputGroup label="학급 코드" value={classCode} onChange={setClassCode} placeholder="숫자 6자리" type={loginMode === 'student' ? 'password' : 'text'} disabled={loading} maxLength={6} />
+                    <InputGroup label="학급 코드" value={classCode} onChange={setClassCode} placeholder="숫자 6자리" type="text" disabled={loading} maxLength={6} />
                   </div>
+
+                  {errorMsg && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                      ⚠️ {errorMsg}
+                    </div>
+                  )}
 
                   <div className="flex gap-2 mt-2">
                     {loginMode === 'teacher' && (

@@ -61,9 +61,17 @@ export default function ReportModal({
   onSaveFeedback,
   onDeleteRecord
 }: ReportModalProps) {
+  let initialFeedback = plant.teacher_feedback || "";
+  let initialStamp = plant.teacher_stamp || null;
+  if (initialFeedback.includes("||STAMP:")) {
+    const parts = initialFeedback.split("||STAMP:");
+    initialFeedback = parts[0];
+    initialStamp = parts[1] || null;
+  }
+
   const [reflection, setReflection] = useState(plant.reflection || "");
-  const [feedback, setFeedback] = useState(plant.teacher_feedback || "");
-  const [stamp, setStamp] = useState<string | null>(plant.teacher_stamp || null);
+  const [stamp, setStamp] = useState<string | null>(initialStamp);
+  const [feedback, setFeedback] = useState(initialFeedback);
   const [isListening, setIsListening] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -97,6 +105,10 @@ export default function ReportModal({
       height: Number(r.height_cm) || 0
     }));
 
+  // Calculate dynamic print height based on plant growth
+  const maxVal = graphData.length > 0 ? Math.max(...graphData.map(d => d.height)) : 0;
+  const dynamicPrintHeight = Math.min(650, Math.max(400, 250 + maxVal * 12));
+
   // Timeline Data
   const timelineData = [...records]
     .filter(r => r.image_url)
@@ -109,9 +121,14 @@ export default function ReportModal({
   const handleSaveTeacherFeedback = async () => {
     if (!onSaveFeedback) return;
     setIsSubmitting(true);
-    await onSaveFeedback(plant.id, feedback, stamp);
-    setIsSubmitting(false);
-    alert("선생님의 피드백이 저장되었습니다! 📝");
+    try {
+      await onSaveFeedback(plant.id, feedback, stamp);
+      alert("선생님의 피드백이 저장되었습니다! 📝");
+    } catch (e) {
+      // Error is already alerted in the parent component
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -122,6 +139,19 @@ export default function ReportModal({
         onClick={e => e.stopPropagation()}
       >
         
+        {/* Print Header Override */}
+        <div className="hidden print:flex justify-between items-center w-full mb-4 px-2 text-[10px] text-gray-500 font-bold border-b border-gray-100 pb-2">
+          <span>우리 반 식집사</span>
+          <span>{new Date().toLocaleString('ko-KR', { 
+            year: 'numeric', 
+            month: 'numeric', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: 'numeric', 
+            hour12: true 
+          })}</span>
+        </div>
+
         {/* Header */}
         <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-400 opacity-90 print:hidden"></div>
@@ -246,10 +276,10 @@ export default function ReportModal({
                   </h4>
                   <p className="text-sm font-bold text-gray-500 print:text-[10px]">단위: cm / 날짜별 키의 변화</p>
                 </div>
-                <div className="w-full h-[500px] print:h-[400px] print:-ml-4 print:w-[105%]">
+                <div className="w-full h-[500px] print:w-[98%] print:mx-auto overflow-hidden" style={{ height: typeof window !== 'undefined' && window.matchMedia?.('print').matches ? `${dynamicPrintHeight}px` : undefined }}>
                   {graphData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={graphData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                      <LineChart data={graphData} margin={{ top: 20, right: 50, left: 10, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis 
                           dataKey="date" 
@@ -431,7 +461,7 @@ export default function ReportModal({
                       {feedback || "아직 작성된 내용이 없습니다."}
                     </div>
                     {stamp && (
-                      <div className="absolute right-4 bottom-4 w-24 h-24 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-14 print:h-14 print:static print:ml-auto print:mt-0.5">
+                      <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 w-24 h-24 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-14 print:h-14 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5">
                         <img src={`/images/${stamp}`} alt="preview" className="w-full h-full object-contain drop-shadow-xl" />
                       </div>
                     )}
@@ -481,14 +511,14 @@ export default function ReportModal({
                   </div>
                 </div>
               ) : (
-                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base relative overflow-hidden z-10 print:p-1 print:text-[10px] print:min-h-0 print:border-none">
-                  {plant.teacher_feedback ? (
+                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base relative z-10 print:p-1 print:text-[10px] print:min-h-0 print:border-none">
+                  {initialFeedback ? (
                     <>
-                      <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{plant.teacher_feedback}"</p>
-                      {plant.teacher_stamp && (
-                        <div className="absolute right-4 bottom-4 w-32 h-32 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-16 print:h-16 print:static print:ml-auto print:mt-0.5 print:rotate-0">
+                      <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{initialFeedback}"</p>
+                      {initialStamp && (
+                        <div className="absolute right-0 bottom-0 translate-x-4 translate-y-6 w-32 h-32 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-16 print:h-16 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5 print:rotate-0">
                           <img 
-                            src={`/images/${plant.teacher_stamp}`} 
+                            src={`/images/${initialStamp}`} 
                             alt="stamp" 
                             className="w-full h-full object-contain drop-shadow-2xl"
                           />
@@ -505,19 +535,22 @@ export default function ReportModal({
 
         </div>
         
-        {/* Footer button for mobile accessibility */}
-        <div className="p-8 border-t border-gray-100 flex justify-center md:hidden print:hidden">
-          <button onClick={onClose} className="bg-orange-500 text-white w-full py-4 rounded-2xl font-title text-xl">보고서 닫기</button>
-        </div>
+
       </div>
       
       {/* Print styles */}
       <style jsx global>{`
         @media print {
           @page {
-            margin: 1.5cm;
+            margin: 0;
             size: A4;
           }
+
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
 
           /* Hide everything by default using visibility */
           body * {
@@ -540,7 +573,7 @@ export default function ReportModal({
             display: block !important;
             overflow: visible !important;
             z-index: 99999 !important;
-            padding: 0 !important;
+            padding: 1.5cm !important;
             margin: 0 !important;
           }
 
@@ -573,8 +606,7 @@ export default function ReportModal({
 
           .recharts-responsive-container {
             width: 100% !important;
-            height: 500px !important;
-            min-height: 500px !important;
+            height: 100% !important;
           }
 
           img {

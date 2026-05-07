@@ -138,22 +138,28 @@ export default function TeacherDashboard() {
   };
 
   const handleSaveFeedback = async (plantId: string, feedback: string, stamp: string | null) => {
+    const combinedFeedback = stamp ? `${feedback}||STAMP:${stamp}` : feedback;
     const { error } = await supabase
       .from("plants")
       .update({ 
-        teacher_feedback: feedback,
-        teacher_stamp: stamp
+        teacher_feedback: combinedFeedback
       })
       .eq("id", plantId);
 
     if (error) {
       console.error("Feedback Save Error:", error);
       alert(`피드백 저장 중 오류가 발생했습니다: ${error.message}`);
+      throw error;
     } else {
       // Refresh local state
       if (selectedPlant && selectedPlant.id === plantId) {
-        setSelectedPlant({ ...selectedPlant, teacher_feedback: feedback, teacher_stamp: stamp || undefined });
+        setSelectedPlant({ ...selectedPlant, teacher_feedback: combinedFeedback });
       }
+      
+      // Update studentPlants list so reopening works
+      setStudentPlants(prev => prev.map(p => 
+        p.id === plantId ? { ...p, teacher_feedback: combinedFeedback } : p
+      ));
     }
   };
 

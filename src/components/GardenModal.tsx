@@ -110,34 +110,70 @@ export default function GardenModal({ onClose, className: userClassName, classId
     setLoading(false);
   };
 
+  const loadInteractions = async (recordId: string) => {
+    try {
+      const { data } = await supabase
+        .from("interactions")
+        .select("*")
+        .eq("record_id", recordId)
+        .order("created_at", { ascending: true });
+      if (data) setInteractions(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleOpenDetail = (data: GardenCardData) => {
     setSelectedRecord(data);
-    setInteractions([
-      { id: '1', name: '선생님', text: '정말 잘 자랐구나! 👍', emoji: '🙌' },
-      { id: '2', name: '친구1', text: '꽃이 너무 예뻐!', emoji: '🌸' },
-    ]);
+    setInteractions([]); // Clear temporary interactions
+    loadInteractions(data.latest_record.id);
   };
 
-  const handleAddComment = () => {
-    if (!comment.trim()) return;
+  const handleAddComment = async () => {
+    if (!comment.trim() || !selectedRecord) return;
+    const authorName = mode === "teacher" ? "선생님" : (localStorage.getItem("studentName") || "친구");
+    
     const newInt = {
-      id: Date.now().toString(),
-      name: mode === "teacher" ? "선생님" : "나",
+      record_id: selectedRecord.latest_record.id,
+      author_name: authorName,
       text: comment,
-      emoji: "📝"
+      emoji: "💬"
     };
-    setInteractions([...interactions, newInt]);
+
+    // Optimistic UI Update
+    const optimisticInt = { ...newInt, id: Date.now().toString() };
+    setInteractions(prev => [...prev, optimisticInt]);
     setComment("");
+
+    try {
+      await supabase.from("interactions").insert(newInt);
+      loadInteractions(selectedRecord.latest_record.id);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleAddEmoji = (emoji: string) => {
+  const handleAddEmoji = async (emoji: string) => {
+    if (!selectedRecord) return;
+    const authorName = mode === "teacher" ? "선생님" : (localStorage.getItem("studentName") || "친구");
+    
     const newInt = {
-      id: Date.now().toString(),
-      name: mode === "teacher" ? "선생님" : "나",
-      text: "",
+      record_id: selectedRecord.latest_record.id,
+      author_name: authorName,
+      text: null,
       emoji: emoji
     };
-    setInteractions([...interactions, newInt]);
+
+    // Optimistic UI Update
+    const optimisticInt = { ...newInt, id: Date.now().toString() };
+    setInteractions(prev => [...prev, optimisticInt]);
+
+    try {
+      await supabase.from("interactions").insert(newInt);
+      loadInteractions(selectedRecord.latest_record.id);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -234,7 +270,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
         {/* Detailed Popup - Matching GardenPage */}
         {selectedRecord && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-            <div className="bg-[#fdfcf5] w-full max-w-[1200px] max-h-[95vh] rounded-[50px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="bg-[#fdfcf5] w-full max-w-[1000px] max-h-[95vh] rounded-[50px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
               <header className="px-8 py-4 bg-white border-b border-gray-100 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">
                   <button onClick={() => setSelectedRecord(null)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-brand-green transition-all text-2xl">←</button>
@@ -246,16 +282,16 @@ export default function GardenModal({ onClose, className: userClassName, classId
                 <button onClick={() => setSelectedRecord(null)} className="font-title text-lg text-gray-400 hover:text-red-500 transition-colors">닫기</button>
               </header>
 
-              <div className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col lg:flex-row gap-8">
-                <div className="flex-1 flex flex-col gap-6">
-                  <div className="h-60 md:h-72 w-full bg-brand-bg rounded-[35px] overflow-hidden border-4 border-white shadow-md shrink-0">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+                <div className="flex-1 flex flex-col gap-4">
+                  <div className="h-48 md:h-[300px] w-full bg-brand-bg/50 rounded-[35px] overflow-hidden border-4 border-white shadow-sm shrink-0">
                     <img 
                       src={selectedRecord.latest_record.image_url || "/images/leaf.png"} 
                       alt="plant" 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain backdrop-blur-sm"
                     />
                   </div>
-                  <div className="bg-white p-6 rounded-[35px] shadow-sm border border-gray-100 flex-1 flex flex-col">
+                  <div className="bg-white p-5 rounded-[35px] shadow-sm border border-gray-100 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h4 className="font-title text-2xl text-brand-brown mb-0.5">{selectedRecord.plant_nickname}</h4>
@@ -284,8 +320,8 @@ export default function GardenModal({ onClose, className: userClassName, classId
                         <p className="text-base font-title text-orange-600">{selectedRecord.latest_record.fruit_count || 0}</p>
                       </div>
                     </div>
-                    <div className="bg-gray-50/50 p-6 rounded-[30px] border border-gray-100 flex-1 flex items-center justify-center">
-                      <p className="font-body text-gray-600 leading-relaxed italic text-base text-center">
+                    <div className="bg-gray-50/50 p-4 rounded-[30px] border border-gray-100 flex-1 flex items-center justify-center">
+                      <p className="font-body text-gray-600 leading-relaxed italic text-sm text-center">
                         "{selectedRecord.latest_record.observation_text}"
                       </p>
                     </div>
@@ -293,7 +329,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
                 </div>
 
                 <div className="w-full lg:w-[320px] flex flex-col gap-4 shrink-0">
-                  <div className="bg-white p-6 rounded-[35px] shadow-lg border border-gray-100 flex-1 flex flex-col min-h-[350px]">
+                  <div className="bg-white p-5 rounded-[35px] shadow-lg border border-gray-100 flex-1 flex flex-col min-h-[350px]">
                     <h5 className="font-title text-lg text-brand-brown mb-4 flex items-center gap-2">
                       💬 응원 <span className="bg-brand-green text-white text-[10px] px-2 py-0.5 rounded-full">{interactions.length}</span>
                     </h5>
@@ -302,10 +338,10 @@ export default function GardenModal({ onClose, className: userClassName, classId
                       {interactions.map((int) => (
                         <div key={int.id} className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100 animate-in slide-in-from-right-4">
                           <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-bold text-brand-green">{int.name}</span>
+                            <span className="text-[10px] font-bold text-brand-green">{int.author_name}</span>
                             <span className="text-lg">{int.emoji}</span>
                           </div>
-                          <p className="text-xs text-gray-600 font-body">{int.text}</p>
+                          {int.text && <p className="text-xs text-gray-600 font-body">{int.text}</p>}
                         </div>
                       ))}
                     </div>
