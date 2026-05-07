@@ -135,11 +135,11 @@ export default function ReportModal({
     <div id="print-modal-container" className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-start p-2 md:p-10 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:overflow-visible" onClick={onClose}>
       <div 
         ref={scrollRef} 
-        className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[30px] md:rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[4px] md:border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0" 
+        className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[30px] md:rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[4px] md:border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0 print:overflow-visible" 
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500">
+        <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500 print:overflow-visible">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-400 opacity-90 print:hidden"></div>
           <div className="absolute inset-0 opacity-40 print:hidden" style={{ backgroundImage: "radial-gradient(circle at 4px 4px, white 2.5px, transparent 0)", backgroundSize: "36px 36px" }}></div>
           
@@ -150,7 +150,7 @@ export default function ReportModal({
               </div>
               <h3 className="font-title text-xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-3xl">
                 <span className="print:text-4xl">{studentName}</span>
-                <span className="text-white text-lg md:text-2xl font-black drop-shadow-sm print:text-gray-800 print:text-xl">꼬마 식집사의 관찰 보고서</span>
+                <span className="text-white text-lg md:text-2xl font-black drop-shadow-sm print:!text-black print:text-xl">꼬마 식집사의 관찰 보고서</span>
                 <img src="/images/report-icon.png" className="w-8 h-8 md:w-12 md:h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10" alt="report" />
               </h3>
             </div>
