@@ -140,7 +140,7 @@ export default function ReportModal({
       >
         
         {/* Print Header Override */}
-        <div className="hidden print:flex justify-between items-center w-full mb-4 px-2 text-[10px] text-gray-500 font-bold border-b border-gray-100 pb-2">
+        <div className="print-header justify-between items-center w-full mb-4 px-2 text-[10px] text-gray-500 font-bold border-b border-gray-100 pb-2">
           <span>우리 반 식집사</span>
           <span>{new Date().toLocaleString('ko-KR', { 
             year: 'numeric', 
@@ -220,8 +220,8 @@ export default function ReportModal({
             <div className="bg-white p-8 md:p-10 rounded-[40px] border border-gray-100 shadow-sm print:p-0 print:border-none print:shadow-none">
               <div className="flex flex-col md:flex-row items-center gap-10 mb-10 print:mb-4 print:flex-row print:gap-4 print:items-start">
                 {/* Plant Pot Frame */}
-                <div className="relative shrink-0 print:w-28 print:h-28">
-                  <div className="w-40 h-40 bg-gradient-to-br from-brand-bg to-white rounded-[50px] flex items-center justify-center shadow-inner border-4 border-brand-bg/30 relative z-10 print:w-28 print:h-28 print:rounded-3xl print:border-2">
+                <div className="relative shrink-0 print:w-28 print:h-28 print:block print:visible">
+                  <div className="w-40 h-40 bg-gradient-to-br from-brand-bg to-white rounded-[50px] flex items-center justify-center shadow-inner border-4 border-brand-bg/30 relative z-10 print:w-28 print:h-28 print:rounded-3xl print:border-2 print:flex print:visible">
                     <img 
                       src={
                         plant.plant_type.includes("선인장") ? "/images/cactus.png" :
@@ -539,10 +539,22 @@ export default function ReportModal({
       
       {/* Print styles */}
       <style jsx global>{`
+        .print-header {
+          display: none !important;
+        }
         @media print {
           @page {
             margin: 0;
             size: A4;
+          }
+
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .print-header {
+            display: flex !important;
           }
 
           body {
