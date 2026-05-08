@@ -148,9 +148,8 @@ export default function ReportModal({
               <div className="inline-flex items-center gap-2 bg-white/25 px-4 py-1.5 rounded-full text-xs md:text-sm font-title mb-2 backdrop-blur-md border border-white/30 tracking-wide shadow-sm print:bg-white print:border-none print:shadow-none print:mb-1 print:mr-0 print:ml-auto print:text-xs print:font-bold">
                 <span className="print:hidden">🍊</span> {className}
               </div>
-              <h3 className="font-title text-xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-3xl">
-                <span className="print:text-4xl">{studentName}</span>
-                <span className="text-white text-lg md:text-2xl font-black drop-shadow-sm print:!text-black print:text-xl">꼬마 식집사의 관찰 보고서</span>
+              <h3 className="font-title text-xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-black print:text-3xl">
+                <span className="text-white print:text-black font-black drop-shadow-sm print:drop-shadow-none">{studentName} 꼬마 식집사의 관찰 보고서</span>
                 <img src="/images/report-icon.png" className="w-8 h-8 md:w-12 md:h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10" alt="report" />
               </h3>
             </div>
@@ -209,7 +208,7 @@ export default function ReportModal({
                 {/* Plant Pot Frame */}
                 <div className="relative shrink-0 print:w-28 print:h-28">
                   <div className="w-40 h-40 bg-gradient-to-br from-brand-bg to-white rounded-[50px] flex items-center justify-center shadow-inner border-4 border-brand-bg/30 relative z-10 print:w-28 print:h-28 print:rounded-3xl print:border-2">
-                    <Image 
+                    <img 
                       src={
                         plant.plant_type.includes("선인장") ? "/images/cactus.png" :
                         plant.plant_type.includes("토마토") ? "/images/tomato.png" :
@@ -219,7 +218,7 @@ export default function ReportModal({
                         plant.plant_type.includes("관엽") ? "/images/leaf.png" :
                         "/images/leaf.png"
                       } 
-                      alt="plant" width={100} height={100} className="object-contain drop-shadow-md print:w-16 print:h-16"
+                      alt="plant" className="w-[100px] h-[100px] object-contain drop-shadow-md print:w-16 print:h-16 print:drop-shadow-none"
                     />
                   </div>
                 </div>
