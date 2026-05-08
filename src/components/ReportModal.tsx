@@ -138,6 +138,20 @@ export default function ReportModal({
         className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[30px] md:rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[4px] md:border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0 print:overflow-visible" 
         onClick={e => e.stopPropagation()}
       >
+        
+        {/* Print Header Override */}
+        <div className="hidden print:flex justify-between items-center w-full mb-4 px-2 text-[10px] text-gray-500 font-bold border-b border-gray-100 pb-2">
+          <span>우리 반 식집사</span>
+          <span>{new Date().toLocaleString('ko-KR', { 
+            year: 'numeric', 
+            month: 'numeric', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: 'numeric', 
+            hour12: true 
+          })}</span>
+        </div>
+
         {/* Header */}
         <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500 print:overflow-visible">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-400 opacity-90 print:hidden"></div>
@@ -261,10 +275,10 @@ export default function ReportModal({
                   </h4>
                   <p className="text-sm font-bold text-gray-500 print:text-[10px]">단위: cm / 날짜별 키의 변화</p>
                 </div>
-                <div className="w-full h-[500px] print:h-[400px] print:-ml-4 print:w-[105%]">
+                <div className="w-full h-[500px] print:w-[98%] print:mx-auto overflow-hidden" style={{ height: typeof window !== 'undefined' && window.matchMedia?.('print').matches ? `${dynamicPrintHeight}px` : undefined }}>
                   {graphData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={graphData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                      <LineChart data={graphData} margin={{ top: 20, right: 50, left: 10, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis 
                           dataKey="date" 
@@ -527,9 +541,15 @@ export default function ReportModal({
       <style jsx global>{`
         @media print {
           @page {
-            margin: 1.5cm;
+            margin: 0;
             size: A4;
           }
+
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
 
           /* Hide everything by default using visibility */
           body * {
@@ -552,7 +572,7 @@ export default function ReportModal({
             display: block !important;
             overflow: visible !important;
             z-index: 99999 !important;
-            padding: 0 !important;
+            padding: 1.5cm !important;
             margin: 0 !important;
           }
 
@@ -585,8 +605,7 @@ export default function ReportModal({
 
           .recharts-responsive-container {
             width: 100% !important;
-            height: 500px !important;
-            min-height: 500px !important;
+            height: 100% !important;
           }
 
           img {
