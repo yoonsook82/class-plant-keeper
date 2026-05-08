@@ -220,8 +220,8 @@ export default function ReportModal({
             <div className="bg-white p-8 md:p-10 rounded-[40px] border border-gray-100 shadow-sm print:p-0 print:border-none print:shadow-none">
               <div className="flex flex-col md:flex-row items-center gap-10 mb-10 print:mb-4 print:flex-row print:gap-4 print:items-start">
                 {/* Plant Pot Frame */}
-                <div className="relative shrink-0 print:w-28 print:h-28 print:block print:visible">
-                  <div className="w-40 h-40 bg-gradient-to-br from-brand-bg to-white rounded-[50px] flex items-center justify-center shadow-inner border-4 border-brand-bg/30 relative z-10 print:w-28 print:h-28 print:rounded-3xl print:border-2 print:flex print:visible">
+                <div className="relative print:min-w-[112px] print:min-h-[112px] print:w-28 print:h-28 print:block print:visible" style={{ minWidth: '112px', minHeight: '112px' }}>
+                  <div className="w-40 h-40 bg-gradient-to-br from-brand-bg to-white rounded-[50px] flex items-center justify-center shadow-inner border-4 border-brand-bg/30 relative z-10 print:w-28 print:h-28 print:rounded-3xl print:border-2 print:flex print:visible" style={{ width: '100%', height: '100%', backgroundColor: '#f4f1ea' }}>
                     <img 
                       src={
                         plant.plant_type.includes("선인장") ? "/images/cactus.png" :
@@ -232,7 +232,8 @@ export default function ReportModal({
                         plant.plant_type.includes("관엽") ? "/images/leaf.png" :
                         "/images/leaf.png"
                       } 
-                      alt="plant" className="w-[100px] h-[100px] object-contain drop-shadow-md print:w-16 print:h-16 print:drop-shadow-none"
+                      alt="plant" className="w-[100px] h-[100px] object-contain drop-shadow-md print:w-[64px] print:h-[64px] print:drop-shadow-none"
+                      style={{ minWidth: '64px', minHeight: '64px', display: 'block' }}
                     />
                   </div>
                 </div>
