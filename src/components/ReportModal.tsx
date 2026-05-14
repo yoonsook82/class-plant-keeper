@@ -97,17 +97,19 @@ export default function ReportModal({
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, []);
 
-  // Graph Data
+  // Graph Data - Show ALL records to ensure all points appear on the X-axis
   const graphData = [...records]
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map(r => ({
-      date: new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-      height: Number(r.height_cm) || 0
+    .map((r, idx) => ({
+      displayDate: `${new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })} (${idx + 1})`,
+      height: Number(r.height_cm) || 0,
+      id: r.id
     }));
 
   // Calculate dynamic print height based on plant growth
   const maxVal = graphData.length > 0 ? Math.max(...graphData.map(d => d.height)) : 0;
-  const dynamicPrintHeight = Math.min(650, Math.max(400, 250 + maxVal * 12));
+  // Make the graph fill the first page more completely (increased base height)
+  const dynamicPrintHeight = Math.min(800, Math.max(550, 400 + maxVal * 8));
 
   // Timeline Data
   const timelineData = [...records]
@@ -182,14 +184,13 @@ export default function ReportModal({
             </div>
           </div>
 
-          {/* Plant Selector for Students with Multiple Plants */}
           {allPlants.length > 1 && (
-            <div className="relative z-10 px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar print:hidden">
+            <div id="plant-selector-container" className="relative z-10 px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar print:hidden">
               {allPlants.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => onPlantChange && onPlantChange(p)}
-                  className={`px-3 py-1 rounded-full font-title text-lg transition-all border-2 whitespace-nowrap shadow-sm ${
+                  className={`px-3 py-1.5 rounded-full font-title text-base transition-all border-2 whitespace-nowrap shadow-sm ${
                     p.id === plant.id
                       ? "bg-white text-orange-600 border-white scale-105 font-black"
                       : "bg-white/20 text-white border-white/30 hover:bg-white/30 font-bold"
@@ -201,16 +202,7 @@ export default function ReportModal({
             </div>
           )}
           
-          {/* Decorative Stickers */}
-          <div className="absolute top-2 right-20 w-16 h-16 opacity-25 -rotate-12 select-none print:hidden">
-            <Image src="/images/sticker_camera.png" width={64} height={64} alt="" />
-          </div>
-          <div className="absolute bottom-6 right-60 w-16 h-16 opacity-20 rotate-45 select-none print:hidden">
-            <Image src="/images/sticker_checklist.png" width={64} height={64} alt="" />
-          </div>
-          <div className="absolute top-10 left-1/2 w-14 h-14 opacity-15 rotate-12 select-none print:hidden">
-            <Image src="/images/flower3.png" width={56} height={56} alt="" />
-          </div>
+          {/* Removed stickers to prevent overlap and white dots */}
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12 print:overflow-visible print:p-4 print:space-y-6">
@@ -287,43 +279,50 @@ export default function ReportModal({
               <div className="pt-8 border-t border-gray-100 min-h-[600px] print:pt-4 print:min-h-[450px]">
                 <div className="flex justify-between items-center mb-6 print:mb-2">
                   <h4 className="font-title text-2xl text-orange-600 flex items-center gap-3 print:text-xl">
-                    📈 성장 그래프
+                    <span className="print:hidden">📈</span> 성장 그래프
                   </h4>
                   <p className="text-sm font-bold text-gray-500 print:text-[10px]">단위: cm / 날짜별 키의 변화</p>
                 </div>
-                <div className="w-full h-[500px] print:w-[98%] print:mx-auto overflow-hidden" style={{ height: typeof window !== 'undefined' && window.matchMedia?.('print').matches ? `${dynamicPrintHeight}px` : undefined }}>
+                <div className="w-full h-[400px] md:h-[500px] print:w-[98%] print:mx-auto overflow-visible" style={{ height: typeof window !== 'undefined' && window.matchMedia?.('print').matches ? `${dynamicPrintHeight}px` : undefined }}>
                   {graphData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={graphData} margin={{ top: 20, right: 50, left: 10, bottom: 20 }}>
+                      <LineChart data={graphData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis 
-                          dataKey="date" 
+                          dataKey="displayDate" 
                           axisLine={{ stroke: '#eee' }}
                           tickLine={false} 
-                          tick={{fontSize: 12, fill: "#666", fontWeight: "bold"}} 
-                          dy={15}
+                          tick={{fontSize: 9, fill: "#666", fontWeight: "bold"}} 
+                          dy={10}
+                          interval={0}
+                          angle={-45}
+                          textAnchor="end"
+                          height={60}
                         />
                         <YAxis 
                           domain={[0, (dataMax: number) => Math.max(dataMax + 2, 10)]} 
                           axisLine={{ stroke: '#eee' }}
                           tickLine={false} 
-                          tick={{fontSize: 12, fill: "#666"}} 
+                          tick={{fontSize: 11, fill: "#666"}} 
                           dx={-5}
                           tickCount={10}
+                          width={40}
                         />
                         <Tooltip 
                           contentStyle={{borderRadius: "20px", border: "none", boxShadow: "0 10px 30px rgba(0,0,0,0.1)", padding: "15px"}}
                           labelStyle={{fontWeight: "bold", color: "#f97316", marginBottom: "5px"}}
                           cursor={{stroke: "#f97316", strokeWidth: 1, strokeDasharray: "5 5"}}
+                          labelFormatter={(value) => `기록: ${value}`}
                         />
                         <Line 
-                          type="monotone" 
+                          type="linear" 
                           dataKey="height" 
                           stroke="#f97316" 
                           strokeWidth={5} 
                           dot={{r: 7, fill: "#f97316", strokeWidth: 3, stroke: "#fff"}} 
                           activeDot={{r: 10, strokeWidth: 0}} 
-                          animationDuration={1500}
+                          animationDuration={1000}
+                          connectNulls={true}
                         />
                       </LineChart>
                     </ResponsiveContainer>
@@ -338,8 +337,8 @@ export default function ReportModal({
             </div>
           </section>
 
-          {/* Section 3: Photo Timeline */}
-          <section className="print:break-inside-avoid print:mb-6">
+          {/* Section 3: Photo Timeline - Forced to Page 2 for print */}
+          <section className="print:break-before-page print:pt-10 print:mt-0 print:mb-6">
             <h4 className="font-title text-2xl text-brand-brown mb-6 flex items-center gap-3 print:text-xl print:mb-3">
               <img src="/images/camera.png" className="w-10 h-10 object-contain print:w-6 print:h-6" alt="camera" />
               찰칵! 식물 성장 타임라인
@@ -438,7 +437,7 @@ export default function ReportModal({
                     {isListening && (
                       <span className="absolute inset-0 rounded-full bg-red-100 animate-ping opacity-75"></span>
                     )}
-                    <div className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 shadow-lg shadow-red-200' : 'bg-white shadow-md hover:bg-orange-500/10'}`}>
+                    <div className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 shadow-lg shadow-red-200' : 'bg-gray-100 hover:bg-orange-500/10'}`}>
                       <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         viewBox="0 0 24 24" 
@@ -574,7 +573,7 @@ export default function ReportModal({
         }
         @media print {
           @page {
-            margin: 0;
+            margin: 20mm 15mm;
             size: A4;
           }
 
@@ -677,16 +676,21 @@ export default function ReportModal({
             opacity: 0 !important;
           }
 
-          /* Force Page 2 only for the second section */
+          /* Natural flow and spacing */
           section:nth-of-type(1) {
-            page-break-after: always !important;
-            break-after: page !important;
-            margin-bottom: 0 !important;
+            margin-bottom: 20px !important;
           }
 
-          /* Ensure page 2 starts with some space */
-          section:nth-of-type(2) {
-            padding-top: 1cm !important;
+          section {
+            padding-top: 0 !important;
+            margin-bottom: 30px !important;
+          }
+
+          /* Photo Timeline forced to new page */
+          section.print\:break-before-page {
+            break-before: page !important;
+            page-break-before: always !important;
+            padding-top: 20mm !important;
           }
 
           .space-y-12 { margin-top: 0 !important; }

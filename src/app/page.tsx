@@ -1,35 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loginMode, setLoginMode] = useState<"student" | "teacher" | null>(null);
 
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      setClassCode(code.toUpperCase());
+      setLoginMode("student");
+    }
+  }, [searchParams]);
+
   const [className, setClassName] = useState("");
+  const [email, setEmail] = useState("");
   const [studentName, setStudentName] = useState("");
   const [classCode, setClassCode] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isCreatingClass, setIsCreatingClass] = useState(false);
+
+  // 6자리 고유 난수 코드 생성 함수
+  const generateClassCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 헷갈리는 문자(0, O, 1, I) 제외
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
 
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    if (!className || !studentName || !classCode) {
-      setErrorMsg("학급 이름, 학생 이름, 학급 코드를 모두 입력해주세요.");
+    if (!studentName || !classCode) {
+      setErrorMsg("학생 이름과 학급 코드를 모두 입력해주세요.");
       return;
     }
     setLoading(true);
     try {
       const { data: classData, error: classError } = await supabase
         .from("classes")
-        .select("id")
-        .eq("class_name", className)
-        .eq("class_code", classCode)
+        .select("id, class_name")
+        .eq("class_code", classCode.toUpperCase())
         .maybeSingle();
 
       if (classError) {
@@ -65,7 +85,7 @@ export default function LoginPage() {
 
       localStorage.setItem("userRole", "student");
       localStorage.setItem("classId", classData.id);
-      localStorage.setItem("className", className);
+      localStorage.setItem("className", classData.class_name);
       localStorage.setItem("studentId", studentData!.id);
       localStorage.setItem("studentName", studentName);
       
@@ -83,44 +103,49 @@ export default function LoginPage() {
   const handleTeacherLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    if (!className || !password || !classCode) {
-      setErrorMsg("모든 정보를 입력해주세요.");
-      return;
-    }
-
-    // 비밀번호 유효성 검사 (영문+숫자 6자리)
-    const pwRegex = /^[a-zA-Z0-9]{6}$/;
-    if (!pwRegex.test(password)) {
-      setErrorMsg("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      setErrorMsg("이메일과 비밀번호를 입력해주세요.");
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // 혹시 남아있을 수 있는 세션 클리어 (RLS 충족을 위해)
+      await supabase.auth.signOut();
+      
+      console.log("Attempting to find class for email:", trimmedEmail);
+      // 1. 해당 교사의 학급 정보 조회 (teacher_email 컬럼 기준)
+      // .ilike를 사용하여 대소문자 구분 없이 검색
+      const { data: classData, error: classError } = await supabase
         .from("classes")
-        .select("id")
-        .eq("class_name", className)
-        .eq("teacher_password", password)
-        .eq("class_code", classCode)
+        .select("*")
+        .ilike("teacher_email", trimmedEmail)
         .maybeSingle();
 
-      if (error) {
-        console.error("Supabase Error:", error);
-        setErrorMsg("로그인 중 문제가 발생했습니다: " + error.message);
+      if (classError || !classData) {
+        console.error("classError:", classError, "classData:", classData);
+        setErrorMsg(`학급 정보를 찾을 수 없습니다. (검색 이메일: ${trimmedEmail}, DB오류: ${classError?.message || '데이터 없음'})`);
         setLoading(false);
         return;
       }
 
-      if (!data) {
-        setErrorMsg("학급 이름, 비밀번호 또는 코드가 일치하지 않습니다.");
+      // 2. Supabase Auth로 로그인
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+
+      if (authError) {
+        setErrorMsg("로그인 실패: " + authError.message);
         setLoading(false);
         return;
       }
       
       localStorage.setItem("userRole", "teacher");
-      localStorage.setItem("classId", data.id);
-      localStorage.setItem("className", className);
+      localStorage.setItem("classId", classData.id);
+      localStorage.setItem("className", classData.class_name);
+      localStorage.setItem("classCode", classData.class_code);
       router.push("/teacher");
     } catch (e: any) { 
       console.error("System Error:", e);
@@ -131,35 +156,48 @@ export default function LoginPage() {
 
   const handleCreateClass = async () => {
     setErrorMsg("");
-    if (!className || !password || !classCode) {
-      setErrorMsg("모든 정보를 입력해주세요.");
-      return;
-    }
-
-    // 비밀번호 유효성 검사
-    const pwRegex = /^[a-zA-Z0-9]{6}$/;
-    if (!pwRegex.test(password)) {
-      setErrorMsg("비밀번호는 영문과 숫자를 조합한 6자리여야 합니다.");
+    if (!email || !password || !className) {
+      setErrorMsg("이메일, 비밀번호, 학급 이름을 모두 입력해주세요.");
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // 1. Supabase Auth 계정 생성
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) {
+        setErrorMsg("계정 생성 오류: " + authError.message);
+        setLoading(false);
+        return;
+      }
+
+      // 2. 고유 학급 코드 생성 및 학급 정보 저장
+      const newClassCode = generateClassCode();
+      const { data: classData, error: classError } = await supabase
         .from("classes")
-        .insert({ class_name: className, teacher_password: password, class_code: classCode })
+        .insert({ 
+          class_name: className, 
+          teacher_email: email, 
+          teacher_password: password, // NOT NULL 제약 조건 우회/충족
+          class_code: newClassCode 
+        })
         .select().single();
         
-      if (error) { 
-        console.error("Create Class Error:", error);
-        setErrorMsg("학급 개설 중 오류가 발생했습니다: " + error.message); 
+      if (classError) { 
+        console.error("Create Class Error:", classError);
+        setErrorMsg("학급 개설 중 오류가 발생했습니다: " + classError.message); 
         setLoading(false); 
         return; 
       }
       
       localStorage.setItem("userRole", "teacher");
-      localStorage.setItem("classId", data.id);
+      localStorage.setItem("classId", classData.id);
       localStorage.setItem("className", className);
+      localStorage.setItem("classCode", newClassCode);
       router.push("/teacher");
     } catch (e: any) { 
       console.error(e);
@@ -237,13 +275,20 @@ export default function LoginPage() {
                   className="flex flex-col gap-3"
                 >
                   <div className="space-y-2">
-                    <InputGroup label="학급 이름" value={className} onChange={setClassName} placeholder="예: 3학년 2반" disabled={loading} />
-                    {loginMode === 'student' ? (
-                      <InputGroup label="학생 이름" value={studentName} onChange={setStudentName} placeholder="홍길동" disabled={loading} />
+                    {loginMode === 'teacher' ? (
+                      <>
+                        <InputGroup label="이메일" value={email} onChange={setEmail} placeholder="teacher@example.com" disabled={loading} />
+                        <InputGroup label="비밀번호" value={password} onChange={setPassword} placeholder="비밀번호를 입력하세요" type="password" disabled={loading} />
+                        {isCreatingClass && (
+                          <InputGroup label="학급 이름" value={className} onChange={setClassName} placeholder="예: 3학년 2반" disabled={loading} />
+                        )}
+                      </>
                     ) : (
-                      <InputGroup label="비밀번호" value={password} onChange={setPassword} placeholder="영문+숫자 6자리" type="password" disabled={loading} maxLength={6} />
+                      <>
+                        <InputGroup label="학급 코드" value={classCode} onChange={setClassCode} placeholder="6자리 코드 입력" type="text" disabled={loading} maxLength={6} />
+                        <InputGroup label="학생 이름" value={studentName} onChange={setStudentName} placeholder="홍길동" disabled={loading} />
+                      </>
                     )}
-                    <InputGroup label="학급 코드" value={classCode} onChange={setClassCode} placeholder="숫자 6자리" type="text" disabled={loading} maxLength={6} />
                   </div>
 
                   {errorMsg && (
@@ -252,29 +297,62 @@ export default function LoginPage() {
                     </div>
                   )}
 
-                  <div className="flex gap-2 mt-2">
-                    {loginMode === 'teacher' && (
+                  <div className="flex flex-col gap-2 mt-2">
+                    {loginMode === 'teacher' ? (
+                      <>
+                        {!isCreatingClass ? (
+                          <>
+                            <button 
+                              type="submit" 
+                              disabled={loading}
+                              className="w-full bg-[#738b27] hover:bg-[#5f7320] text-white font-title text-lg py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
+                            >
+                              {loading ? "통신 중..." : "선생님 로그인"}
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => setIsCreatingClass(true)}
+                              disabled={loading}
+                              className="w-full bg-transparent border-2 border-amber-500 text-amber-600 hover:bg-amber-50 font-title text-base py-2 rounded-xl transition-all active:scale-95 disabled:opacity-50 mt-1"
+                            >
+                              새로운 학급 개설하기
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button 
+                              type="button" 
+                              onClick={handleCreateClass}
+                              disabled={loading}
+                              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-title text-lg py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
+                            >
+                              {loading ? "생성 중..." : "학급 개설 완료"}
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => setIsCreatingClass(false)}
+                              disabled={loading}
+                              className="w-full bg-transparent text-gray-500 hover:text-gray-700 font-title text-base py-2 transition-all"
+                            >
+                              취소하고 로그인으로 돌아가기
+                            </button>
+                          </>
+                        )}
+                      </>
+                    ) : (
                       <button 
-                        type="button" 
-                        onClick={handleCreateClass}
+                        type="submit" 
                         disabled={loading}
-                        className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-title text-lg py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
+                        className="w-full bg-[#738b27] hover:bg-[#5f7320] text-white font-title text-lg py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
                       >
-                        학급 개설
+                        {loading ? "통신 중..." : "학생으로 입장하기"}
                       </button>
                     )}
-                    <button 
-                      type="submit" 
-                      disabled={loading}
-                      className="flex-1 bg-[#738b27] hover:bg-[#5f7320] text-white font-title text-lg py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
-                    >
-                      {loading ? "통신 중..." : "입장하기"}
-                    </button>
                   </div>
 
                   {loginMode === 'teacher' && (
-                    <p className="text-center text-xs text-red-500 font-bold">
-                      🚨 학급 이름, 비번, 코드를 꼭 기억하세요!
+                    <p className="text-center text-xs text-red-500 font-bold mt-2">
+                      🚨 교사 이메일과 비밀번호를 기억해주세요!
                     </p>
                   )}
                 </form>
@@ -284,6 +362,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
 

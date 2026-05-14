@@ -51,6 +51,7 @@ export default function TeacherDashboard() {
     const role = localStorage.getItem("userRole");
     const storedClassId = localStorage.getItem("classId");
     const storedClassName = localStorage.getItem("className");
+    const storedClassCode = localStorage.getItem("classCode");
 
     if (role !== "teacher" || !storedClassId) {
       alert("선생님 로그인이 필요합니다.");
@@ -60,6 +61,7 @@ export default function TeacherDashboard() {
 
     setClassId(storedClassId);
     setClassName(storedClassName || "");
+    if (storedClassCode) setClassCode(storedClassCode);
     fetchClassInfo(storedClassId);
     fetchStudents(storedClassId);
   }, []);
@@ -256,7 +258,7 @@ export default function TeacherDashboard() {
           <div className="bg-white p-8 rounded-[30px] shadow-2xl animate-in zoom-in-95 duration-200 max-w-[400px] w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-title text-2xl text-center text-brand-green mb-6">학생 간편 입장 QR</h2>
             <div className="bg-gray-50 p-4 rounded-2xl border-2 border-gray-100 flex justify-center">
-              {appUrl && <QRCodeCanvas value={`${appUrl}`} size={260} fgColor="#333333" />}
+              {appUrl && <QRCodeCanvas value={`${appUrl}?code=${classCode}`} size={260} fgColor="#333333" />}
             </div>
             <div className="mt-6 text-center bg-brand-input py-4 rounded-xl">
                <p className="font-body text-gray-400 text-sm mb-1">학급 코드</p>
@@ -299,7 +301,7 @@ export default function TeacherDashboard() {
               className="bg-white p-2 rounded-xl mb-4 border-2 border-gray-100 cursor-pointer hover:scale-105 hover:shadow-md transition-all group relative"
               onClick={() => setIsQrModalOpen(true)}
             >
-              {appUrl && <QRCodeCanvas value={`${appUrl}`} size={180} fgColor="#333333" />}
+              {appUrl && <QRCodeCanvas value={`${appUrl}?code=${classCode}`} size={180} fgColor="#333333" />}
               <div className="absolute inset-0 bg-black/5 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="bg-white/90 text-brand-green font-bold px-3 py-1 rounded-full text-sm shadow-sm backdrop-blur-sm">확대하기 🔍</span>
               </div>

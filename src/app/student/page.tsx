@@ -368,6 +368,15 @@ export default function StudentDashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
+                onClick={() => setIsCareOpen(true)}
+                className="bg-[#fff0f0] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#ffdada] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/plant.png" alt="plant" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
+                </div>
+                <span className="font-title text-base md:text-lg text-pink-700">식물 마스터</span>
+              </div>
+              <div 
                 onClick={() => setIsLogOpen(true)}
                 className="bg-[#fdf3e7] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#f5e1c8] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
@@ -381,30 +390,21 @@ export default function StudentDashboard() {
                   if (studentId) await fetchData(studentId);
                   setIsReportOpen(true);
                 }}
-                className="bg-[#e7f3fd] p-6 rounded-[40px] shadow-sm border border-[#c8e1f5] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+                className="bg-[#e7f3fd] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#c8e1f5] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
-                  <Image src="/images/report-icon.png" alt="report" width={64} height={64} className="drop-shadow-sm" />
+                  <Image src="/images/report-icon.png" alt="report" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-lg text-[#424a5a]">활동 보고서</span>
+                <span className="font-title text-base md:text-lg text-[#424a5a]">활동 보고서</span>
               </div>
               <div 
                 onClick={() => setIsAiOpen(true)}
-                className="bg-[#f3fde7] p-6 rounded-[40px] shadow-sm border border-[#e1f5c8] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+                className="bg-[#f3fde7] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#e1f5c8] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
-                  <Image src="/images/ai-icon.png" alt="ai" width={64} height={64} className="drop-shadow-sm" />
+                  <Image src="/images/ai-icon.png" alt="ai" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-lg text-[#4a5a42]">AI 식물 진단</span>
-              </div>
-              <div 
-                onClick={() => setIsCareOpen(true)}
-                className="bg-[#fff0f0] p-6 rounded-[40px] shadow-sm border border-[#ffdada] flex flex-col items-center justify-center gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
-              >
-                <div className="transition-transform group-hover:scale-110 duration-300">
-                  <Image src="/images/plant.png" alt="plant" width={64} height={64} className="drop-shadow-sm" />
-                </div>
-                <span className="font-title text-lg text-pink-700">식물 마스터</span>
+                <span className="font-title text-base md:text-lg text-[#4a5a42]">AI 식물 진단</span>
               </div>
             </div>
 
@@ -1006,30 +1006,28 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   const hasOnlyEssentials = selectedEssentials.length === essentialSupplies.length && selectedDistractors.length === 0;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 md:p-6 backdrop-blur-md overflow-y-auto" onClick={onClose}>
-      <div className="bg-white w-full max-w-[1000px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col min-h-[700px]" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-2 md:p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+      <div className="bg-white w-full max-w-[950px] rounded-[30px] p-4 md:p-6 shadow-2xl flex flex-col max-h-[95vh] overflow-hidden" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-pink-50 rounded-2xl flex items-center justify-center text-2xl">✨</div>
+        <div className="flex justify-between items-center mb-2 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-xl">✨</div>
             <div>
-              <h3 className="font-title text-3xl text-pink-500">식물 가꾸기 마스터</h3>
-              <p className="text-sm font-body text-gray-400">정확한 도구와 순서로 식물을 심어보아요!</p>
+              <h3 className="font-title text-2xl text-pink-500">식물 가꾸기 마스터</h3>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-3xl">✕</button>
+          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-2xl">✕</button>
         </div>
 
-        <div className="flex-1 relative">
+        <div className="flex-1 overflow-y-auto pr-1">
           {step === 1 && (
-            <div className="h-full flex flex-col">
-              <div className="text-center mb-4">
-                <h4 className="font-title text-2xl text-brand-brown mb-1">Step 1. 식물 심기에 꼭 필요한 <span className="text-pink-500">도구</span>만 골라보세요!</h4>
-                <p className="text-gray-400 font-body text-sm">불필요한 물건을 고르면 안 돼요.</p>
+            <div className="flex flex-col">
+              <div className="text-center mb-2">
+                <h4 className="font-title text-xl text-brand-brown">Step 1. 식물 심기에 꼭 필요한 <span className="text-pink-500">도구</span> 고르기</h4>
               </div>
               
-              <div className="flex-1 relative bg-gray-50/50 rounded-[40px] border-2 border-dashed border-gray-200 overflow-hidden min-h-[450px]">
+              <div className="relative bg-gray-50/50 rounded-[30px] border-2 border-dashed border-gray-200 overflow-hidden h-[380px]">
                 {shuffledSupplies.map((item, idx) => (
                   <button
                     key={item.id}
@@ -1053,48 +1051,45 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         item.img
                       )}
                     </div>
-                    <span className={`font-title text-sm mt-1 ${selectedItems.includes(item.id) ? 'text-pink-600 font-bold' : 'text-gray-400'}`}>
+                    <span className={`font-title text-base mt-1 ${selectedItems.includes(item.id) ? 'text-pink-600 font-bold' : 'text-gray-500'}`}>
                       {item.name}
                     </span>
                   </button>
                 ))}
               </div>
 
-              <div className="flex flex-col items-center mt-6">
+              <div className="flex flex-col items-center mt-4">
                 <button
                   disabled={!hasOnlyEssentials}
                   onClick={() => setStep(1.5)}
-                  className={`px-16 py-4 rounded-full font-title text-2xl shadow-xl transition-all ${
+                  className={`px-12 py-3 rounded-full font-title text-xl shadow-lg transition-all ${
                     hasOnlyEssentials ? 'bg-pink-500 text-white hover:bg-pink-600 active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  준비 완료! 다음으로 →
+                  준비 완료! →
                 </button>
-                {selectedDistractors.length > 0 && <p className="text-red-400 mt-2 font-body font-bold animate-bounce text-sm">앗! 필요 없는 물건이 섞여 있어요! 🙅‍♂️</p>}
-                {!hasOnlyEssentials && selectedDistractors.length === 0 && <p className="text-xs text-gray-400 mt-2 font-body">* 필수 도구 6가지를 모두 찾아주세요.</p>}
+                {selectedDistractors.length > 0 && <p className="text-red-400 mt-1 font-body font-bold animate-bounce text-xs">앗! 필요 없는 물건이 섞여 있어요! 🙅‍♂️</p>}
               </div>
             </div>
           )}
 
           {step === 1.5 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-10">
-              <h4 className="font-title text-2xl text-brand-brown mb-12">어떤 방법으로 식물을 심을까요?</h4>
-              <div className="flex flex-col md:flex-row gap-8 justify-center">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-6">
+              <h4 className="font-title text-2xl text-brand-brown mb-6">어떤 방법으로 식물을 심을까요?</h4>
+              <div className="flex flex-col md:flex-row gap-4 justify-center">
                 <button 
                   onClick={() => { setMethod("seed"); setStep(2); }}
-                  className="bg-amber-50 hover:bg-amber-100 p-10 rounded-[50px] border-4 border-amber-200 transition-all hover:scale-105 group"
+                  className="bg-amber-50 hover:bg-amber-100 p-6 rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group"
                 >
-                  <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-sm">🌰</div>
-                  <span className="font-title text-3xl text-amber-700 block mb-2">씨앗 심기</span>
-                  <p className="text-amber-500 font-body">작은 씨앗을 흙 속에 쏙!</p>
+                  <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌰</div>
+                  <span className="font-title text-2xl text-amber-700 block mb-1">씨앗 심기</span>
                 </button>
                 <button 
                   onClick={() => { setMethod("seedling"); setStep(2); }}
-                  className="bg-green-50 hover:bg-green-100 p-10 rounded-[50px] border-4 border-green-200 transition-all hover:scale-105 group"
+                  className="bg-green-50 hover:bg-green-100 p-6 rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group"
                 >
-                  <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-sm">🌱</div>
-                  <span className="font-title text-3xl text-green-700 block mb-2">모종 심기</span>
-                  <p className="text-green-500 font-body">어린 식물을 화분으로!</p>
+                  <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌱</div>
+                  <span className="font-title text-2xl text-green-700 block mb-1">모종 심기</span>
                 </button>
               </div>
             </div>
@@ -1102,82 +1097,81 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
 
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="text-center mb-8">
-                <h4 className="font-title text-2xl text-brand-brown mb-2">
+              <div className="text-center mb-2">
+                <h4 className="font-title text-2xl text-brand-brown">
                   Step 2. {method === "seed" ? "씨앗" : "모종"} 심기 <span className="text-blue-500">이미지 코딩</span>
                 </h4>
-                <p className="text-gray-400 font-body">그림을 보고 순서대로 코드를 완성하세요!</p>
               </div>
               
               <div className="flex flex-col md:flex-row gap-8 items-start">
-                {/* Available Blocks (Images) */}
-                <div className="flex-1 w-full">
-                  <div className="grid grid-cols-3 gap-3">
+                {/* Available Blocks */}
+                <div className="w-full md:w-[320px]">
+                  <div className="grid grid-cols-3 gap-1.5">
                     {availableBlocks.map((block) => (
                       <button
                         key={block.id}
                         disabled={codingBlocks.includes(block.id)}
                         onClick={() => addBlock(block.id)}
-                        className={`p-3 md:p-4 rounded-3xl border-4 transition-all flex flex-col items-center gap-2 md:gap-3 ${
+                        className={`p-1.5 rounded-2xl border-2 transition-all flex flex-col items-center gap-0.5 ${
                           codingBlocks.includes(block.id)
                             ? 'bg-gray-100 border-gray-200 grayscale opacity-30'
                             : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105 shadow-sm'
                         }`}
                       >
-                        <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
-                          <Image src={block.img} alt={block.name} width={80} height={80} className="object-contain w-12 h-12 md:w-16 md:h-16" />
+                        <div className="w-14 h-14 flex items-center justify-center">
+                          <Image src={block.img} alt={block.name} width={70} height={70} className="object-contain w-11 h-11" />
                         </div>
-                        <span className="text-xs md:text-sm font-body font-bold text-gray-700 break-keep leading-tight text-center">{block.name}</span>
+                        <span className="text-xs font-body font-bold text-gray-700 leading-tight text-center">{block.name}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Selected Flow */}
-                <div className="flex-1 w-full bg-blue-50/50 p-6 md:p-8 rounded-[40px] border-2 border-dashed border-blue-200 min-h-[350px] flex flex-col items-center">
-                  <p className="font-title text-blue-400 mb-6 flex items-center gap-2">
-                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">▷</span>
+                <div className="flex-1 w-full bg-blue-50/50 p-4 rounded-[30px] border-2 border-dashed border-blue-200 h-[350px] flex flex-col items-center">
+                  <p className="font-title text-blue-400 mb-2 text-sm flex items-center gap-2">
+                    <span className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-[10px]">▷</span>
                     코딩 실행창
                   </p>
-                  <div className="relative w-full flex-1 min-h-[350px] flex items-center justify-center mt-4">
+                  <div className="relative w-full flex-1 flex items-center justify-center">
                     {codingBlocks.map((blockId, index) => {
                       const block = (method === "seed" ? seedSteps : seedlingSteps).find(s => s.id === blockId);
                       const maxItems = 6;
                       const angle = (index * (360 / maxItems)) - 90;
-                      const radius = 120; // Distance from center
+                      const radius = 95; // Compact radius
                       const x = Math.cos(angle * Math.PI / 180) * radius;
                       const y = Math.sin(angle * Math.PI / 180) * radius;
 
                       return (
                         <div 
                           key={index} 
-                          className="absolute bg-white p-2 md:p-3 rounded-full border-4 border-blue-500 shadow-lg flex items-center justify-center group animate-in zoom-in-50 duration-300"
+                          className="absolute bg-white p-1 rounded-full border-2 border-blue-500 shadow-md flex items-center justify-center group animate-in zoom-in-50 duration-300"
                           style={{ 
                             left: '50%', 
                             top: '50%',
                             transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                           }}
                         >
-                          <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-title text-lg shadow-md z-10">
+                          <div className="absolute -top-2 -left-2 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-title text-xs shadow-sm z-10">
                             {index + 1}
                           </div>
                           <button 
                             onClick={() => removeBlock(index)} 
-                            className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
                             title="제거"
                           >
                             ✕
                           </button>
-                          <div className="w-14 h-14 md:w-20 md:h-20 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
-                            <Image src={block?.img || ""} width={64} height={64} alt="" className="object-contain w-10 h-10 md:w-16 md:h-16" />
+                          <div className="w-14 h-14 md:w-18 md:h-18 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
+                            <Image src={block?.img || ""} width={60} height={60} alt="" className="object-contain w-10 h-10 md:w-14 md:h-14" />
                           </div>
                         </div>
                       );
                     })}
                     {codingBlocks.length === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <p className="text-center text-blue-400 text-base md:text-lg font-body font-bold bg-white/60 px-6 py-3 rounded-full backdrop-blur-sm border border-blue-100 shadow-sm">
-                          왼쪽에서 블록을 골라주세요!
+                        <p className="text-center text-blue-400 text-sm font-body font-bold bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm border border-blue-100 shadow-sm">
+                          블록을 골라주세요!
                         </p>
                       </div>
                     )}
@@ -1185,71 +1179,66 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                 </div>
               </div>
 
-              <div className="flex justify-center mt-10 gap-4">
-                <button onClick={() => { setStep(1.5); setCodingBlocks([]); }} className="px-8 py-3 rounded-full font-title text-lg bg-white border-2 border-gray-200 text-gray-400">뒤로가기</button>
+              <div className="flex justify-center mt-6 gap-4">
+                <button onClick={() => { setStep(1.5); setCodingBlocks([]); }} className="px-6 py-2 rounded-full font-title text-base bg-white border-2 border-gray-200 text-gray-400">뒤로</button>
                 <button
                   disabled={codingBlocks.length < 5}
                   onClick={checkOrder}
-                  className={`px-12 py-3 rounded-full font-title text-xl shadow-lg transition-all ${
+                  className={`px-10 py-2 rounded-full font-title text-lg shadow-lg transition-all ${
                     codingBlocks.length >= 5 ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-400'
                   }`}
                 >
-                  프로그램 실행 ▶
+                  실행 ▶
                 </button>
               </div>
             </div>
           )}
 
           {step === 3 && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-300 py-6">
-              <div className="text-center mb-10">
-                <h4 className="font-title text-2xl text-brand-brown mb-2">Step 3. 식물이 자라기 좋은 <span className="text-brand-green">환경</span> 만들기</h4>
-                <p className="text-gray-400 font-body">식물을 어디에 두면 좋을지 함께 고민해봐요!</p>
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-2">
+                <h4 className="font-title text-2xl text-brand-brown">Step 3. 식물이 자라기 좋은 <span className="text-brand-green">환경</span> 만들기</h4>
               </div>
 
-              <div className="bg-brand-bg/20 rounded-[40px] p-8 max-w-[700px] mx-auto border-2 border-white shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 text-6xl opacity-10 rotate-12">
-                  {method === "seed" ? "☀️" : "🛋️"}
-                </div>
-                
+              <div className="bg-brand-bg/20 rounded-[30px] p-4 max-w-[650px] mx-auto border-2 border-white shadow-sm relative">
                 {method === "seed" ? (
                   <div className="relative z-10">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-4xl">🌑</div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-3xl">🌑</div>
                       <h5 className="font-title text-2xl text-amber-700">씨앗은 빛이 필요할까요?</h5>
                     </div>
-                    <div className="space-y-4 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                    <div className="space-y-3 font-body text-gray-700 text-lg leading-relaxed break-keep">
                       <p>많은 씨앗들은 싹이 틀 때까지 <span className="font-bold text-amber-600">어둡고 따뜻한 곳</span>을 좋아해요. 이것을 <span className="font-bold text-amber-600">'암발아'</span>라고 불러요.</p>
                       <p>하지만 상추나 당근처럼 싹이 틀 때 <span className="font-bold text-amber-600">빛이 필요한 '광발아'</span> 씨앗도 있답니다!</p>
-                      <p className="bg-white/60 p-4 rounded-2xl border border-amber-100 mt-6">
-                        💡 <span className="font-title text-amber-800">미션:</span> 내가 심은 식물의 이름을 검색해보고, 빛이 필요한지 어두운 곳이 필요한지 확인하여 알맞은 장소에 놓아주세요!
+                      <p className="bg-white/70 p-3 rounded-2xl border border-amber-200 mt-2 text-base font-bold">
+                        💡 <span className="text-amber-800">미션:</span> 내가 심은 식물을 검색해보고, 알맞은 장소에 놓아주세요!
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="relative z-10">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-4xl">🌿</div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-3xl">🌿</div>
                       <h5 className="font-title text-2xl text-green-700">모종은 어디에 두면 좋을까요?</h5>
                     </div>
-                    <div className="space-y-4 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                    <div className="space-y-3 font-body text-gray-700 text-lg leading-relaxed break-keep">
                       <p>식물마다 좋아하는 햇빛의 양이 달라요!</p>
-                      <ul className="space-y-2 list-disc list-inside ml-2">
+                      <ul className="space-y-2 list-disc list-inside ml-1">
                         <li><span className="font-bold text-green-600">양지 식물</span> (토마토, 고추): 햇빛이 잘 드는 <span className="font-bold text-green-600">창가</span>를 좋아해요.</li>
                         <li><span className="font-bold text-green-600">음지 식물</span> (스킨답서스, 고사리): 직접적인 햇빛보다는 <span className="font-bold text-green-600">실내 안쪽</span>을 좋아해요.</li>
                       </ul>
-                      <p className="bg-white/60 p-4 rounded-2xl border border-green-100 mt-6">
-                        💡 <span className="font-title text-green-800">미션:</span> 우리 식물이 햇빛을 얼마나 좋아하는지 확인하고, 가장 기분 좋아할 장소를 찾아주세요!
+                      <p className="bg-white/70 p-3 rounded-2xl border border-green-200 mt-2 text-base font-bold">
+                        💡 <span className="text-green-800">미션:</span> 우리 식물이 좋아하는 장소를 찾아주세요!
                       </p>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex justify-center mt-12">
+              <div className="flex justify-center mt-6">
                 <button
                   onClick={() => setStep(4)}
-                  className="px-16 py-4 bg-brand-green text-white rounded-full font-title text-2xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95 flex items-center gap-3"
+                  className="px-12 py-3 bg-brand-green text-white rounded-full font-title text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95"
                 >
                   준비 끝! 식물 키우러 가기 🚀
                 </button>
@@ -1258,17 +1247,16 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
           )}
 
           {step === 4 && (
-            <div className="animate-in zoom-in duration-500 text-center py-12">
-              <div className="relative inline-block mb-8">
-                <div className="w-32 h-32 bg-pink-100 rounded-full flex items-center justify-center mx-auto relative z-10">
-                  <Image src="/images/stage-sprout.png" alt="success" width={80} height={80} className="animate-bounce" />
+            <div className="animate-in zoom-in duration-500 text-center py-8">
+              <div className="relative inline-block mb-4">
+                <div className="w-24 h-24 bg-pink-100 rounded-full flex items-center justify-center mx-auto relative z-10">
+                  <Image src="/images/stage-sprout.png" alt="success" width={60} height={60} className="animate-bounce" />
                 </div>
-                <div className="absolute -top-4 -right-4 text-4xl">🎉</div>
-                <div className="absolute -bottom-2 -left-4 text-3xl">🌸</div>
+                <div className="absolute -top-3 -right-3 text-3xl">🎉</div>
               </div>
-              <h3 className="font-title text-4xl text-brand-brown mb-4">참 잘했어요!</h3>
-              <p className="font-body text-gray-600 text-xl mb-12">당신은 훌륭한 식집사가 될 준비가 되었군요!</p>
-              <button onClick={onClose} className="px-16 py-4 bg-brand-green text-white rounded-full font-title text-2xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95">완료!</button>
+              <h3 className="font-title text-3xl text-brand-brown mb-2">참 잘했어요!</h3>
+              <p className="font-body text-gray-600 text-lg mb-8">당신은 훌륭한 식집사가 될 준비가 되었군요!</p>
+              <button onClick={onClose} className="px-12 py-3 bg-brand-green text-white rounded-full font-title text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95">완료!</button>
             </div>
           )}
         </div>
