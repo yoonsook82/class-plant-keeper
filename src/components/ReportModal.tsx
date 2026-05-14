@@ -408,11 +408,25 @@ export default function ReportModal({
                 관찰 후 느낀 점
               </h4>
               <div className="relative group/reflect">
-                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base print:p-1 print:text-[10px] print:min-h-0">
-                  {reflection ? (
+                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base print:p-1 print:text-[10px] print:min-h-0 print:bg-transparent">
+                  {mode === "student" ? (
+                    <textarea 
+                      value={reflection}
+                      onChange={(e) => setReflection(e.target.value)}
+                      placeholder="아직 작성된 내용이 없습니다."
+                      className="w-full min-h-[100px] bg-transparent resize-none outline-none text-gray-700 leading-relaxed placeholder:text-gray-400 placeholder:italic print:hidden"
+                    />
+                  ) : reflection ? (
                     <p className="text-gray-700 leading-relaxed text-left">"{reflection}"</p>
                   ) : (
                     <p className="text-gray-400 italic text-center py-2">아직 작성된 내용이 없습니다.</p>
+                  )}
+                  {/* Print version of textarea text */}
+                  {mode === "student" && reflection && (
+                    <p className="hidden print:block text-gray-700 leading-relaxed text-left">"{reflection}"</p>
+                  )}
+                  {mode === "student" && !reflection && (
+                    <p className="hidden print:block text-gray-400 italic text-center py-2">아직 작성된 내용이 없습니다.</p>
                   )}
                 </div>
                 {mode === "student" && (
