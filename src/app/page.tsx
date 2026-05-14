@@ -137,7 +137,11 @@ function LoginContent() {
       });
 
       if (authError) {
-        setErrorMsg("로그인 실패: " + authError.message);
+        if (authError.message === "Email not confirmed") {
+          setErrorMsg("이메일 인증이 필요하거나 Supabase 설정에서 'Confirm Email'을 꺼야 합니다.");
+        } else {
+          setErrorMsg("로그인 실패: " + authError.message);
+        }
         setLoading(false);
         return;
       }
