@@ -37,6 +37,13 @@ function LoginContent() {
     return result;
   };
 
+  // 효과음 재생 함수
+  const playPopSound = () => {
+    const audio = new Audio("/sound/u_8e8ungop1x-pop-268648.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play blocked by browser:", e));
+  };
+
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -250,7 +257,10 @@ function LoginContent() {
             ].map((mode) => (
               <button
                 key={mode.id}
-                onClick={() => setLoginMode(mode.id as any)}
+                onMouseEnter={playPopSound}
+                onClick={() => {
+                  setLoginMode(mode.id as any);
+                }}
                 className={`group flex flex-col items-center space-y-1 transition-all duration-300 ${
                   loginMode === mode.id ? 'scale-105' : 'opacity-60 hover:opacity-100 hover:scale-105'
                 }`}

@@ -36,6 +36,13 @@ export default function StudentDashboard() {
   const [newPlantDate, setNewPlantDate] = useState(new Date().toISOString().split('T')[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 효과음 재생 함수
+  const playPopSound = () => {
+    const audio = new Audio("/sound/u_8e8ungop1x-pop-268648.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play blocked:", e));
+  };
+
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     const sId = localStorage.getItem("studentId");
@@ -368,7 +375,10 @@ export default function StudentDashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
-                onClick={() => setIsCareOpen(true)}
+                onMouseEnter={playPopSound}
+                onClick={() => {
+                  setIsCareOpen(true);
+                }}
                 className="bg-[#fff0f0] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#ffdada] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
@@ -377,7 +387,10 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-pink-700">식물 마스터</span>
               </div>
               <div 
-                onClick={() => setIsLogOpen(true)}
+                onMouseEnter={playPopSound}
+                onClick={() => {
+                  setIsLogOpen(true);
+                }}
                 className="bg-[#fdf3e7] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#f5e1c8] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
@@ -386,6 +399,7 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#5a4a42]">새 관찰일지</span>
               </div>
               <div 
+                onMouseEnter={playPopSound}
                 onClick={async () => {
                   if (studentId) await fetchData(studentId);
                   setIsReportOpen(true);
@@ -398,7 +412,10 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#424a5a]">활동 보고서</span>
               </div>
               <div 
-                onClick={() => setIsAiOpen(true)}
+                onMouseEnter={playPopSound}
+                onClick={() => {
+                  setIsAiOpen(true);
+                }}
                 className="bg-[#f3fde7] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#e1f5c8] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
                 <div className="transition-transform group-hover:scale-110 duration-300">
@@ -565,10 +582,10 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [stage, setStage] = useState("씨앗");
-  const [height, setHeight] = useState("");
-  const [leafCount, setLeafCount] = useState("");
-  const [flowerCount, setFlowerCount] = useState("");
-  const [fruitCount, setFruitCount] = useState("");
+  const [height, setHeight] = useState("0");
+  const [leafCount, setLeafCount] = useState("0");
+  const [flowerCount, setFlowerCount] = useState("0");
+  const [fruitCount, setFruitCount] = useState("0");
   const [isListening, setIsListening] = useState(false);
 
   const stages = [
@@ -630,10 +647,10 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
       observation_text: text.trim(),
       image_url: image,
       growth_stage: stage,
-      height_cm: height ? parseInt(height) : null,
-      leaf_count: leafCount ? parseInt(leafCount) : null,
-      flower_count: flowerCount ? parseInt(flowerCount) : null,
-      fruit_count: fruitCount ? parseInt(fruitCount) : null
+      height_cm: height ? parseFloat(height) : 0,
+      leaf_count: leafCount ? parseInt(leafCount) : 0,
+      flower_count: flowerCount ? parseInt(flowerCount) : 0,
+      fruit_count: fruitCount ? parseInt(fruitCount) : 0
     });
 
     if (error) {
@@ -698,19 +715,19 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-black text-gray-500 ml-1">키(cm)</label>
-                <input type="number" min="0" value={height} onChange={e => setHeight(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+                <input type="number" min="0" step="0.5" value={height} onChange={e => setHeight(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
               </div>
               <div>
                 <label className="text-xs font-black text-gray-500 ml-1">잎(개)</label>
-                <input type="number" min="0" value={leafCount} onChange={e => setLeafCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+                <input type="number" min="0" step="1" value={leafCount} onChange={e => setLeafCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
               </div>
               <div>
                 <label className="text-xs font-black text-gray-500 ml-1">꽃(개)</label>
-                <input type="number" min="0" value={flowerCount} onChange={e => setFlowerCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+                <input type="number" min="0" step="1" value={flowerCount} onChange={e => setFlowerCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
               </div>
               <div>
                 <label className="text-xs font-black text-gray-500 ml-1">열매(개)</label>
-                <input type="number" min="0" value={fruitCount} onChange={e => setFruitCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
+                <input type="number" min="0" step="1" value={fruitCount} onChange={e => setFruitCount(e.target.value)} className="w-full bg-gray-50 rounded-xl px-3 py-2 text-base font-bold text-gray-700 outline-none border border-gray-200 focus:border-brand-green" />
               </div>
             </div>
           </div>
@@ -866,6 +883,29 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   const [method, setMethod] = useState<"seed" | "seedling" | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [codingBlocks, setCodingBlocks] = useState<string[]>([]);
+  const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  // 선택 효과음 재생 함수 (도구 등)
+  const playSelectSound = () => {
+    const audio = new Audio("/sound/floraphonic-casual-click-pop-ui-3-262120.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play blocked:", e));
+  };
+
+  // 블록 선택 효과음 재생 함수 (코딩 블록)
+  const playBlockSound = () => {
+    const audio = new Audio("/sound/floraphonic-minimal-pop-click-ui-1-198301.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play blocked:", e));
+  };
+
+  // 성공 시퀀스 효과음 재생 함수
+  const playSuccessSound = () => {
+    const audio = new Audio("/sound/floraphonic-minimal-pop-click-ui-15-198315.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio play blocked:", e));
+  };
 
   useEffect(() => {
     if (step === 4) { // Success stage
@@ -959,12 +999,14 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   }, [step, method]);
 
   const toggleItem = (id: string) => {
+    playSelectSound();
     setSelectedItems(prev => 
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
   const addBlock = (id: string) => {
+    playBlockSound();
     if (!codingBlocks.includes(id)) {
       setCodingBlocks([...codingBlocks, id]);
     }
@@ -993,7 +1035,20 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
     }
 
     if (isCorrect) {
-      setStep(3); // Go to Environment knowledge
+      setIsExecuting(true);
+      let idx = 0;
+      const interval = setInterval(() => {
+        if (idx < codingBlocks.length) {
+          setHighlightIndex(idx);
+          playSuccessSound();
+          idx++;
+        } else {
+          clearInterval(interval);
+          setHighlightIndex(null);
+          setIsExecuting(false);
+          setStep(3);
+        }
+      }, 400);
     } else {
       alert("순서가 조금 틀린 것 같아요! 이미지를 다시 한 번 살펴볼까요? 🤔");
       setCodingBlocks([]);
@@ -1078,14 +1133,14 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
               <h4 className="font-title text-2xl text-brand-brown mb-6">어떤 방법으로 식물을 심을까요?</h4>
               <div className="flex flex-col md:flex-row gap-4 justify-center">
                 <button 
-                  onClick={() => { setMethod("seed"); setStep(2); }}
+                  onClick={() => { playSelectSound(); setMethod("seed"); setStep(2); }}
                   className="bg-amber-50 hover:bg-amber-100 p-6 rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group"
                 >
                   <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌰</div>
                   <span className="font-title text-2xl text-amber-700 block mb-1">씨앗 심기</span>
                 </button>
                 <button 
-                  onClick={() => { setMethod("seedling"); setStep(2); }}
+                  onClick={() => { playSelectSound(); setMethod("seedling"); setStep(2); }}
                   className="bg-green-50 hover:bg-green-100 p-6 rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group"
                 >
                   <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌱</div>
@@ -1145,7 +1200,9 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                       return (
                         <div 
                           key={index} 
-                          className="absolute bg-white p-1 rounded-full border-2 border-blue-500 shadow-md flex items-center justify-center group animate-in zoom-in-50 duration-300"
+                          className={`absolute p-1 rounded-full border-2 shadow-md flex items-center justify-center group animate-in zoom-in-50 duration-300 transition-all ${
+                            highlightIndex === index ? 'bg-yellow-100 border-yellow-400 scale-125 z-30 shadow-yellow-200' : 'bg-white border-blue-500 z-20'
+                          }`}
                           style={{ 
                             left: '50%', 
                             top: '50%',
@@ -1182,13 +1239,13 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
               <div className="flex justify-center mt-6 gap-4">
                 <button onClick={() => { setStep(1.5); setCodingBlocks([]); }} className="px-6 py-2 rounded-full font-title text-base bg-white border-2 border-gray-200 text-gray-400">뒤로</button>
                 <button
-                  disabled={codingBlocks.length < 5}
+                  disabled={codingBlocks.length < 5 || isExecuting}
                   onClick={checkOrder}
                   className={`px-10 py-2 rounded-full font-title text-lg shadow-lg transition-all ${
-                    codingBlocks.length >= 5 ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-400'
+                    codingBlocks.length >= 5 && !isExecuting ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-400'
                   }`}
                 >
-                  실행 ▶
+                  {isExecuting ? '실행 중...' : '실행 ▶'}
                 </button>
               </div>
             </div>
