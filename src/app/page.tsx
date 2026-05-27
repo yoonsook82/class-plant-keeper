@@ -174,6 +174,25 @@ function LoginContent() {
 
     setLoading(true);
     try {
+      // 0. 이미 개설된 학급이 존재하는지 확인 (대소문자 구분 없이)
+      const { data: existingClass, error: checkError } = await supabase
+        .from("classes")
+        .select("id")
+        .ilike("teacher_email", email.trim())
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Check existing class error:", checkError);
+      }
+
+      if (existingClass) {
+        setErrorMsg("이미 이 이메일로 개설된 학급이 존재합니다. 선생님 로그인 화면에서 로그인해 주세요.");
+        setLoading(false);
+        return;
+      }
+
+      let authUserId = null;
+
       // 1. Supabase Auth 계정 생성
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -181,9 +200,28 @@ function LoginContent() {
       });
 
       if (authError) {
-        setErrorMsg("계정 생성 오류: " + authError.message);
-        setLoading(false);
-        return;
+        // 이미 가입된 계정 에러가 발생한 경우 데드락 우회 시도
+        if (authError.message.includes("already registered") || authError.status === 422) {
+          // 입력한 비밀번호가 맞는지 검증하기 위해 로그인을 시도합니다.
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (signInError) {
+            setErrorMsg("이미 가입된 계정입니다. 비밀번호가 틀렸거나 다른 이메일을 사용해 주세요.");
+            setLoading(false);
+            return;
+          }
+
+          authUserId = signInData.user?.id;
+        } else {
+          setErrorMsg("계정 생성 오류: " + authError.message);
+          setLoading(false);
+          return;
+        }
+      } else {
+        authUserId = authData.user?.id;
       }
 
       // 2. 고유 학급 코드 생성 및 학급 정보 저장
@@ -192,7 +230,7 @@ function LoginContent() {
         .from("classes")
         .insert({ 
           class_name: className, 
-          teacher_email: email, 
+          teacher_email: email.trim(), 
           teacher_password: password, // NOT NULL 제약 조건 우회/충족
           class_code: newClassCode 
         })
