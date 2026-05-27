@@ -154,6 +154,18 @@ export default function ReportModal({
         onClick={e => e.stopPropagation()}
       >
         
+        {/* Print Header Override */}
+        <div className="print-header">
+          <span>{new Date().toLocaleString('ko-KR', { 
+            year: 'numeric', 
+            month: 'numeric', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: 'numeric', 
+            hour12: true 
+          })}</span>
+          <span>우리 반 식집사</span>
+        </div>
 
         {/* Header */}
         <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500 print:overflow-visible">
@@ -617,8 +629,8 @@ export default function ReportModal({
         }
         @media print {
           @page {
+            margin: 0;
             size: A4;
-            margin: 20mm !important;
           }
 
           * {
@@ -664,7 +676,7 @@ export default function ReportModal({
             display: block !important;
             overflow: visible !important;
             z-index: 99999 !important;
-            padding: 0 !important; /* Handled natively by @page margin */
+            padding: 20mm !important; /* Acts as precise page margin and disables default browser headers */
             margin: 0 !important;
             box-sizing: border-box !important;
           }
@@ -690,7 +702,9 @@ export default function ReportModal({
 
           section {
             display: block !important;
-            margin-bottom: 25px !important;
+            margin-bottom: 30px !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
             clear: both !important;
           }
 
@@ -734,16 +748,15 @@ export default function ReportModal({
           }
 
           section {
-            padding: 0 !important;
-            margin-top: 0 !important;
-            margin-bottom: 25px !important;
+            padding-top: 0 !important;
+            margin-bottom: 30px !important;
           }
 
           /* Photo Timeline forced to new page */
           section.print\:break-before-page {
             break-before: page !important;
             page-break-before: always !important;
-            padding-top: 0 !important; /* Handled natively by @page margin */
+            padding-top: 20mm !important;
           }
 
           .space-y-12 { margin-top: 0 !important; }
