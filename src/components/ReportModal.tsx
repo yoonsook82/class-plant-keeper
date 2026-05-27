@@ -76,6 +76,19 @@ export default function ReportModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    let freshFeedback = plant.teacher_feedback || "";
+    let freshStamp = plant.teacher_stamp || null;
+    if (freshFeedback.includes("||STAMP:")) {
+      const parts = freshFeedback.split("||STAMP:");
+      freshFeedback = parts[0];
+      freshStamp = parts[1] || null;
+    }
+    setReflection(plant.reflection || "");
+    setFeedback(freshFeedback);
+    setStamp(freshStamp);
+  }, [plant]);
+
   const startListening = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -584,13 +597,13 @@ export default function ReportModal({
                 </div>
               ) : (
                 <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base relative z-10 print:p-1 print:text-[10px] print:min-h-0 print:border-none">
-                  {initialFeedback ? (
+                  {feedback ? (
                     <>
-                      <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{initialFeedback}"</p>
-                      {initialStamp && (
+                      <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{feedback}"</p>
+                      {stamp && (
                         <div className="absolute right-0 bottom-0 translate-x-4 translate-y-6 w-32 h-32 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-16 print:h-16 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5 print:rotate-0">
                           <img 
-                            src={`/images/${initialStamp}`} 
+                            src={`/images/${stamp}`} 
                             alt="stamp" 
                             className="w-full h-full object-contain drop-shadow-2xl"
                           />
