@@ -212,22 +212,6 @@ export default function StudentDashboard() {
 
   return (
     <>
-    <style dangerouslySetInnerHTML={{ __html: `
-      .touch-delete-btn {
-        opacity: 1 !important;
-      }
-      @media (hover: hover) {
-        .touch-delete-btn {
-          opacity: 0 !important;
-          transition: opacity 0.2s ease-in-out !important;
-        }
-        .group:hover .touch-delete-btn,
-        .group\\/item:hover .touch-delete-btn,
-        .group-hover:hover .touch-delete-btn {
-          opacity: 1 !important;
-        }
-      }
-    `}} />
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
       style={{ backgroundImage: "url('/images/bg-student.jpg')" }}

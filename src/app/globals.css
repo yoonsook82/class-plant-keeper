@@ -59,3 +59,22 @@ body {
   font-size: 14px;
 }
 
+/* 터치 디바이스(태블릿/모바일)에서는 삭제 버튼 상시 노출, 마우스 지원 기기에서는 호버 시 노출 */
+.touch-delete-btn {
+  opacity: 1 !important;
+}
+
+@media (hover: hover) {
+  .touch-delete-btn {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease-in-out !important;
+  }
+  
+  .group:hover .touch-delete-btn,
+  .group\/item:hover .touch-delete-btn,
+  .group-hover:hover .touch-delete-btn {
+    opacity: 1 !important;
+  }
+}
+
+
