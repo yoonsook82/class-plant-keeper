@@ -212,6 +212,22 @@ export default function StudentDashboard() {
 
   return (
     <>
+    <style dangerouslySetInnerHTML={{ __html: `
+      .touch-delete-btn {
+        opacity: 1 !important;
+      }
+      @media (hover: hover) {
+        .touch-delete-btn {
+          opacity: 0 !important;
+          transition: opacity 0.2s ease-in-out !important;
+        }
+        .group:hover .touch-delete-btn,
+        .group\\/item:hover .touch-delete-btn,
+        .group-hover:hover .touch-delete-btn {
+          opacity: 1 !important;
+        }
+      }
+    `}} />
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
       style={{ backgroundImage: "url('/images/bg-student.jpg')" }}
@@ -270,7 +286,7 @@ export default function StudentDashboard() {
                         e.stopPropagation();
                         handleDeletePlant(plant.id, plant.plant_nickname);
                       }}
-                      className="absolute top-3 right-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all z-20 shadow-sm"
+                      className="absolute top-3 right-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all z-20 shadow-sm touch-delete-btn"
                       title="식물 삭제"
                     >
                       ✕
@@ -443,7 +459,7 @@ export default function StudentDashboard() {
                       {/* Delete Button */}
                       <button 
                         onClick={() => handleDeleteRecord(record.id)}
-                        className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/item:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold"
+                        className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold touch-delete-btn"
                       >
                         ✕
                       </button>
@@ -1214,7 +1230,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                           </div>
                           <button 
                             onClick={() => removeBlock(index)} 
-                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-md z-10"
+                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] transition-opacity shadow-md z-10 touch-delete-btn"
                             title="제거"
                           >
                             ✕
