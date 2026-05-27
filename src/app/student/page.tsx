@@ -1173,8 +1173,8 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                             : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105 shadow-sm'
                         }`}
                       >
-                        <div className="w-14 h-14 flex items-center justify-center">
-                          <Image src={block.img} alt={block.name} width={70} height={70} className="object-contain w-11 h-11" />
+                        <div className="w-[74px] h-[74px] flex items-center justify-center">
+                          <Image src={block.img} alt={block.name} width={70} height={70} className="object-contain w-[58px] h-[58px]" />
                         </div>
                         <span className="text-xs font-body font-bold text-gray-700 leading-tight text-center">{block.name}</span>
                       </button>
