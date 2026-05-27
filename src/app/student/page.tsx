@@ -443,7 +443,7 @@ export default function StudentDashboard() {
                       {/* Delete Button */}
                       <button 
                         onClick={() => handleDeleteRecord(record.id)}
-                        className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold"
+                        className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/item:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold"
                       >
                         ✕
                       </button>
