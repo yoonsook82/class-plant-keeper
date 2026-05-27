@@ -629,7 +629,7 @@ export default function ReportModal({
         }
         @media print {
           @page {
-            margin: 0;
+            margin: 20mm;
             size: A4;
           }
 
@@ -676,7 +676,7 @@ export default function ReportModal({
             display: block !important;
             overflow: visible !important;
             z-index: 99999 !important;
-            padding: 20mm !important; /* Acts as precise page margin and disables default browser headers */
+            padding: 0 !important; /* Handled natively by @page margin */
             margin: 0 !important;
             box-sizing: border-box !important;
           }
@@ -756,7 +756,7 @@ export default function ReportModal({
           section.print\:break-before-page {
             break-before: page !important;
             page-break-before: always !important;
-            padding-top: 20mm !important;
+            padding-top: 0 !important; /* Handled natively by @page margin */
           }
 
           .space-y-12 { margin-top: 0 !important; }
