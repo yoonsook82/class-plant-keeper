@@ -629,8 +629,8 @@ export default function ReportModal({
         }
         @media print {
           @page {
-            margin: 20mm;
             size: A4;
+            margin: 20mm !important;
           }
 
           * {
@@ -702,9 +702,7 @@ export default function ReportModal({
 
           section {
             display: block !important;
-            margin-bottom: 30px !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            margin-bottom: 25px !important;
             clear: both !important;
           }
 
@@ -748,8 +746,9 @@ export default function ReportModal({
           }
 
           section {
-            padding-top: 0 !important;
-            margin-bottom: 30px !important;
+            padding: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 25px !important;
           }
 
           /* Photo Timeline forced to new page */
