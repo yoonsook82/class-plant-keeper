@@ -142,8 +142,7 @@ export default function ReportModal({
       >
         
         {/* Print Header Override */}
-        <div className="print-header justify-between items-center w-full mb-4 px-2 text-[10px] text-gray-500 font-bold border-b border-gray-100 pb-2">
-          <span>우리 반 식집사</span>
+        <div className="print-header">
           <span>{new Date().toLocaleString('ko-KR', { 
             year: 'numeric', 
             month: 'numeric', 
@@ -152,6 +151,7 @@ export default function ReportModal({
             minute: 'numeric', 
             hour12: true 
           })}</span>
+          <span>우리 반 식집사</span>
         </div>
 
         {/* Header */}
@@ -279,11 +279,13 @@ export default function ReportModal({
               <div className="pt-8 border-t border-gray-100 min-h-[600px] print:pt-4 print:min-h-[450px]">
                 <div className="flex justify-between items-center mb-6 print:mb-2">
                   <h4 className="font-title text-2xl text-orange-600 flex items-center gap-3 print:text-xl">
-                    <span className="print:hidden">📈</span> 성장 그래프
+                    <span>📈</span> 성장 그래프
                   </h4>
                   <p className="text-sm font-bold text-gray-500 print:text-[10px]">단위: cm / 날짜별 키의 변화</p>
                 </div>
-                <div className="w-full h-[400px] md:h-[500px] print:w-[98%] print:mx-auto overflow-visible" style={{ height: typeof window !== 'undefined' && window.matchMedia?.('print').matches ? `${dynamicPrintHeight}px` : undefined }}>
+                
+                {/* Screen Graph */}
+                <div className="w-full h-[400px] md:h-[500px] print:hidden overflow-visible">
                   {graphData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={graphData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
@@ -333,6 +335,48 @@ export default function ReportModal({
                     </div>
                   )}
                 </div>
+
+                {/* Print Graph (A4 optimized fixed sizing) */}
+                <div className="hidden print:block w-full print-graph-container overflow-visible">
+                  {graphData.length > 0 ? (
+                    <LineChart data={graphData} width={630} height={580} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="displayDate" 
+                        axisLine={{ stroke: '#eee' }}
+                        tickLine={false} 
+                        tick={{fontSize: 9, fill: "#666", fontWeight: "bold"}} 
+                        dy={10}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
+                      />
+                      <YAxis 
+                        domain={[0, (dataMax: number) => Math.max(dataMax + 2, 10)]} 
+                        axisLine={{ stroke: '#eee' }}
+                        tickLine={false} 
+                        tick={{fontSize: 11, fill: "#666"}} 
+                        dx={-5}
+                        tickCount={10}
+                        width={40}
+                      />
+                      <Line 
+                        type="linear" 
+                        dataKey="height" 
+                        stroke="#f97316" 
+                        strokeWidth={5} 
+                        dot={{r: 7, fill: "#f97316", strokeWidth: 3, stroke: "#fff"}} 
+                        activeDot={{r: 10, strokeWidth: 0}} 
+                        connectNulls={true}
+                      />
+                    </LineChart>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-4">
+                      <p className="font-body italic text-sm">기록이 쌓이면 멋진 성장 곡선이 그려집니다.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </section>
@@ -369,7 +413,7 @@ export default function ReportModal({
                   {mode === "student" && onDeleteRecord && (
                     <button 
                       onClick={() => onDeleteRecord(r.id)}
-                      className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold print:hidden"
+                      className="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm z-20 font-bold print:hidden"
                     >
                       ✕
                     </button>
@@ -566,14 +610,13 @@ export default function ReportModal({
 
       </div>
       
-      {/* Print styles */}
       <style jsx global>{`
         .print-header {
           display: none !important;
         }
         @media print {
           @page {
-            margin: 20mm 15mm;
+            margin: 0;
             size: A4;
           }
 
@@ -582,15 +625,10 @@ export default function ReportModal({
             print-color-adjust: exact !important;
           }
 
-          .print-header {
-            display: flex !important;
-          }
-
           body {
             margin: 0 !important;
             padding: 0 !important;
           }
-
 
           /* Hide everything by default using visibility */
           body * {
@@ -603,6 +641,18 @@ export default function ReportModal({
             visibility: visible !important;
           }
 
+          .print-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            font-size: 11px !important;
+            color: #9ca3af !important; /* text-gray-400 */
+            font-weight: bold !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 8px !important;
+            margin-bottom: 16px !important;
+          }
+
           #print-modal-container {
             position: relative !important;
             left: 0 !important;
@@ -613,8 +663,9 @@ export default function ReportModal({
             display: block !important;
             overflow: visible !important;
             z-index: 99999 !important;
-            padding: 1.5cm !important;
+            padding: 20mm !important; /* Acts as precise page margin and disables default browser headers */
             margin: 0 !important;
+            box-sizing: border-box !important;
           }
 
           #print-modal-container > div {
@@ -644,9 +695,11 @@ export default function ReportModal({
             clear: both !important;
           }
 
-          .recharts-responsive-container {
+          /* Set graph A4 height & alignment */
+          .print-graph-container {
+            height: 580px !important;
             width: 100% !important;
-            height: 100% !important;
+            max-width: 100% !important;
           }
 
           img {

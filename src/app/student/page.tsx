@@ -270,7 +270,7 @@ export default function StudentDashboard() {
                         e.stopPropagation();
                         handleDeletePlant(plant.id, plant.plant_nickname);
                       }}
-                      className="absolute top-3 right-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all z-20 shadow-sm"
+                      className="absolute top-3 right-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all z-20 shadow-sm"
                       title="식물 삭제"
                     >
                       ✕
@@ -409,7 +409,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/report-icon.png" alt="report" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-[#424a5a]">활동 보고서</span>
+                <span className="font-title text-base md:text-lg text-[#424a5a]">관찰 보고서</span>
               </div>
               <div 
                 onMouseEnter={playPopSound}
@@ -1214,7 +1214,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                           </div>
                           <button 
                             onClick={() => removeBlock(index)} 
-                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-md z-10"
                             title="제거"
                           >
                             ✕
