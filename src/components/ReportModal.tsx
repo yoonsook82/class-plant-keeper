@@ -154,18 +154,6 @@ export default function ReportModal({
         onClick={e => e.stopPropagation()}
       >
         
-        {/* Print Header Override */}
-        <div className="print-header">
-          <span>{new Date().toLocaleString('ko-KR', { 
-            year: 'numeric', 
-            month: 'numeric', 
-            day: 'numeric', 
-            hour: 'numeric', 
-            minute: 'numeric', 
-            hour12: true 
-          })}</span>
-          <span>우리 반 식집사</span>
-        </div>
 
         {/* Header */}
         <div className="relative shrink-0 overflow-hidden print:bg-white print:border-b-4 print:border-orange-500 print:overflow-visible">
