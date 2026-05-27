@@ -677,6 +677,8 @@ export default function ReportModal({
             overflow: visible !important;
             z-index: 99999 !important;
             padding: 20mm !important; /* Acts as precise page margin and disables default browser headers */
+            box-decoration-break: clone !important;
+            -webkit-box-decoration-break: clone !important;
             margin: 0 !important;
             box-sizing: border-box !important;
           }
@@ -703,8 +705,6 @@ export default function ReportModal({
           section {
             display: block !important;
             margin-bottom: 30px !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
             clear: both !important;
           }
 
@@ -756,7 +756,7 @@ export default function ReportModal({
           section.print\:break-before-page {
             break-before: page !important;
             page-break-before: always !important;
-            padding-top: 20mm !important;
+            padding-top: 0 !important; /* Handled by box-decoration-break: clone */
           }
 
           .space-y-12 { margin-top: 0 !important; }
