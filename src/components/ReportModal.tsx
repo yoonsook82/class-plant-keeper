@@ -575,12 +575,13 @@ export default function ReportModal({
                       ))}
                       <button
                         onClick={() => setStamp(null)}
-                        className={`aspect-square rounded-2xl flex flex-col items-center justify-center text-[10px] font-bold transition-all border-2 ${
+                        className={`aspect-square rounded-2xl flex flex-col items-center justify-center text-[10px] font-bold transition-all border-2 gap-1 ${
                           stamp === null
                             ? "bg-gray-200 border-gray-400"
                             : "bg-white border-gray-100 hover:border-gray-300"
                         }`}
                       >
+                        <img src="/images/eraser.png" alt="지우기" className="w-8 h-8 object-contain" />
                         지우기
                       </button>
                     </div>
