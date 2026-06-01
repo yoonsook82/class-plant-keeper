@@ -43,6 +43,7 @@ export default function TeacherDashboard() {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingStudentId, setDeletingStudentId] = useState<string | null>(null);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   
   const [appUrl, setAppUrl] = useState("");
 
@@ -340,12 +341,24 @@ export default function TeacherDashboard() {
                    여학생
                  </button>
                </div>
-               <button disabled={isAdding} type="submit" className="bg-[#5a4a42] text-white py-3 rounded-lg font-bold hover:bg-[#3d322c] transition-colors active:scale-95 disabled:opacity-50 mt-2">
-                 {isAdding ? "추가 중..." : "학생 추가하기 ➕"}
-               </button>
-             </form>
-          </div>
-        </div>
+                <button disabled={isAdding} type="submit" className="bg-[#5a4a42] text-white py-3 rounded-lg font-bold hover:bg-[#3d322c] transition-colors active:scale-95 disabled:opacity-50 mt-2">
+                  {isAdding ? "추가 중..." : "학생 추가하기 ➕"}
+                </button>
+              </form>
+           </div>
+
+           {/* 개인정보 처리방침 메뉴 */}
+           <div 
+             onClick={() => setIsPrivacyOpen(true)}
+             className="bg-white p-5 rounded-3xl shadow-md border-2 border-brand-green/30 hover:border-brand-green hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group"
+           >
+             <div className="flex items-center gap-3">
+               <span className="text-2xl group-hover:scale-110 transition-transform">🔒</span>
+               <span className="font-title text-base md:text-lg text-brand-brown">개인정보 처리방침</span>
+             </div>
+             <span className="text-gray-400 group-hover:text-brand-green group-hover:translate-x-1 transition-all">➔</span>
+           </div>
+         </div>
 
         {/* Right Side: Student Grid */}
         <div className="flex-1">
@@ -486,6 +499,126 @@ export default function TeacherDashboard() {
         mode="teacher"
         onClose={() => setIsGardenOpen(false)}
       />
+    )}
+
+    {/* 개인정보 처리방침 모달 */}
+    {isPrivacyOpen && (
+      <div 
+        className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in"
+        onClick={() => setIsPrivacyOpen(false)}
+      >
+        <div 
+          className="bg-[#fdfbf7] p-6 md:p-8 rounded-[35px] shadow-2xl animate-in zoom-in-95 duration-200 max-w-[700px] w-full max-h-[85vh] flex flex-col border-[6px] border-white"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6 shrink-0 pb-3 border-b-2 border-brand-green/10">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🛡️</span>
+              <h3 className="font-title text-2xl text-brand-brown">개인정보 처리방침</h3>
+            </div>
+            <button 
+              onClick={() => setIsPrivacyOpen(false)} 
+              className="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Content (Scrollable) */}
+          <div className="flex-1 overflow-y-auto pr-2 space-y-6 font-body text-gray-700 leading-relaxed text-sm md:text-base text-left">
+            
+            <div className="bg-brand-green/5 p-4 rounded-2xl border border-brand-green/10 text-brand-green font-bold text-xs md:text-sm">
+              💡 '우리 반 식집사'는 아동과 교사의 소중한 개인정보를 안전하게 보호하며, 수집된 모든 정보는 Supabase 암호화 보안 데이터베이스에 안전하게 보관됩니다.
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제1조 (개인정보의 처리 목적, 항목, 보유 및 이용 기간)</h4>
+              <p className="mb-3">본 서비스는 필요 최소한의 범위 내에서 개인정보를 처리하며, 목적 외의 용도로는 절대 사용되지 않습니다.</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs md:text-sm border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                  <thead>
+                    <tr className="bg-gray-100/80 text-gray-700 font-bold border-b border-gray-200">
+                      <th className="p-2 border-r border-gray-200">구분</th>
+                      <th className="p-2 border-r border-gray-200">처리 목적</th>
+                      <th className="p-2 border-r border-gray-200">수집 항목</th>
+                      <th className="p-2">보유 및 이용 기간</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 text-gray-600">
+                    <tr>
+                      <td className="p-2 border-r border-gray-200 font-bold">교사</td>
+                      <td className="p-2 border-r border-gray-200">학급 생성, 학생 관리, 도장 피드백</td>
+                      <td className="p-2 border-r border-gray-200">이메일 주소, 비밀번호, 학급 이름</td>
+                      <td className="p-2">회원 탈퇴 또는 학급 폐쇄 시까지</td>
+                    </tr>
+                    <tr className="bg-gray-50/50">
+                      <td className="p-2 border-r border-gray-200 font-bold">학생</td>
+                      <td className="p-2 border-r border-gray-200">대시보드 로그인, 관찰기록 연동</td>
+                      <td className="p-2 border-r border-gray-200">학생 이름, 성별 (일러스트용)</td>
+                      <td className="p-2">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                    </tr>
+                    <tr>
+                      <td className="p-2 border-r border-gray-200 font-bold">활동</td>
+                      <td className="p-2 border-r border-gray-200">일지 기록, 성장 곡선 시각화</td>
+                      <td className="p-2 border-r border-gray-200">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
+                      <td className="p-2">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제2조 (개인정보의 제3자 제공 및 처리 위탁에 관한 사항)</h4>
+              <p>① 본 서비스는 정보주체의 개인정보를 제3자에게 임의 제공하지 않으며, 학급의 독립된 교육 환경에서만 관리됩니다.</p>
+              <p>② 본 서비스는 원활한 개인정보 처리를 위하여 외부 업체에 업무를 위탁하고 있지 않습니다.</p>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제3조 (만 14세 미만 아동의 개인정보 처리에 관한 사항)</h4>
+              <p>① 본 서비스는 만 14세 미만 아동이 안전하게 이용할 수 있도록 교사가 학급 코드를 발급해 아동을 등록하는 일괄 등록 방식을 채택하고 있습니다.</p>
+              <p>② 교사는 아동 등록 및 개인정보 처리를 수행하기 전, 법정대리인(보호자)의 이용약관 및 개인정보 수집·이용 위임 절차를 반드시 확보해야 합니다.</p>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제4조 (개인정보의 파기 절차 및 방법)</h4>
+              <p>① 목적 달성(학년도 종료, 교사의 학급 데이터 폐쇄 등) 시 수집된 개인정보는 지체 없이 완전히 삭제됩니다.</p>
+              <p>② 데이터베이스 내 모든 데이터는 복구 불가능한 기술적 방법으로 영구 파기 처리됩니다.</p>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제5조 (정보주체와 법정대리인의 권리·의무 및 그 행사방법)</h4>
+              <p>① 아동 및 법정대리인은 언제든지 아동의 개인정보 및 관찰 일지 데이터의 열람, 정정, 개별 삭제 및 처리 정지를 요구할 수 있습니다.</p>
+              <p>② 이 권리 행사는 서비스 내 개별 일지 삭제 버튼을 이용하시거나 담임교사를 통해 즉각 처리하실 수 있습니다.</p>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제6조 (개인정보의 안전성 확보 조치)</h4>
+              <p>① **클라우드 데이터 보안**: 글로벌 보안 인증 규격을 갖춘 Supabase 데이터베이스의 암호화 저장 기법을 적용해 외부 침입 위험을 차단합니다.</p>
+              <p>② **전송 데이터 암호화**: 전 구간 SSL/HTTPS 보안 프로토콜을 탑재하여 통신 중 정보 가로채기를 철저히 차단합니다.</p>
+            </div>
+
+            <div className="pb-4">
+              <h4 className="font-title text-lg text-brand-green mb-2">제7조 (개인정보 보호책임자 및 담당자)</h4>
+              <p className="bg-[#f4f1ea]/60 p-4 rounded-xl text-xs md:text-sm border border-gray-200 italic">
+                본 서비스의 개인정보 처리에 관한 모든 문의사항, 의견 수렴 및 불만 처리는 해당 학급 담임교사에게 연락하여 안내받으실 수 있습니다.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Footer Buttons */}
+          <div className="mt-6 shrink-0 flex justify-center pt-3 border-t border-brand-green/10">
+            <button 
+              onClick={() => setIsPrivacyOpen(false)}
+              className="bg-brand-green text-white px-10 py-3 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] transition-colors shadow-lg active:scale-95 whitespace-nowrap"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
     )}
   </>
   );
