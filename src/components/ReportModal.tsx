@@ -89,7 +89,7 @@ export default function ReportModal({
     setStamp(freshStamp);
   }, [plant]);
 
-  const startListening = async () => {
+  const startListening = () => {
     // 모든 주요 브라우저(크롬, 사파리, 파이어폭스, 엣지, 오페라 등)의 벤더 프리픽스 호환성 최대 보장
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -100,23 +100,6 @@ export default function ReportModal({
 
     if (!SpeechRecognition) {
       alert("이 브라우저는 음성 인식을 지원하지 않습니다. 구글 크롬(Chrome), 마이크로소프트 엣지(Edge) 등 표준 브라우저의 최신 버전을 이용해주세요. 💻");
-      return;
-    }
-
-    try {
-      // 노트북 마이크 권한 요청 및 연결 장치 상태 검증
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-      }
-    } catch (err: any) {
-      console.error("Microphone Access Error:", err);
-      alert(
-        "노트북 마이크 장치 또는 권한 설정에 오류가 있습니다! 🎤\n\n" +
-        "[해결 방법]\n" +
-        "1. 노트북 내장 마이크나 이어폰 마이크가 시스템에 정상 인식되는지 확인해주세요.\n" +
-        "2. 운영체제 설정(윈도우 '마이크 개인 정보 설정' 또는 맥의 '개인 정보 보호')에서 브라우저의 마이크 사용 권한이 켜져 있는지 확인해주세요.\n" +
-        "3. 브라우저 주소창 왼쪽의 '자물쇠(설정)' 아이콘을 누르고 마이크 설정을 '허용'으로 변경해주세요."
-      );
       return;
     }
 
@@ -140,14 +123,16 @@ export default function ReportModal({
       if (event.error === 'not-allowed') {
         alert(
           "마이크 권한이 차단되어 음성 인식을 시작할 수 없습니다. 🎤\n\n" +
-          "주소창 왼쪽의 '자물쇠' 또는 '설정' 아이콘을 클릭하여 마이크 권한을 '허용'으로 변경한 후 다시 시도해주세요."
+          "[해결 방법]\n" +
+          "1. 브라우저 주소창 왼쪽의 '자물쇠' 또는 '설정' 아이콘을 클릭하여 마이크 권한을 '허용'으로 변경해주세요.\n" +
+          "2. 운영체제 설정(윈도우 '마이크 개인 정보 설정' 또는 맥의 '개인 정보 보호')에서 브라우저의 마이크 사용 권한이 켜져 있는지 확인해주세요."
         );
       } else if (event.error === 'no-speech') {
         // 음성이 감지되지 않은 경우 자연스럽게 마감
       } else if (event.error === 'network') {
         alert("인터넷 연결이 원활하지 않아 음성 인식 네트워크 오류가 발생했습니다. 연결을 확인해주세요.");
       } else {
-        alert(`음성 인식 오류 (${event.error}): 노트북 기본 마이크 입력 크기나 시스템 장치 드라이버를 점검해주세요.`);
+        alert(`음성 인식 오류 (${event.error}): 마이크 장치 연결이나 시스템 장치 설정을 점검해주세요.`);
       }
     };
 
