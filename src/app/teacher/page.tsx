@@ -512,17 +512,11 @@ export default function TeacherDashboard() {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex justify-between items-center mb-6 shrink-0 pb-3 border-b-2 border-brand-green/10">
+          <div className="flex items-center mb-6 shrink-0 pb-3 border-b-2 border-brand-green/10">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🛡️</span>
               <h3 className="font-title text-2xl text-brand-brown">개인정보 처리방침</h3>
             </div>
-            <button 
-              onClick={() => setIsPrivacyOpen(false)} 
-              className="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors"
-            >
-              ✕
-            </button>
           </div>
 
           {/* Content (Scrollable) */}
