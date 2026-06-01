@@ -508,7 +508,7 @@ export default function TeacherDashboard() {
         onClick={() => setIsPrivacyOpen(false)}
       >
         <div 
-          className="bg-[#fdfbf7] p-6 md:p-8 rounded-[35px] shadow-2xl animate-in zoom-in-95 duration-200 max-w-[700px] w-full max-h-[85vh] flex flex-col border-[6px] border-white"
+          className="bg-[#fdfbf7] p-6 md:p-8 rounded-[35px] shadow-2xl animate-in zoom-in-95 duration-200 max-w-[850px] md:max-w-[900px] w-full max-h-[85vh] flex flex-col border-[6px] border-white"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -535,34 +535,34 @@ export default function TeacherDashboard() {
             <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제1조 (개인정보의 처리 목적, 항목, 보유 및 이용 기간)</h4>
               <p className="mb-3">본 서비스는 필요 최소한의 범위 내에서 개인정보를 처리하며, 목적 외의 용도로는 절대 사용되지 않습니다.</p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs md:text-sm border-collapse border border-gray-200 rounded-lg overflow-hidden">
+              <div className="overflow-x-auto rounded-xl border border-gray-200">
+                <table className="w-full text-xs md:text-sm border-collapse">
                   <thead>
                     <tr className="bg-gray-100/80 text-gray-700 font-bold border-b border-gray-200">
-                      <th className="p-2 border-r border-gray-200">구분</th>
-                      <th className="p-2 border-r border-gray-200">처리 목적</th>
-                      <th className="p-2 border-r border-gray-200">수집 항목</th>
-                      <th className="p-2">보유 및 이용 기간</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[70px] min-w-[70px]">구분</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center min-w-[150px]">처리 목적</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center min-w-[200px]">수집 항목</th>
+                      <th className="p-3 whitespace-nowrap text-center min-w-[150px]">보유 및 이용 기간</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 text-gray-600">
                     <tr>
-                      <td className="p-2 border-r border-gray-200 font-bold">교사</td>
-                      <td className="p-2 border-r border-gray-200">학급 생성, 학생 관리, 도장 피드백</td>
-                      <td className="p-2 border-r border-gray-200">이메일 주소, 비밀번호, 학급 이름</td>
-                      <td className="p-2">회원 탈퇴 또는 학급 폐쇄 시까지</td>
+                      <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">교사</td>
+                      <td className="p-3 border-r border-gray-200">학급 생성, 학생 관리, 도장 피드백</td>
+                      <td className="p-3 border-r border-gray-200">이메일 주소, 비밀번호, 학급 이름</td>
+                      <td className="p-3">회원 탈퇴 또는 학급 폐쇄 시까지</td>
                     </tr>
                     <tr className="bg-gray-50/50">
-                      <td className="p-2 border-r border-gray-200 font-bold">학생</td>
-                      <td className="p-2 border-r border-gray-200">대시보드 로그인, 관찰기록 연동</td>
-                      <td className="p-2 border-r border-gray-200">학생 이름, 성별 (일러스트용)</td>
-                      <td className="p-2">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                      <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">학생</td>
+                      <td className="p-3 border-r border-gray-200">대시보드 로그인, 관찰기록 연동</td>
+                      <td className="p-3 border-r border-gray-200">학생 이름, 성별 (일러스트 구분용)</td>
+                      <td className="p-3">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
                     <tr>
-                      <td className="p-2 border-r border-gray-200 font-bold">활동</td>
-                      <td className="p-2 border-r border-gray-200">일지 기록, 성장 곡선 시각화</td>
-                      <td className="p-2 border-r border-gray-200">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
-                      <td className="p-2">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                      <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">활동</td>
+                      <td className="p-3 border-r border-gray-200">일지 기록, 성장 곡선 시각화</td>
+                      <td className="p-3 border-r border-gray-200">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
+                      <td className="p-3">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
                   </tbody>
                 </table>
@@ -599,11 +599,30 @@ export default function TeacherDashboard() {
               <p>② **전송 데이터 암호화**: 전 구간 SSL/HTTPS 보안 프로토콜을 탑재하여 통신 중 정보 가로채기를 철저히 차단합니다.</p>
             </div>
 
-            <div className="pb-4">
+            <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제7조 (개인정보 보호책임자 및 담당자)</h4>
               <p className="bg-[#f4f1ea]/60 p-4 rounded-xl text-xs md:text-sm border border-gray-200 italic">
                 본 서비스의 개인정보 처리에 관한 모든 문의사항, 의견 수렴 및 불만 처리는 해당 학급 담임교사에게 연락하여 안내받으실 수 있습니다.
               </p>
+            </div>
+
+            {/* PDF 동의서 다운로드 카드 */}
+            <div className="pt-4 border-t border-brand-green/10">
+              <div className="bg-orange-50/50 p-5 rounded-2xl border border-orange-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-left">
+                  <p className="font-title text-base text-orange-700 mb-1 flex items-center gap-1.5">
+                    <span>📄</span> 학부모 배포용 동의서 다운로드
+                  </p>
+                  <p className="text-xs text-gray-500 font-body leading-relaxed">교사의 일괄 등록 대행 및 학부모 개인정보 수집·이용 동의서 및 위임장 양식(PDF)입니다.</p>
+                </div>
+                <a 
+                  href="/files/교사 등록을 통한 우리 반 식집사 학생 회원 가입 동의서.pdf" 
+                  download="교사 등록을 통한 우리 반 식집사 학생 회원 가입 동의서.pdf"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-title px-6 py-2.5 rounded-full text-xs md:text-sm shadow-md hover:shadow-lg transition-all active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-1"
+                >
+                  다운로드 📥
+                </a>
+              </div>
             </div>
 
           </div>
