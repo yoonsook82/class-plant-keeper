@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { QRCodeCanvas } from "qrcode.react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 import ReportModal, { Plant, Record } from "@/components/ReportModal";
 import GardenModal from "@/components/GardenModal";
 
@@ -73,7 +73,7 @@ export default function TeacherDashboard() {
   };
 
   const fetchStudents = async (cId: string) => {
-    const { data: studentsData } = await supabase
+    const { data: studentsData } = await getSupabaseClient()
       .from("students")
       .select("id, student_name, created_at, gender")
       .eq("class_id", cId)
@@ -83,14 +83,14 @@ export default function TeacherDashboard() {
 
     const stats: StudentStat[] = await Promise.all(
       studentsData.map(async (st) => {
-        const { count: pCount } = await supabase.from("plants").select("id", { count: "exact" }).eq("student_id", st.id);
+        const { count: pCount } = await getSupabaseClient().from("plants").select("id", { count: "exact" }).eq("student_id", st.id);
         
-        const { data: pData } = await supabase.from("plants").select("id").eq("student_id", st.id);
+        const { data: pData } = await getSupabaseClient().from("plants").select("id").eq("student_id", st.id);
         const pIds = pData?.map(p => p.id) || [];
         
         let rCount = 0;
         if (pIds.length > 0) {
-           const { count } = await supabase.from("records").select("id", { count: "exact" }).in("plant_id", pIds);
+           const { count } = await getSupabaseClient().from("records").select("id", { count: "exact" }).in("plant_id", pIds);
            rCount = count || 0;
         }
 
@@ -112,7 +112,7 @@ export default function TeacherDashboard() {
     setSelectedStudent(student);
     
     // Fetch all plants of this student
-    const { data: plants } = await supabase
+    const { data: plants } = await getSupabaseClient()
       .from("plants")
       .select("*")
       .eq("student_id", student.id)
@@ -131,7 +131,7 @@ export default function TeacherDashboard() {
     setSelectedPlant(plant);
     
     // Fetch all records for this specific plant
-    const { data: records } = await supabase
+    const { data: records } = await getSupabaseClient()
       .from("records")
       .select("*")
       .eq("plant_id", plant.id)
@@ -142,7 +142,7 @@ export default function TeacherDashboard() {
 
   const handleSaveFeedback = async (plantId: string, feedback: string, stamp: string | null) => {
     const combinedFeedback = stamp ? `${feedback}||STAMP:${stamp}` : feedback;
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from("plants")
       .update({ 
         teacher_feedback: combinedFeedback
@@ -190,7 +190,7 @@ export default function TeacherDashboard() {
     }
     
     setIsAdding(true);
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from("students")
       .insert({ 
         class_id: classId, 
@@ -217,19 +217,19 @@ export default function TeacherDashboard() {
   const handleDeleteStudent = async (studentId: string, studentName: string) => {
     try {
       // 1. 식물 ID 목록 가져오기
-      const { data: plants } = await supabase.from("plants").select("id").eq("student_id", studentId);
+      const { data: plants } = await getSupabaseClient().from("plants").select("id").eq("student_id", studentId);
       const plantIds = plants?.map(p => p.id) || [];
 
       // 2. 기록 삭제
       if (plantIds.length > 0) {
-        await supabase.from("records").delete().in("plant_id", plantIds);
+        await getSupabaseClient().from("records").delete().in("plant_id", plantIds);
       }
 
       // 3. 식물 삭제
-      await supabase.from("plants").delete().eq("student_id", studentId);
+      await getSupabaseClient().from("plants").delete().eq("student_id", studentId);
 
       // 4. 학생 삭제
-      const { error } = await supabase.from("students").delete().eq("id", studentId);
+      const { error } = await getSupabaseClient().from("students").delete().eq("id", studentId);
 
       if (error) throw error;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 
 interface Record {
   id: string;
@@ -47,7 +47,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
     setLoading(true);
     try {
       // 1. 해당 학급의 모든 학생 ID 먼저 가져오기
-      const { data: classStudents, error: studentsError } = await supabase
+      const { data: classStudents, error: studentsError } = await getSupabaseClient()
         .from("students")
         .select("id, student_name")
         .eq("class_id", classId);
@@ -62,7 +62,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
       const classStudentIds = classStudents.map(s => s.id);
 
       // 2. 해당 학생들의 식물 관찰 기록 가져오기 (INNER JOIN 효과를 위해 !inner 사용 가능하나 호환성 위해 id 필터링)
-      const { data: allRecords, error: recordsError } = await supabase
+      const { data: allRecords, error: recordsError } = await getSupabaseClient()
         .from("records")
         .select(`
           *,
@@ -112,7 +112,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
 
   const loadInteractions = async (recordId: string) => {
     try {
-      const { data } = await supabase
+      const { data } = await getSupabaseClient()
         .from("interactions")
         .select("*")
         .eq("record_id", recordId)
@@ -146,7 +146,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
     setComment("");
 
     try {
-      await supabase.from("interactions").insert(newInt);
+      await getSupabaseClient().from("interactions").insert(newInt);
       loadInteractions(selectedRecord.latest_record.id);
     } catch (e) {
       console.error(e);
@@ -169,7 +169,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
     setInteractions(prev => [...prev, optimisticInt]);
 
     try {
-      await supabase.from("interactions").insert(newInt);
+      await getSupabaseClient().from("interactions").insert(newInt);
       loadInteractions(selectedRecord.latest_record.id);
     } catch (e) {
       console.error(e);

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 
 function LoginContent() {
   const router = useRouter();
@@ -26,6 +26,14 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isCreatingClass, setIsCreatingClass] = useState(false);
+
+  // 개인 Supabase 연동용 신규 상태
+  const [customUrl, setCustomUrl] = useState("");
+  const [customAnonKey, setCustomAnonKey] = useState("");
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [isSqlModalOpen, setIsSqlModalOpen] = useState(false);
+  const [createdClassCode, setCreatedClassCode] = useState("");
+  const [createdClassId, setCreatedClassId] = useState("");
 
   // 6자리 고유 난수 코드 생성 함수
   const generateClassCode = () => {
@@ -53,9 +61,10 @@ function LoginContent() {
     }
     setLoading(true);
     try {
+      // 1. 공용 데이터베이스에서 학급 코드 매핑 정보 조회
       const { data: classData, error: classError } = await supabase
         .from("classes")
-        .select("id, class_name")
+        .select("id, class_name, custom_supabase_url, custom_supabase_anon_key")
         .eq("class_code", classCode.toUpperCase())
         .maybeSingle();
 
@@ -71,7 +80,17 @@ function LoginContent() {
         return;
       }
 
-      let { data: studentData, error: studentError } = await supabase
+      // 2. 만약 해당 학급이 개인용 Supabase를 사용 중이라면 브라우저 세션에 동적 매핑 정보를 탑재
+      if (classData.custom_supabase_url && classData.custom_supabase_anon_key) {
+        localStorage.setItem("custom_supabase_url", classData.custom_supabase_url.trim());
+        localStorage.setItem("custom_supabase_anon_key", classData.custom_supabase_anon_key.trim());
+      } else {
+        localStorage.removeItem("custom_supabase_url");
+        localStorage.removeItem("custom_supabase_anon_key");
+      }
+
+      // 3. 동적 클라이언트를 활용하여 학생 및 식물 정보 검증
+      let { data: studentData, error: studentError } = await getSupabaseClient()
         .from("students")
         .select("id")
         .eq("class_id", classData.id)
@@ -96,7 +115,7 @@ function LoginContent() {
       localStorage.setItem("studentId", studentData!.id);
       localStorage.setItem("studentName", studentName);
       
-      const { data: stData } = await supabase.from("students").select("gender").eq("id", studentData!.id).single();
+      const { data: stData } = await getSupabaseClient().from("students").select("gender").eq("id", studentData!.id).single();
       if (stData?.gender) localStorage.setItem("studentGender", stData.gender);
       
       router.push("/student");
@@ -137,7 +156,16 @@ function LoginContent() {
         return;
       }
 
-      // 2. Supabase Auth로 로그인
+      // 2. 개인용 Supabase 정보 연동 매핑 등록
+      if (classData.custom_supabase_url && classData.custom_supabase_anon_key) {
+        localStorage.setItem("custom_supabase_url", classData.custom_supabase_url.trim());
+        localStorage.setItem("custom_supabase_anon_key", classData.custom_supabase_anon_key.trim());
+      } else {
+        localStorage.removeItem("custom_supabase_url");
+        localStorage.removeItem("custom_supabase_anon_key");
+      }
+
+      // 3. Supabase Auth로 로그인
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
         password,
@@ -232,7 +260,9 @@ function LoginContent() {
           class_name: className, 
           teacher_email: email.trim(), 
           teacher_password: password, // NOT NULL 제약 조건 우회/충족
-          class_code: newClassCode 
+          class_code: newClassCode,
+          custom_supabase_url: customUrl.trim() || null,
+          custom_supabase_anon_key: customAnonKey.trim() || null
         })
         .select().single();
         
@@ -243,11 +273,24 @@ function LoginContent() {
         return; 
       }
       
-      localStorage.setItem("userRole", "teacher");
-      localStorage.setItem("classId", classData.id);
-      localStorage.setItem("className", className);
-      localStorage.setItem("classCode", newClassCode);
-      router.push("/teacher");
+      // 3. 개인 Supabase 정보 입력 여부에 따른 분기 처리
+      if (customUrl.trim() && customAnonKey.trim()) {
+        localStorage.setItem("custom_supabase_url", customUrl.trim());
+        localStorage.setItem("custom_supabase_anon_key", customAnonKey.trim());
+        setCreatedClassCode(newClassCode);
+        setCreatedClassId(classData.id);
+        
+        // 마법 팝업 모달창 오픈 (세션 임시 셋팅은 팝업 확인 버튼 클릭 시 완료됨)
+        setIsSqlModalOpen(true);
+      } else {
+        localStorage.removeItem("custom_supabase_url");
+        localStorage.removeItem("custom_supabase_anon_key");
+        localStorage.setItem("userRole", "teacher");
+        localStorage.setItem("classId", classData.id);
+        localStorage.setItem("className", className);
+        localStorage.setItem("classCode", newClassCode);
+        router.push("/teacher");
+      }
     } catch (e: any) { 
       console.error(e);
       setErrorMsg("시스템 오류가 발생했습니다."); 
@@ -332,7 +375,79 @@ function LoginContent() {
                         <InputGroup label="이메일" value={email} onChange={setEmail} placeholder="teacher@example.com" disabled={loading} />
                         <InputGroup label="비밀번호" value={password} onChange={setPassword} placeholder="비밀번호를 입력하세요" type="password" disabled={loading} />
                         {isCreatingClass && (
-                          <InputGroup label="학급 이름" value={className} onChange={setClassName} placeholder="예: 3학년 2반" disabled={loading} />
+                          <>
+                            <InputGroup label="학급 이름" value={className} onChange={setClassName} placeholder="예: 3학년 2반" disabled={loading} />
+                            
+                            {/* 비용 걱정 없는 우리 반 전용 100% 무료 서버 개설 가이드 */}
+                            <div className="mt-4 border border-brand-green/30 bg-[#fbfdf9] rounded-2xl overflow-hidden text-left">
+                              <button
+                                type="button"
+                                onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+                                className="w-full px-4 py-3 flex justify-between items-center bg-[#f0f7ec] hover:bg-[#e7f2e1] transition-colors"
+                              >
+                                <span className="font-title text-sm md:text-base text-brand-green flex items-center gap-1.5">
+                                  <span>⚙️</span> 비용 걱정 없는 우리 반 전용 100% 무료 서버 개설 가이드
+                                </span>
+                                <span className="text-gray-400 font-bold text-xs">{isAccordionOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+                              </button>
+                              
+                              {isAccordionOpen && (
+                                <div className="p-4 space-y-3 font-body text-xs md:text-sm text-gray-600 leading-relaxed border-t border-brand-green/10 animate-in slide-in-from-top-1 duration-200">
+                                  <div className="bg-[#fcfaf4] p-3 rounded-xl border border-amber-100 text-[#a67c00] font-bold text-xs">
+                                    💡 100% 개인 소유의 Supabase 서버를 연동하면 평생 트래픽/용량 제한 걱정 없이 아름다운 식물 정원을 무제한 사용하실 수 있습니다!
+                                  </div>
+                                  
+                                  <div>
+                                    <p className="font-bold text-brand-brown mb-1">1단계: Supabase 1분 무료 회원가입</p>
+                                    <a 
+                                      href="https://supabase.com" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="inline-block bg-brand-green text-white font-title px-3.5 py-1 rounded-full text-xs hover:bg-[#5e741e] shadow-sm transition-all"
+                                    >
+                                      공식 웹사이트 바로가기 ↗
+                                    </a>
+                                  </div>
+                                  
+                                  <div>
+                                    <p className="font-bold text-brand-brown mb-1">2단계: 새 프로젝트 생성 방법</p>
+                                    <p className="pl-1 text-gray-500 font-body">
+                                      - 가입 후 <b>New Project</b> 클릭 → 이름 지정 → <b>Database Password</b>를 설정하고 <b>Create New Project</b>를 클릭하면 1분 만에 개인 서버가 개설됩니다.
+                                    </p>
+                                  </div>
+
+                                  <div>
+                                    <p className="font-bold text-brand-brown mb-1">3단계: API 키 복사하기</p>
+                                    <p className="pl-1 text-gray-500 font-body">
+                                      - 개설 완료 후 우측 상단의 <b>[Connect]</b> 버튼이나 <b>Project Settings &rarr; API</b> 탭에서 다음 두 가지 자격 증명을 복사하여 아래에 입력하세요.
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* 커스텀 Supabase 입력 양식 */}
+                            <div className="bg-[#fdfbf7] p-4 rounded-2xl border border-[#f5e1c8] space-y-2 mt-2">
+                              <p className="font-title text-xs text-[#a65d00] text-left">🌱 개인 전용 서버 연동 (선택 사항)</p>
+                              <InputGroup 
+                                label="나의 Supabase URL" 
+                                value={customUrl} 
+                                onChange={setCustomUrl} 
+                                placeholder="예: https://abcdxyz.supabase.co" 
+                                disabled={loading} 
+                              />
+                              <InputGroup 
+                                label="나의 Supabase Anon Key" 
+                                value={customAnonKey} 
+                                onChange={setCustomAnonKey} 
+                                placeholder="eyJhbGciOi..." 
+                                disabled={loading} 
+                              />
+                              <p className="text-[10px] text-gray-400 font-body text-left leading-normal">
+                                * 입력하지 않고 비워두면 기존의 **기본 제공 무료 공용 서버**로 간편하게 즉시 개설됩니다.
+                              </p>
+                            </div>
+                          </>
                         )}
                       </>
                     ) : (
@@ -413,6 +528,85 @@ function LoginContent() {
           </div>
         </div>
       </div>
+      
+      {/* 1초 마법 테이블 세팅 모달 */}
+      {isSqlModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto"
+          onClick={() => {}}
+        >
+          <div 
+            className="bg-[#fdfbf7] w-full max-w-[550px] rounded-[35px] p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-300 border-[6px] border-white flex flex-col text-left"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4 border-b border-orange-100 pb-3">
+              <span className="text-3xl animate-bounce">⚡</span>
+              <h3 className="font-title text-2xl text-brand-brown">1초 만에 개인 서버 활성화하기</h3>
+            </div>
+            
+            <div className="space-y-4 font-body text-sm md:text-base text-gray-600 leading-relaxed">
+              <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-orange-700 font-bold text-xs md:text-sm">
+                🔒 철통 보안: 선생님의 데이터베이스 마스터 비밀번호는 요구하지 않으니 안심하세요! 
+              </div>
+
+              <p className="font-body text-gray-500 text-xs md:text-sm">
+                선생님의 새 Supabase 서버에 학생/식물/일지 관찰 기록을 위한 <b>3개 테이블(students, plants, records)</b>을 마우스 단 2번 클릭으로 1초 만에 무인 세팅합니다.
+              </p>
+
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                <p className="font-title text-brand-green mb-1 text-xs md:text-sm">📌 마법 셋업 3단계 진행 수칙</p>
+                <ol className="list-decimal pl-5 space-y-1 text-xs md:text-sm text-gray-500 font-body">
+                  <li>아래 <b>[1단계: 테이블 자동 세팅 열기]</b> 버튼을 누릅니다.</li>
+                  <li>클립보드에 테이블 생성용 SQL이 <b>자동 복사</b>되며, Supabase SQL Editor 창이 새 탭으로 켜집니다.</li>
+                  <li>열린 화면에서 마우스를 클릭하고 <b>Ctrl + V</b> (붙여넣기)를 누른 뒤, 우측 하단의 <b>[Run]</b> 버튼을 누르면 끝납니다!</li>
+                </ol>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const sqlText = `-- 1. students (학생 테이블) 생성\nCREATE TABLE IF NOT EXISTS students (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  class_id uuid NOT NULL,\n  student_name text NOT NULL,\n  gender text DEFAULT 'boy',\n  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 2. plants (반려 식물 테이블) 생성\nCREATE TABLE IF NOT EXISTS plants (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  student_id uuid NOT NULL,\n  plant_type text NOT NULL,\n  plant_nickname text NOT NULL,\n  planted_at text NOT NULL,\n  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,\n  reflection text DEFAULT '',\n  teacher_feedback text DEFAULT ''\n);\n\n-- 3. records (관찰 기록 테이블) 생성\nCREATE TABLE IF NOT EXISTS records (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  plant_id uuid NOT NULL,\n  observation_text text NOT NULL,\n  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,\n  image_url text,\n  growth_stage text DEFAULT '씨앗',\n  height_cm numeric DEFAULT 0,\n  leaf_count integer DEFAULT 0,\n  flower_count integer DEFAULT 0,\n  fruit_count integer DEFAULT 0\n);`;
+                    
+                    navigator.clipboard.writeText(sqlText).then(() => {
+                      let projectId = "default";
+                      try {
+                        const match = customUrl.match(/https:\/\/(.*?)\.supabase\.co/);
+                        if (match && match[1]) {
+                          projectId = match[1];
+                        }
+                      } catch (e) {
+                        console.error(e);
+                      }
+                      window.open(`https://supabase.com/dashboard/project/${projectId}/sql/new`, "_blank");
+                    }).catch(err => {
+                      console.error("Clipboard Copy Fail:", err);
+                      alert("클립보드 자동 복사에 실패했습니다. 다른 브라우저를 이용하시거나 SQL 스크립트를 직접 입력해주세요.");
+                    });
+                  }}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-title py-3 rounded-2xl text-center shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
+                >
+                  ⚡ 1단계: 테이블 자동 세팅 열기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSqlModalOpen(false);
+                    localStorage.setItem("userRole", "teacher");
+                    localStorage.setItem("classId", createdClassId);
+                    localStorage.setItem("className", className);
+                    localStorage.setItem("classCode", createdClassCode);
+                    router.push("/teacher");
+                  }}
+                  className="flex-1 bg-brand-green hover:bg-[#5e741e] text-white font-title py-3 rounded-2xl text-center shadow-md active:scale-95 transition-all whitespace-nowrap"
+                >
+                  🎉 2단계: 세팅 완료 및 입장
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

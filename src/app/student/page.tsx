@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import confetti from 'canvas-confetti';
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ReportModal, { Plant, Record } from "@/components/ReportModal";
 import GardenModal from "@/components/GardenModal";
@@ -71,7 +71,7 @@ export default function StudentDashboard() {
     
     try {
       // 1. Fetch Plants
-      const { data: plantsData } = await supabase
+      const { data: plantsData } = await getSupabaseClient()
         .from("plants")
         .select("*")
         .eq("student_id", sId)
@@ -85,7 +85,7 @@ export default function StudentDashboard() {
       // 2. Fetch Latest Records
       if (plantsData && plantsData.length > 0) {
         const plantIds = plantsData.map(p => p.id);
-        const { data: recordsData } = await supabase
+        const { data: recordsData } = await getSupabaseClient()
           .from("records")
           .select("*")
           .in("plant_id", plantIds)
@@ -114,7 +114,7 @@ export default function StudentDashboard() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from("plants")
         .insert({
           student_id: studentId,
@@ -143,7 +143,7 @@ export default function StudentDashboard() {
     if (!studentId) return;
     
     if (confirm(`'${nickname}' 식물을 정말 삭제할까요? 모든 관찰 기록도 함께 삭제됩니다.`)) {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from("plants")
         .delete()
         .eq("id", plantId);
@@ -159,7 +159,7 @@ export default function StudentDashboard() {
 
   const handleDeleteRecord = async (recordId: string) => {
     if (confirm("이 관찰 기록을 삭제할까요?")) {
-      const { error } = await supabase.from("records").delete().eq("id", recordId);
+      const { error } = await getSupabaseClient().from("records").delete().eq("id", recordId);
       if (error) {
         alert("삭제 중 오류가 발생했습니다.");
       } else {
@@ -169,7 +169,7 @@ export default function StudentDashboard() {
   };
   
   const handleSaveReflection = async (plantId: string, reflection: string) => {
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from("plants")
       .update({ reflection })
       .eq("id", plantId);
@@ -680,7 +680,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
     setIsSubmitting(true);
     
     // Note: image_url will store the base64 for now, or you'd upload to Supabase Storage
-    const { error } = await supabase.from("records").insert({
+    const { error } = await getSupabaseClient().from("records").insert({
       plant_id: plantId,
       observation_text: text.trim(),
       image_url: image,
