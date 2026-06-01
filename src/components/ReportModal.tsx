@@ -89,21 +89,55 @@ export default function ReportModal({
     setStamp(freshStamp);
   }, [plant]);
 
-  const startListening = () => {
+  const startListening = async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("이 브라우저는 음성 인식을 지원하지 않습니다.");
+      alert("이 브라우저는 음성 인식을 지원하지 않습니다. 구글 크롬 등 지원 브라우저를 이용해주세요.");
       return;
     }
+
+    try {
+      // 웹(HTTPS) 배포 환경에서 명시적으로 마이크 사용 권한 팝업을 먼저 호출
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+    } catch (err: any) {
+      console.error("Microphone Access Error:", err);
+      alert("마이크 사용 권한이 거부되었거나 마이크 장치를 찾을 수 없습니다. 브라우저 설정에서 마이크 사용을 허용해주세요. 🎤");
+      return;
+    }
+
     const recognition = new SpeechRecognition();
     recognition.lang = "ko-KR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
+    
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setReflection(prev => prev.trim() + " " + transcript.trim() + ".");
     };
-    recognition.start();
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech Recognition Error:", event.error);
+      setIsListening(false);
+      if (event.error === 'not-allowed') {
+        alert("마이크 권한이 차단되었습니다. 브라우저 주소창 왼쪽의 설정(자물쇠) 버튼을 눌러 마이크 권한을 활성화해주세요. 🎤");
+      } else if (event.error === 'no-speech') {
+        // 말이 없을 경우의 자연스러운 종료
+      } else {
+        alert(`음성 인식 중 오류 발생: ${event.error}`);
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch (e: any) {
+      console.error("Speech Recognition Start Fail:", e);
+      setIsListening(false);
+    }
   };
 
   useEffect(() => {
