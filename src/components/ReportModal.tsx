@@ -546,7 +546,7 @@ export default function ReportModal({
                       {feedback || "아직 작성된 내용이 없습니다."}
                     </div>
                     {stamp && (
-                      <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 w-24 h-24 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-14 print:h-14 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5">
+                      <div className="absolute right-4 bottom-4 w-24 h-24 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-14 print:h-14 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5">
                         <img src={`/images/${stamp}`} alt="preview" className="w-full h-full object-contain drop-shadow-xl" />
                       </div>
                     )}
@@ -602,7 +602,7 @@ export default function ReportModal({
                     <>
                       <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{feedback}"</p>
                       {stamp && (
-                        <div className="absolute right-0 bottom-0 translate-x-4 translate-y-6 w-32 h-32 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-16 print:h-16 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5 print:rotate-0">
+                        <div className="absolute right-4 bottom-4 w-28 h-28 pointer-events-none animate-in zoom-in-50 duration-500 rotate-12 z-20 print:w-16 print:h-16 print:static print:translate-x-0 print:translate-y-0 print:ml-auto print:mt-0.5 print:rotate-0">
                           <img 
                             src={`/images/${stamp}`} 
                             alt="stamp" 
