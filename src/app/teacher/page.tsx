@@ -535,34 +535,34 @@ export default function TeacherDashboard() {
             <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제1조 (개인정보의 처리 목적, 항목, 보유 및 이용 기간)</h4>
               <p className="mb-3">본 서비스는 필요 최소한의 범위 내에서 개인정보를 처리하며, 목적 외의 용도로는 절대 사용되지 않습니다.</p>
-              <div className="overflow-x-auto rounded-xl border border-gray-200">
-                <table className="w-full text-xs md:text-sm border-collapse">
+              <div className="rounded-xl border border-gray-200 overflow-hidden">
+                <table className="w-full text-xs md:text-sm border-collapse table-fixed">
                   <thead>
                     <tr className="bg-gray-100/80 text-gray-700 font-bold border-b border-gray-200">
-                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[70px] min-w-[70px]">구분</th>
-                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[240px] min-w-[240px]">처리 목적</th>
-                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[240px] min-w-[240px]">수집 항목</th>
-                      <th className="p-3 whitespace-nowrap text-center w-[240px] min-w-[240px]">보유 및 이용 기간</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[10%] min-w-[60px]">구분</th>
+                      <th className="p-3 border-r border-gray-200 text-center w-[30%]">처리 목적</th>
+                      <th className="p-3 border-r border-gray-200 text-center w-[30%]">수집 항목</th>
+                      <th className="p-3 text-center w-[30%]">보유 및 이용 기간</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 text-gray-600">
                     <tr>
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">교사</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">학급 생성, 학생 관리, 도장 피드백</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">이메일 주소, 비밀번호, 학급 이름</td>
-                      <td className="p-3 whitespace-nowrap text-left bg-white">회원 탈퇴 또는 학급 폐쇄 시까지</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-white break-keep leading-relaxed">학급 생성, 학생 관리, 도장 피드백</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-white break-keep leading-relaxed">이메일 주소, 비밀번호, 학급 이름</td>
+                      <td className="p-3 text-left bg-white break-keep leading-relaxed">회원 탈퇴 또는 학급 폐쇄 시까지</td>
                     </tr>
                     <tr className="bg-gray-50/50">
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">학생</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-gray-50/50">대시보드 로그인, 관찰기록 연동</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-gray-50/50">학생 이름, 성별 (일러스트 구분용)</td>
-                      <td className="p-3 whitespace-nowrap text-left bg-gray-50/50">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-gray-50/50 break-keep leading-relaxed">대시보드 로그인, 관찰기록 연동</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-gray-50/50 break-keep leading-relaxed">학생 이름, 성별 (일러스트 구분용)</td>
+                      <td className="p-3 text-left bg-gray-50/50 break-keep leading-relaxed">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
                     <tr>
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">활동</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">일지 기록, 성장 곡선 시각화</td>
-                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
-                      <td className="p-3 whitespace-nowrap text-left bg-white">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-white break-keep leading-relaxed">일지 기록, 성장 곡선 시각화</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-white break-keep leading-relaxed">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
+                      <td className="p-3 text-left bg-white break-keep leading-relaxed">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
                   </tbody>
                 </table>
