@@ -595,15 +595,13 @@ export default function TeacherDashboard() {
 
             <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제6조 (개인정보의 안전성 확보 조치)</h4>
-              <p>① **클라우드 데이터 보안**: 글로벌 보안 인증 규격을 갖춘 Supabase 데이터베이스의 암호화 저장 기법을 적용해 외부 침입 위험을 차단합니다.</p>
-              <p>② **전송 데이터 암호화**: 전 구간 SSL/HTTPS 보안 프로토콜을 탑재하여 통신 중 정보 가로채기를 철저히 차단합니다.</p>
+              <p>① 클라우드 데이터 보안: 글로벌 보안 인증 규격을 갖춘 Supabase 데이터베이스의 암호화 저장 기법을 적용해 외부 침입 위험을 차단합니다.</p>
+              <p>② 전송 데이터 암호화: 전 구간 SSL/HTTPS 보안 프로토콜을 탑재하여 통신 중 정보 가로채기를 철저히 차단합니다.</p>
             </div>
 
             <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제7조 (개인정보 보호책임자 및 담당자)</h4>
-              <p className="bg-[#f4f1ea]/60 p-4 rounded-xl text-xs md:text-sm border border-gray-200 italic">
-                본 서비스의 개인정보 처리에 관한 모든 문의사항, 의견 수렴 및 불만 처리는 해당 학급 담임교사에게 연락하여 안내받으실 수 있습니다.
-              </p>
+              <p>① 개인정보 보호책임: 본 서비스의 개인정보 처리에 관한 모든 문의사항, 의견 수렴 및 불만 처리는 해당 학급 담임교사에게 연락하여 안내받으실 수 있습니다.</p>
             </div>
 
             {/* PDF 동의서 다운로드 카드 */}
@@ -611,9 +609,9 @@ export default function TeacherDashboard() {
               <div className="bg-orange-50/50 p-5 rounded-2xl border border-orange-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-left">
                   <p className="font-title text-base text-orange-700 mb-1 flex items-center gap-1.5">
-                    <span>📄</span> 학부모 배포용 동의서 다운로드
+                    <span>📄</span> 학생 회원 가입을 위한 보호자용 동의서
                   </p>
-                  <p className="text-xs text-gray-500 font-body leading-relaxed">교사의 일괄 등록 대행 및 학부모 개인정보 수집·이용 동의서 및 위임장 양식(PDF)입니다.</p>
+                  <p className="text-xs text-gray-500 font-body leading-relaxed">교사의 일괄 등록 대행 및 학생 회원 가입을 위한 보호자 동의서 양식입니다.</p>
                 </div>
                 <a 
                   href="/files/교사 등록을 통한 우리 반 식집사 학생 회원 가입 동의서.pdf" 
