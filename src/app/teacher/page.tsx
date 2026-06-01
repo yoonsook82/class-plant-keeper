@@ -540,27 +540,27 @@ export default function TeacherDashboard() {
                   <thead>
                     <tr className="bg-gray-100/80 text-gray-700 font-bold border-b border-gray-200">
                       <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[70px] min-w-[70px]">구분</th>
-                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center min-w-[150px]">처리 목적</th>
-                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center min-w-[200px]">수집 항목</th>
-                      <th className="p-3 whitespace-nowrap text-center min-w-[150px]">보유 및 이용 기간</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center w-[280px] min-w-[280px]">처리 목적</th>
+                      <th className="p-3 border-r border-gray-200 whitespace-nowrap text-center min-w-[220px]">수집 항목</th>
+                      <th className="p-3 whitespace-nowrap text-center min-w-[180px]">보유 및 이용 기간</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 text-gray-600">
                     <tr>
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">교사</td>
-                      <td className="p-3 border-r border-gray-200">학급 생성, 학생 관리, 도장 피드백</td>
+                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">학급 생성, 학생 관리, 도장 피드백</td>
                       <td className="p-3 border-r border-gray-200">이메일 주소, 비밀번호, 학급 이름</td>
                       <td className="p-3">회원 탈퇴 또는 학급 폐쇄 시까지</td>
                     </tr>
                     <tr className="bg-gray-50/50">
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">학생</td>
-                      <td className="p-3 border-r border-gray-200">대시보드 로그인, 관찰기록 연동</td>
+                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-gray-50/50">대시보드 로그인, 관찰기록 연동</td>
                       <td className="p-3 border-r border-gray-200">학생 이름, 성별 (일러스트 구분용)</td>
                       <td className="p-3">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
                     <tr>
                       <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">활동</td>
-                      <td className="p-3 border-r border-gray-200">일지 기록, 성장 곡선 시각화</td>
+                      <td className="p-3 border-r border-gray-200 whitespace-nowrap text-left bg-white">일지 기록, 성장 곡선 시각화</td>
                       <td className="p-3 border-r border-gray-200">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
                       <td className="p-3">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
@@ -626,10 +626,10 @@ export default function TeacherDashboard() {
           </div>
 
           {/* Footer Buttons */}
-          <div className="mt-6 shrink-0 flex justify-center pt-3 border-t border-brand-green/10">
+          <div className="mt-5 shrink-0 flex justify-center pt-3 border-t border-brand-green/10">
             <button 
               onClick={() => setIsPrivacyOpen(false)}
-              className="bg-brand-green text-white px-10 py-3 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] transition-colors shadow-lg active:scale-95 whitespace-nowrap"
+              className="bg-brand-green text-white px-7 py-2 md:px-8 md:py-2.5 rounded-full text-sm md:text-base font-title hover:bg-[#5e741e] transition-colors shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
             >
               닫기
             </button>
