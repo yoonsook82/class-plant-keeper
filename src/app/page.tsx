@@ -430,14 +430,14 @@ function LoginContent() {
                             <div className="bg-[#fdfbf7] p-4 rounded-2xl border border-[#f5e1c8] space-y-2 mt-2">
                               <p className="font-title text-xs text-[#a65d00] text-left">🌱 개인 전용 서버 연동 (선택 사항)</p>
                               <InputGroup 
-                                label="나의 Supabase URL (Project URL)" 
+                                label="나의 Supabase Project URL" 
                                 value={customUrl} 
                                 onChange={setCustomUrl} 
                                 placeholder="예: https://abcdxyz.supabase.co" 
                                 disabled={loading} 
                               />
                               <InputGroup 
-                                label="나의 Supabase Anon Key (Publishable key)" 
+                                label="나의 Supabase Publishable key" 
                                 value={customAnonKey} 
                                 onChange={setCustomAnonKey} 
                                 placeholder="sb_publishable_..." 
