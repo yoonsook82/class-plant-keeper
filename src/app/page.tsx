@@ -443,8 +443,8 @@ function LoginContent() {
                                 placeholder="eyJhbGciOi..." 
                                 disabled={loading} 
                               />
-                              <p className="text-[10px] text-gray-400 font-body text-left leading-normal">
-                                * 입력하지 않고 비워두면 기존의 **기본 제공 무료 공용 서버**로 간편하게 즉시 개설됩니다.
+                              <p className="text-[11px] text-red-500 font-medium font-body text-left leading-normal">
+                                * 입력하지 않고 비워두면 기본 제공 무료 공용 서버를 이용하여 즉시 개설됩니다.
                               </p>
                             </div>
                           </>
