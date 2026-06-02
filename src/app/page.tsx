@@ -386,7 +386,7 @@ function LoginContent() {
                                 className="w-full px-4 py-3 flex justify-between items-center bg-[#f0f7ec] hover:bg-[#e7f2e1] transition-colors"
                               >
                                 <span className="font-title text-sm md:text-base text-brand-green flex items-center gap-1.5">
-                                  <span>⚙️</span> 비용 걱정 없는 우리 반 전용 100% 무료 서버 개설 가이드
+                                  <span>⚙️</span> 우리 반 전용 100% 무료 서버 개설 가이드
                                 </span>
                                 <span className="text-gray-400 font-bold text-xs">{isAccordionOpen ? "▲ 접기" : "▼ 펼치기"}</span>
                               </button>
@@ -394,7 +394,7 @@ function LoginContent() {
                               {isAccordionOpen && (
                                 <div className="p-4 space-y-3 font-body text-xs md:text-sm text-gray-600 leading-relaxed border-t border-brand-green/10 animate-in slide-in-from-top-1 duration-200">
                                   <div className="bg-[#fcfaf4] p-3 rounded-xl border border-amber-100 text-[#a67c00] font-bold text-xs">
-                                    💡 100% 개인 소유의 Supabase 서버를 연동하면 평생 트래픽/용량 제한 걱정 없이 아름다운 식물 정원을 무제한 사용하실 수 있습니다!
+                                    💡 100% 개인 소유의 Supabase 서버를 연동하면 평생 트래픽/용량 제한 걱정 없이 우리 반 식집사 앱을 무제한 사용하실 수 있습니다!
                                   </div>
                                   
                                   <div>
