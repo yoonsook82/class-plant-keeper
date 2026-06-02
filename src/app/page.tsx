@@ -383,12 +383,12 @@ function LoginContent() {
                               <button
                                 type="button"
                                 onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-                                className="w-full px-4 py-3 flex justify-between items-center bg-[#f0f7ec] hover:bg-[#e7f2e1] transition-colors"
+                                className="w-full px-4 py-3 flex justify-between items-center bg-[#f0f7ec] hover:bg-[#e7f2e1] transition-colors gap-3"
                               >
-                                <span className="font-title text-sm md:text-base text-brand-green flex items-center gap-1.5">
-                                  <span>⚙️</span> 우리 반 전용 100% 무료 서버 개설 가이드
+                                <span className="font-title text-sm md:text-base text-brand-green text-left break-keep leading-snug">
+                                  우리 반 전용 100% 무료 서버 개설 가이드
                                 </span>
-                                <span className="text-gray-400 font-bold text-xs">{isAccordionOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+                                <span className="text-gray-400 font-bold text-xs whitespace-nowrap shrink-0">{isAccordionOpen ? "▲ 접기" : "▼ 펼치기"}</span>
                               </button>
                               
                               {isAccordionOpen && (
@@ -443,7 +443,7 @@ function LoginContent() {
                                 placeholder="eyJhbGciOi..." 
                                 disabled={loading} 
                               />
-                              <p className="text-[11px] text-red-500 font-medium font-body text-left leading-normal">
+                              <p className="text-[11px] text-red-500 font-medium font-body text-left leading-normal break-keep">
                                 * 입력하지 않고 비워두면 기본 제공 무료 공용 서버를 이용하여 즉시 개설됩니다.
                               </p>
                             </div>
