@@ -418,8 +418,8 @@ function LoginContent() {
 
                                   <div>
                                     <p className="font-bold text-brand-brown mb-1">3단계: API 키 복사하기</p>
-                                    <p className="pl-1 text-gray-500 font-body">
-                                      - 개설 완료 후 우측 상단의 <b>[Connect]</b> 버튼이나 <b>Project Settings &rarr; API</b> 탭에서 다음 두 가지 자격 증명을 복사하여 아래에 입력하세요.
+                                    <p className="pl-1 text-gray-500 font-body break-keep">
+                                      - 개설 완료 후 우측 상단의 <b>[Connect]</b> 버튼을 클릭하면 나타나는 팝업창에서 <b>Project URL</b>과 <b>Publishable key (Anon Key)</b>를 복사하여 아래에 입력하세요.
                                     </p>
                                   </div>
                                 </div>
@@ -430,17 +430,17 @@ function LoginContent() {
                             <div className="bg-[#fdfbf7] p-4 rounded-2xl border border-[#f5e1c8] space-y-2 mt-2">
                               <p className="font-title text-xs text-[#a65d00] text-left">🌱 개인 전용 서버 연동 (선택 사항)</p>
                               <InputGroup 
-                                label="나의 Supabase URL" 
+                                label="나의 Supabase URL (Project URL)" 
                                 value={customUrl} 
                                 onChange={setCustomUrl} 
                                 placeholder="예: https://abcdxyz.supabase.co" 
                                 disabled={loading} 
                               />
                               <InputGroup 
-                                label="나의 Supabase Anon Key" 
+                                label="나의 Supabase Anon Key (Publishable key)" 
                                 value={customAnonKey} 
                                 onChange={setCustomAnonKey} 
-                                placeholder="eyJhbGciOi..." 
+                                placeholder="sb_publishable_..." 
                                 disabled={loading} 
                               />
                               <p className="text-[11px] text-red-500 font-medium font-body text-left leading-normal break-keep">
