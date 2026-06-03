@@ -587,6 +587,28 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
   const [flowerCount, setFlowerCount] = useState("0");
   const [fruitCount, setFruitCount] = useState("0");
   const [isListening, setIsListening] = useState(false);
+  const [randomQuestion, setRandomQuestion] = useState("");
+
+  useEffect(() => {
+    const questionTemplates = [
+      "잎이나 줄기에 새로운 변화가 보이나요?",
+      "줄기의 길이나 두께는 어떻게 달라졌나요?",
+      "꽃이나 봉오리가 생겼나요, 혹은 다른 변화가 있나요?",
+      "흙의 상태는 어떤가요? 물을 줘야 할까요?",
+      "식물에서 냄새가 나나요? 어떤 냄새인지 구체적으로 표현해 볼까요?",
+      "잎이나 줄기를 만졌을 때 느낌은 어떤가요?",
+      "오늘 날씨는 어떤가요? 햇빛을 얼마나 받았나요?",
+      "식물에 벌레나 다른 작은 생물이 있나요?",
+      "줄기나 잎이 어느 방향으로 자라고 있나요?",
+      "식물의 크기가 지난번과 비교해 달라졌나요?",
+      "바람이나 날씨가 식물에 어떤 영향을 준 것 같나요?",
+      "오늘 식물의 기분을 상상해 본다면 어떤가요?",
+      "식물이 자라는 속도가 빠른가요, 느린가요?",
+      "식물의 모양이 특별히 재미있거나 신기한 부분이 있나요?"
+    ];
+    const randomIndex = Math.floor(Math.random() * questionTemplates.length);
+    setRandomQuestion(questionTemplates[randomIndex]);
+  }, []);
 
   const stages = [
     { name: "씨앗", img: "/images/stage-seed.png" },
@@ -783,7 +805,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
                 value={text}
                 onChange={e => setText(e.target.value)}
                 className="w-full h-28 bg-gray-50 rounded-[30px] p-6 pr-16 font-body text-lg font-medium text-gray-800 outline-none border border-gray-200 focus:border-brand-green transition-all resize-none placeholder:text-gray-400"
-                placeholder="오늘 식물은 어떤가요?"
+                placeholder={`오늘 식물은 어떤가요?\n(예: ${randomQuestion})`}
                 required
               />
               <button 
