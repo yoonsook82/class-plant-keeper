@@ -1372,7 +1372,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   onClick={() => setStep(4)}
                   className="px-6 py-2 sm:px-12 sm:py-3 bg-brand-green text-white rounded-full font-title text-sm sm:text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95"
                 >
-                  준비 끝! 식물 키우러 가기 🚀
+                  식물 가꾸러 가기 🚀
                 </button>
               </div>
             </div>
