@@ -950,6 +950,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   const [codingBlocks, setCodingBlocks] = useState<string[]>([]);
   const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // 선택 효과음 재생 함수 (도구 등)
   const playSelectSound = () => {
@@ -971,6 +972,15 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
     audio.volume = 0.5;
     audio.play().catch(e => console.log("Audio play blocked:", e));
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (step === 4) { // Success stage
@@ -1147,31 +1157,31 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                 <h4 className="font-title text-xl text-brand-brown">Step 1. 식물 심기에 꼭 필요한 <span className="text-pink-500">도구</span> 고르기</h4>
               </div>
               
-              <div className="relative bg-gray-50/50 rounded-[30px] border-2 border-dashed border-gray-200 overflow-hidden h-[380px]">
+              <div className={`bg-gray-50/50 rounded-[30px] border-2 border-dashed border-gray-200 ${isMobile ? 'grid grid-cols-3 gap-2 p-3 min-h-[380px] overflow-y-auto' : 'relative overflow-hidden h-[380px]'}`}>
                 {shuffledSupplies.map((item, idx) => (
                   <button
                     key={item.id}
                     onClick={() => toggleItem(item.id)}
-                    style={{
+                    style={isMobile ? { transform: `rotate(${positions[idx].rotate})` } : {
                       position: 'absolute',
                       top: positions[idx].top,
                       left: positions[idx].left,
                       transform: `rotate(${positions[idx].rotate})`,
                     }}
-                    className={`flex flex-col items-center p-3 rounded-[25px] border-4 transition-all hover:scale-110 active:scale-95 ${
+                    className={`flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-[15px] sm:rounded-[25px] border-2 sm:border-4 transition-all hover:scale-105 active:scale-95 ${isMobile ? 'relative w-full' : ''} ${
                       selectedItems.includes(item.id) 
-                        ? (item.essential ? 'border-pink-400 bg-pink-50 z-20 shadow-lg' : 'border-red-300 bg-red-50 z-20 shadow-lg') 
+                        ? (item.essential ? 'border-pink-400 bg-pink-50 z-20 shadow-md' : 'border-red-300 bg-red-50 z-20 shadow-md') 
                         : 'border-white bg-white/50 shadow-sm hover:border-pink-100 z-10'
                     }`}
                   >
-                    <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl overflow-hidden">
+                    <div className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center text-2xl sm:text-4xl overflow-hidden">
                       {item.img.startsWith('/') ? (
-                        <Image src={item.img} alt={item.name} width={80} height={80} className="object-contain" />
+                        <Image src={item.img} alt={item.name} width={80} height={80} className="object-contain w-full h-full" />
                       ) : (
                         item.img
                       )}
                     </div>
-                    <span className={`font-title text-base mt-1 ${selectedItems.includes(item.id) ? 'text-pink-600 font-bold' : 'text-gray-500'}`}>
+                    <span className={`font-title text-xs sm:text-base mt-0.5 sm:mt-1 ${selectedItems.includes(item.id) ? 'text-pink-600 font-bold' : 'text-gray-500'}`}>
                       {item.name}
                     </span>
                   </button>
@@ -1248,7 +1258,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                 </div>
 
                 {/* Selected Flow */}
-                <div className="flex-1 w-full bg-blue-50/50 p-4 rounded-[30px] border-2 border-dashed border-blue-200 h-[350px] flex flex-col items-center">
+                <div className={`flex-1 w-full bg-blue-50/50 p-4 rounded-[30px] border-2 border-dashed border-blue-200 flex flex-col items-center ${isMobile ? 'h-[280px]' : 'h-[350px]'}`}>
                   <p className="font-title text-blue-400 mb-2 text-sm flex items-center gap-2">
                     <span className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-[10px]">▷</span>
                     코딩 실행창
@@ -1258,14 +1268,14 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                       const block = (method === "seed" ? seedSteps : seedlingSteps).find(s => s.id === blockId);
                       const maxItems = 6;
                       const angle = (index * (360 / maxItems)) - 90;
-                      const radius = 95; // Compact radius
+                      const radius = isMobile ? 65 : 95; // Compact radius
                       const x = Math.cos(angle * Math.PI / 180) * radius;
                       const y = Math.sin(angle * Math.PI / 180) * radius;
 
                       return (
                         <div 
                           key={index} 
-                          className={`absolute p-1 rounded-full border-2 shadow-md flex items-center justify-center group animate-in zoom-in-50 duration-300 transition-all ${
+                          className={`absolute p-0.5 sm:p-1 rounded-full border-2 shadow-md flex items-center justify-center group animate-in zoom-in-50 duration-300 transition-all ${
                             highlightIndex === index ? 'bg-yellow-100 border-yellow-400 scale-125 z-30 shadow-yellow-200' : 'bg-white border-blue-500 z-20'
                           }`}
                           style={{ 
@@ -1274,18 +1284,18 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                             transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                           }}
                         >
-                          <div className="absolute -top-2 -left-2 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-title text-xs shadow-sm z-10">
+                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 sm:-top-2 sm:-left-2 sm:w-6 sm:h-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-title text-[10px] sm:text-xs shadow-sm z-10">
                             {index + 1}
                           </div>
                           <button 
                             onClick={() => removeBlock(index)} 
-                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] transition-opacity shadow-md z-10 touch-delete-btn"
+                            className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[8px] sm:text-[10px] transition-opacity shadow-md z-10 touch-delete-btn"
                             title="제거"
                           >
                             ✕
                           </button>
-                          <div className="w-14 h-14 md:w-18 md:h-18 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
-                            <Image src={block?.img || ""} width={60} height={60} alt="" className="object-contain w-10 h-10 md:w-14 md:h-14" />
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-18 md:h-18 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
+                            <Image src={block?.img || ""} width={60} height={60} alt="" className="object-contain w-7 h-7 sm:w-10 sm:h-10 md:w-14 md:h-14" />
                           </div>
                         </div>
                       );
