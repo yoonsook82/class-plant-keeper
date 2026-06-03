@@ -394,7 +394,7 @@ function LoginContent() {
                               {isAccordionOpen && (
                                 <div className="p-4 space-y-3 font-body text-xs md:text-sm text-gray-600 leading-relaxed border-t border-brand-green/10 animate-in slide-in-from-top-1 duration-200">
                                   <div className="bg-[#fcfaf4] p-3 rounded-xl border border-amber-100 text-[#a67c00] font-bold text-xs">
-                                    💡 100% 개인 소유의 Supabase 서버를 연동하면 평생 트래픽/용량 제한 걱정 없이 우리 반 식집사 앱을 무제한 사용하실 수 있습니다!
+                                    💡 100% 개인 소유의 Supabase 서버를 연동하면 트래픽/용량 제한 걱정 없이 우리 반 식집사 앱을 무제한 사용하실 수 있습니다!
                                   </div>
                                   
                                   <div>
@@ -419,7 +419,7 @@ function LoginContent() {
                                   <div>
                                     <p className="font-bold text-brand-brown mb-1">3단계: API 키 복사하기</p>
                                     <p className="pl-1 text-gray-500 font-body break-keep">
-                                      - 개설 완료 후 우측 상단의 <b>[Connect]</b> 버튼을 클릭하면 나타나는 팝업창에서 <b>Project URL</b>과 <b>Publishable key (Anon Key)</b>를 복사하여 아래에 입력하세요.
+                                      - 개설 후 내 프로젝트 우측의 <b>[copy]</b> 버튼을 클릭하면 나타나는 팝업창에서 <b>Project URL</b>과 <b>Publishable key (Anon Key)</b>를 복사하여 아래에 입력하세요.
                                     </p>
                                   </div>
                                 </div>
