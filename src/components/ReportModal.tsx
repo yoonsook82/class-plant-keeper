@@ -113,7 +113,12 @@ export default function ReportModal({
     
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      setReflection(prev => prev.trim() + " " + transcript.trim() + ".");
+      if (transcript && transcript.trim()) {
+        setReflection(prev => {
+          const base = prev.trim();
+          return base ? base + " " + transcript.trim() + "." : transcript.trim() + ".";
+        });
+      }
     };
 
     recognition.onerror = (event: any) => {
