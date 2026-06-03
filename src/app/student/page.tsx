@@ -1137,17 +1137,17 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-2 md:p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
-      <div className="bg-white w-full max-w-[950px] rounded-[30px] p-4 md:p-6 shadow-2xl flex flex-col max-h-[95vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="bg-white w-full max-w-[950px] rounded-[30px] p-3 sm:p-4 md:p-6 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[95vh] overflow-hidden" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
         <div className="flex justify-between items-center mb-2 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-xl">✨</div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-pink-50 rounded-xl flex items-center justify-center text-lg sm:text-xl">✨</div>
             <div>
-              <h3 className="font-title text-2xl text-pink-500">식물 가꾸기 마스터</h3>
+              <h3 className="font-title text-lg sm:text-2xl text-pink-500">식물 가꾸기 마스터</h3>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-2xl">✕</button>
+          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-xl sm:text-2xl">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto pr-1">
@@ -1204,22 +1204,22 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
           )}
 
           {step === 1.5 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-6">
-              <h4 className="font-title text-2xl text-brand-brown mb-6">어떤 방법으로 식물을 심을까요?</h4>
-              <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-4 sm:py-6">
+              <h4 className="font-title text-xl sm:text-2xl text-brand-brown mb-4 sm:mb-6">어떤 방법으로 식물을 심을까요?</h4>
+              <div className="flex flex-row gap-3 sm:gap-4 justify-center">
                 <button 
                   onClick={() => { playSelectSound(); setMethod("seed"); setStep(2); }}
-                  className="bg-amber-50 hover:bg-amber-100 p-6 rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group"
+                  className="bg-amber-50 hover:bg-amber-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group"
                 >
-                  <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌰</div>
-                  <span className="font-title text-2xl text-amber-700 block mb-1">씨앗 심기</span>
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center text-4xl sm:text-6xl shadow-sm">🌰</div>
+                  <span className="font-title text-lg sm:text-2xl text-amber-700 block mb-1">씨앗 심기</span>
                 </button>
                 <button 
                   onClick={() => { playSelectSound(); setMethod("seedling"); setStep(2); }}
-                  className="bg-green-50 hover:bg-green-100 p-6 rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group"
+                  className="bg-green-50 hover:bg-green-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group"
                 >
-                  <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-6xl shadow-sm">🌱</div>
-                  <span className="font-title text-2xl text-green-700 block mb-1">모종 심기</span>
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center text-4xl sm:text-6xl shadow-sm">🌱</div>
+                  <span className="font-title text-lg sm:text-2xl text-green-700 block mb-1">모종 심기</span>
                 </button>
               </div>
             </div>
@@ -1328,21 +1328,21 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
 
           {step === 3 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="text-center mb-2">
-                <h4 className="font-title text-2xl text-brand-brown">Step 3. 식물이 자라기 좋은 <span className="text-brand-green">환경</span> 만들기</h4>
+              <div className="text-center mb-1.5 sm:mb-2">
+                <h4 className="font-title text-lg sm:text-2xl text-brand-brown">Step 3. 식물이 자라기 좋은 <span className="text-brand-green">환경</span> 만들기</h4>
               </div>
 
-              <div className="bg-brand-bg/20 rounded-[30px] p-4 max-w-[650px] mx-auto border-2 border-white shadow-sm relative">
+              <div className="bg-brand-bg/20 rounded-[20px] sm:rounded-[30px] p-3 sm:p-4 max-w-[650px] mx-auto border-2 border-white shadow-sm relative">
                 {method === "seed" ? (
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-3xl">🌑</div>
-                      <h5 className="font-title text-2xl text-amber-700">씨앗은 빛이 필요할까요?</h5>
+                      <div className="w-9 h-9 sm:w-12 sm:h-12 bg-amber-100 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-3xl">🌑</div>
+                      <h5 className="font-title text-base sm:text-2xl text-amber-700">씨앗은 빛이 필요할까요?</h5>
                     </div>
-                    <div className="space-y-3 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                    <div className="space-y-1.5 sm:space-y-3 font-body text-gray-700 text-[11px] sm:text-lg leading-normal sm:leading-relaxed break-keep">
                       <p>많은 씨앗들은 싹이 틀 때까지 <span className="font-bold text-amber-600">어둡고 따뜻한 곳</span>을 좋아해요. 이것을 <span className="font-bold text-amber-600">'암발아'</span>라고 불러요.</p>
                       <p>하지만 상추나 당근처럼 싹이 틀 때 <span className="font-bold text-amber-600">빛이 필요한 '광발아'</span> 씨앗도 있답니다!</p>
-                      <p className="bg-white/70 p-3 rounded-2xl border border-amber-200 mt-2 text-base font-bold">
+                      <p className="bg-white/70 p-2 rounded-xl border border-amber-200 mt-1.5 text-[10px] sm:text-base font-bold">
                         💡 <span className="text-amber-800">미션:</span> 내가 심은 식물을 검색해보고, 알맞은 장소에 놓아주세요!
                       </p>
                     </div>
@@ -1350,16 +1350,16 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                 ) : (
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-3xl">🌿</div>
-                      <h5 className="font-title text-2xl text-green-700">모종은 어디에 두면 좋을까요?</h5>
+                      <div className="w-9 h-9 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-3xl">🌿</div>
+                      <h5 className="font-title text-base sm:text-2xl text-green-700">모종은 어디에 두면 좋을까요?</h5>
                     </div>
-                    <div className="space-y-3 font-body text-gray-700 text-lg leading-relaxed break-keep">
+                    <div className="space-y-1.5 sm:space-y-3 font-body text-gray-700 text-[11px] sm:text-lg leading-normal sm:leading-relaxed break-keep">
                       <p>식물마다 좋아하는 햇빛의 양이 달라요!</p>
-                      <ul className="space-y-2 list-disc list-inside ml-1">
+                      <ul className="space-y-1 sm:space-y-2 list-disc list-inside ml-1">
                         <li><span className="font-bold text-green-600">양지 식물</span> (토마토, 고추): 햇빛이 잘 드는 <span className="font-bold text-green-600">창가</span>를 좋아해요.</li>
                         <li><span className="font-bold text-green-600">음지 식물</span> (스킨답서스, 고사리): 직접적인 햇빛보다는 <span className="font-bold text-green-600">실내 안쪽</span>을 좋아해요.</li>
                       </ul>
-                      <p className="bg-white/70 p-3 rounded-2xl border border-green-200 mt-2 text-base font-bold">
+                      <p className="bg-white/70 p-2 rounded-xl border border-green-200 mt-1.5 text-[10px] sm:text-base font-bold">
                         💡 <span className="text-green-800">미션:</span> 우리 식물이 좋아하는 장소를 찾아주세요!
                       </p>
                     </div>
@@ -1367,10 +1367,10 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                 )}
               </div>
 
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-3 sm:mt-6">
                 <button
                   onClick={() => setStep(4)}
-                  className="px-12 py-3 bg-brand-green text-white rounded-full font-title text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95"
+                  className="px-6 py-2 sm:px-12 sm:py-3 bg-brand-green text-white rounded-full font-title text-sm sm:text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95"
                 >
                   준비 끝! 식물 키우러 가기 🚀
                 </button>
@@ -1379,16 +1379,16 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
           )}
 
           {step === 4 && (
-            <div className="animate-in zoom-in duration-500 text-center py-8">
+            <div className="animate-in zoom-in duration-500 text-center py-4 sm:py-8">
               <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 bg-pink-100 rounded-full flex items-center justify-center mx-auto relative z-10">
+                <div className="w-16 h-16 sm:w-24 sm:h-24 bg-pink-100 rounded-full flex items-center justify-center mx-auto relative z-10">
                   <Image src="/images/stage-sprout.png" alt="success" width={60} height={60} className="animate-bounce" />
                 </div>
-                <div className="absolute -top-3 -right-3 text-3xl">🎉</div>
+                <div className="absolute -top-3 -right-3 text-xl sm:text-3xl">🎉</div>
               </div>
-              <h3 className="font-title text-3xl text-brand-brown mb-2">참 잘했어요!</h3>
-              <p className="font-body text-gray-600 text-lg mb-8">당신은 훌륭한 식집사가 될 준비가 되었군요!</p>
-              <button onClick={onClose} className="px-12 py-3 bg-brand-green text-white rounded-full font-title text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95">완료!</button>
+              <h3 className="font-title text-xl sm:text-3xl text-brand-brown mb-2">참 잘했어요!</h3>
+              <p className="font-body text-gray-600 text-sm sm:text-lg mb-4 sm:mb-8">당신은 훌륭한 식집사가 될 준비가 되었군요!</p>
+              <button onClick={onClose} className="px-8 py-2 sm:px-12 sm:py-3 bg-brand-green text-white rounded-full font-title text-sm sm:text-xl shadow-xl hover:bg-brand-green/90 transition-all active:scale-95">완료!</button>
             </div>
           )}
         </div>
