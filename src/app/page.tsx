@@ -313,7 +313,7 @@ function LoginContent() {
 
           
           <div className="text-center space-y-4">
-            <div className="relative animate-float-slow translate-x-12">
+            <div className="relative animate-float-slow translate-x-0 lg:translate-x-12">
               <Image 
                 src="/images/title3.png" 
                 alt="우리 반 식집사" 
