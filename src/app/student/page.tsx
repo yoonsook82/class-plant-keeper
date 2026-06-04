@@ -588,6 +588,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
   const [fruitCount, setFruitCount] = useState("0");
   const [isListening, setIsListening] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState("");
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     const questionTemplates = [
@@ -642,6 +643,12 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
   };
 
   const startListening = () => {
+    // 이미 음성인식이 동작 중인 경우, 두 번 이상 동시 실행되는 것을 방지하고 멈춤 처리
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
     // 모든 주요 브라우저(크롬, 사파리, 파이어폭스, 엣지, 오페라 등)의 벤더 프리픽스 호환성 최대 보장
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -656,19 +663,30 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
     }
 
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = "ko-KR";
     recognition.continuous = false;
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
     
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      if (transcript && transcript.trim()) {
+      // 데스크톱 브라우저 중복 입력 방지를 위한 최종 결과(isFinal) 필터링 기법 적용
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalTranscript.trim()) {
         setText(prev => {
           const base = prev.trim();
-          return base ? base + " " + transcript.trim() + "." : transcript.trim() + ".";
+          return base ? base + " " + finalTranscript.trim() + "." : finalTranscript.trim() + ".";
         });
       }
     };
@@ -676,6 +694,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
     recognition.onerror = (event: any) => {
       console.error("Speech Recognition Error:", event.error);
       setIsListening(false);
+      recognitionRef.current = null;
       
       if (event.error === 'not-allowed') {
         alert(
@@ -805,7 +824,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
                 value={text}
                 onChange={e => setText(e.target.value)}
                 className="w-full h-28 bg-gray-50 rounded-[30px] p-6 pr-16 font-body text-lg font-medium text-gray-800 outline-none border border-gray-200 focus:border-brand-green transition-all resize-none placeholder:text-gray-400"
-                placeholder={`오늘 식물은 어떤가요?\n(예: ${randomQuestion})`}
+                placeholder={`오늘의 초록 질문: 오늘 식물은 어떤가요? ${randomQuestion}`}
                 required
               />
               <button 
