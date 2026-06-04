@@ -44,6 +44,9 @@ export default function TeacherDashboard() {
   const [isAdding, setIsAdding] = useState(false);
   const [deletingStudentId, setDeletingStudentId] = useState<string | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
+  const [closeConfirmInput, setCloseConfirmInput] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
   
   const [appUrl, setAppUrl] = useState("");
 
@@ -169,6 +172,77 @@ export default function TeacherDashboard() {
   const handleLogout = () => {
     localStorage.clear();
     router.push("/");
+  };
+
+  const handleCloseClass = async () => {
+    if (closeConfirmInput !== className) {
+      alert("학급명이 정확하지 않습니다.");
+      return;
+    }
+
+    setIsClosing(true);
+    try {
+      // 1. 해당 학급에 속한 모든 학생의 ID 조회
+      const { data: studentList, error: stFetchError } = await getSupabaseClient()
+        .from("students")
+        .select("id")
+        .eq("class_id", classId);
+
+      if (stFetchError) throw stFetchError;
+      const studentIds = studentList?.map(s => s.id) || [];
+
+      if (studentIds.length > 0) {
+        // 2. 해당 학생들의 모든 식물 ID 조회
+        const { data: plantList, error: plFetchError } = await getSupabaseClient()
+          .from("plants")
+          .select("id")
+          .in("student_id", studentIds);
+
+        if (plFetchError) throw plFetchError;
+        const plantIds = plantList?.map(p => p.id) || [];
+
+        // 3. records(관찰 일지) 삭제
+        if (plantIds.length > 0) {
+          const { error: recDelError } = await getSupabaseClient()
+            .from("records")
+            .delete()
+            .in("plant_id", plantIds);
+          if (recDelError) throw recDelError;
+        }
+
+        // 4. plants(반려 식물) 삭제
+        const { error: plDelError } = await getSupabaseClient()
+          .from("plants")
+          .delete()
+          .in("student_id", studentIds);
+        if (plDelError) throw plDelError;
+      }
+
+      // 5. students(학생) 삭제
+      const { error: stDelError } = await getSupabaseClient()
+        .from("students")
+        .delete()
+        .eq("class_id", classId);
+      if (stDelError) throw stDelError;
+
+      // 6. classes(학급 및 교사 가입 정보) 최종 삭제
+      const { error: classDelError } = await supabase
+        .from("classes")
+        .delete()
+        .eq("id", classId);
+      if (classDelError) throw classDelError;
+
+      alert("학급이 폐쇄되었으며 모든 데이터가 영구 삭제되었습니다. 🚪");
+      localStorage.clear();
+      router.push("/");
+    } catch (error: any) {
+      console.error("Class Closure Error:", error);
+      alert(`학급 폐쇄 진행 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
+    } finally {
+      setIsClosing(false);
+      setIsCloseModalOpen(false);
+      setCloseConfirmInput("");
+    }
   };
 
   const getPlantImage = (type: string) => {
@@ -357,6 +431,21 @@ export default function TeacherDashboard() {
                <span className="font-title text-base md:text-lg text-brand-brown">개인정보 처리방침</span>
              </div>
              <span className="text-gray-400 group-hover:text-brand-green group-hover:translate-x-1 transition-all">➔</span>
+           </div>
+
+           {/* 학급 폐쇄 메뉴 */}
+           <div 
+             onClick={() => {
+               setCloseConfirmInput("");
+               setIsCloseModalOpen(true);
+             }}
+             className="bg-red-50 p-5 rounded-3xl shadow-md border-2 border-red-200 hover:border-red-500 hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group mt-2"
+           >
+             <div className="flex items-center gap-3">
+               <span className="text-2xl group-hover:scale-110 transition-transform">⚠️</span>
+               <span className="font-title text-base md:text-lg text-red-600">학급 폐쇄 및 데이터 삭제</span>
+             </div>
+             <span className="text-red-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all">➔</span>
            </div>
          </div>
 
@@ -626,6 +715,58 @@ export default function TeacherDashboard() {
               className="bg-brand-green text-white px-5 py-1.5 md:px-6 md:py-2 rounded-full text-sm md:text-base font-title hover:bg-[#5e741e] transition-colors shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
             >
               닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Class Close 2-step Confirm Modal */}
+    {isCloseModalOpen && (
+      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in" onClick={() => setIsCloseModalOpen(false)}>
+        <div className="bg-white p-8 rounded-[30px] shadow-2xl animate-in zoom-in-95 duration-200 max-w-[450px] w-full" onClick={(e) => e.stopPropagation()}>
+          <h2 className="font-title text-2xl text-center text-red-600 mb-4 flex items-center justify-center gap-2">
+            ⚠️ 학급 폐쇄 및 데이터 삭제
+          </h2>
+          <div className="bg-red-50/50 p-5 rounded-2xl border border-red-100 font-body text-sm text-gray-600 leading-relaxed">
+            <p className="font-bold text-red-600 text-center mb-3 text-base">⚠️ 정말로 학급을 폐쇄하시겠습니까?</p>
+            <p className="mb-2 text-left">학급을 폐쇄하면 다음과 같은 정보가 <b>영구 삭제되며 즉시 소실</b>됩니다.</p>
+            <ul className="list-disc pl-5 space-y-1 text-xs text-red-800 mb-4 text-left">
+              <li>우리 반 모든 학생 정보 및 계정</li>
+              <li>등록된 모든 반려식물 정보</li>
+              <li>학생들이 정성들여 쓴 모든 관찰일지 및 업로드된 사진</li>
+            </ul>
+            <p className="text-center font-semibold border-t pt-3 border-red-100">
+              안전한 확인을 위해 아래 입력창에<br/>
+              현재 학급명 <b className="text-red-600 font-title text-base font-normal">[{className}]</b>을 똑같이 입력해주세요.
+            </p>
+          </div>
+
+          <div className="mt-5">
+            <input 
+              type="text" 
+              value={closeConfirmInput}
+              onChange={(e) => setCloseConfirmInput(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 outline-none font-title text-center text-lg focus:border-red-500 transition-all text-red-600"
+              placeholder={className}
+              disabled={isClosing}
+            />
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <button 
+              onClick={() => setIsCloseModalOpen(false)}
+              className="flex-1 bg-gray-200 text-gray-500 py-3.5 rounded-xl text-lg font-title hover:bg-gray-300 transition-colors"
+              disabled={isClosing}
+            >
+              취소
+            </button>
+            <button 
+              onClick={handleCloseClass}
+              disabled={closeConfirmInput !== className || isClosing}
+              className="flex-2 bg-red-600 text-white py-3.5 rounded-xl text-lg font-title hover:bg-red-700 transition-colors shadow-lg active:scale-95 disabled:opacity-30 disabled:scale-100"
+            >
+              {isClosing ? "폐쇄 처리 중..." : "학급 폐쇄 확정 ⚠️"}
             </button>
           </div>
         </div>
