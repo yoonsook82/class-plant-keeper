@@ -649,6 +649,9 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
       return;
     }
 
+    // 음성 인식을 시작하는 순간의 텍스트 상태 스냅샷을 캡처
+    const startText = text.trim();
+
     // 모든 주요 브라우저(크롬, 사파리, 파이어폭스, 엣지, 오페라 등)의 벤더 프리픽스 호환성 최대 보장
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -675,19 +678,20 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
     };
     
     recognition.onresult = (event: any) => {
-      // 데스크톱 브라우저 중복 입력 방지를 위한 최종 결과(isFinal) 필터링 기법 적용
-      let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      // 0번 인덱스부터 event.results 전체를 검사하여 이번 음성인식 세션에서 확정된(isFinal) 모든 텍스트를 누적
+      let speechToText = "";
+      for (let i = 0; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+          const transcript = event.results[i][0].transcript.trim();
+          if (transcript) {
+            speechToText += (speechToText ? " " : "") + transcript + ".";
+          }
         }
       }
 
-      if (finalTranscript.trim()) {
-        setText(prev => {
-          const base = prev.trim();
-          return base ? base + " " + finalTranscript.trim() + "." : finalTranscript.trim() + ".";
-        });
+      if (speechToText.trim()) {
+        // 시작 시점 원본 텍스트 + 공백 + 이번 인식된 전체 텍스트
+        setText(startText ? startText + " " + speechToText.trim() : speechToText.trim());
       }
     };
 

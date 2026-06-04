@@ -75,6 +75,7 @@ export default function ReportModal({
   const [isListening, setIsListening] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     let freshFeedback = plant.teacher_feedback || "";
@@ -90,6 +91,15 @@ export default function ReportModal({
   }, [plant]);
 
   const startListening = () => {
+    // 이미 음성인식이 동작 중인 경우, 중복 실행을 막고 종료
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
+    // 음성 인식을 시작하는 순간의 느낀 점 원본 텍스트 캡처
+    const startText = reflection.trim();
+
     // 모든 주요 브라우저(크롬, 사파리, 파이어폭스, 엣지, 오페라 등)의 벤더 프리픽스 호환성 최대 보장
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -104,26 +114,38 @@ export default function ReportModal({
     }
 
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = "ko-KR";
     recognition.continuous = false;
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
     
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      if (transcript && transcript.trim()) {
-        setReflection(prev => {
-          const base = prev.trim();
-          return base ? base + " " + transcript.trim() + "." : transcript.trim() + ".";
-        });
+      // 전체 결과를 검사하여 이번 세션에서 확정된(isFinal) 모든 텍스트를 누적
+      let speechToText = "";
+      for (let i = 0; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          const transcript = event.results[i][0].transcript.trim();
+          if (transcript) {
+            speechToText += (speechToText ? " " : "") + transcript + ".";
+          }
+        }
+      }
+
+      if (speechToText.trim()) {
+        setReflection(startText ? startText + " " + speechToText.trim() : speechToText.trim());
       }
     };
 
     recognition.onerror = (event: any) => {
       console.error("Speech Recognition Error:", event.error);
       setIsListening(false);
+      recognitionRef.current = null;
       
       if (event.error === 'not-allowed') {
         alert(
