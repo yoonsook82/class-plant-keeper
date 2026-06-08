@@ -891,8 +891,8 @@ function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNicknam
   const selectedDiagnosis = diagnosisData.find(d => d.id === selectedId);
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
-      <div className="bg-white w-full max-w-[850px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-start md:items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+      <div className="bg-white w-full max-w-[850px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col my-auto" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
