@@ -901,11 +901,11 @@ function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNicknam
               <Image src="/images/ai-icon.png" alt="ai" width={32} height={32} />
             </div>
             <div>
-              <h3 className="font-title text-3xl text-brand-green">AI 식물 진단</h3>
-              <p className="text-sm font-body text-gray-400">'{plantNickname}'의 증상을 선택해 주세요.</p>
+              <h3 className="font-title text-2xl md:text-3xl text-brand-green">AI 식물 진단</h3>
+              <p className="text-xs md:text-sm font-body text-gray-400 break-keep">'{plantNickname}'의 증상을 선택해 주세요.</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-3xl">✕</button>
+          <button onClick={onClose} className="text-gray-300 hover:text-gray-500 text-xl md:text-2xl shrink-0 p-1">✕</button>
         </div>
 
         <div className="flex-1">
