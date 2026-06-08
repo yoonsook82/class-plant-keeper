@@ -16,7 +16,100 @@ function LoginContent() {
       setClassCode(code.toUpperCase());
       setLoginMode("student");
     }
-  }, [searchParams]);
+
+    const bypass = searchParams.get("bypass");
+    if (bypass === "teacher01") {
+      const autoTeacherLogin = async () => {
+        setLoading(true);
+        setErrorMsg("");
+        try {
+          await supabase.auth.signOut();
+          const { data: classData, error: classError } = await supabase
+            .from("classes")
+            .select("*")
+            .ilike("teacher_email", "teacher01@example.com")
+            .maybeSingle();
+
+          if (classError || !classData) {
+            setErrorMsg("학급 정보를 찾을 수 없습니다.");
+            setLoading(false);
+            return;
+          }
+
+          localStorage.setItem("userRole", "teacher");
+          localStorage.setItem("classId", classData.id);
+          localStorage.setItem("className", classData.class_name);
+          localStorage.setItem("classCode", classData.class_code);
+
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email: "teacher01@example.com",
+            password: "asd1234",
+          });
+
+          if (authError) {
+            setErrorMsg("로그인 실패: " + authError.message);
+            setLoading(false);
+            return;
+          }
+          
+          router.push("/teacher");
+        } catch (e) {
+          setErrorMsg("시스템 오류가 발생했습니다.");
+        }
+        setLoading(false);
+      };
+      autoTeacherLogin();
+    } else if (bypass === "jenny") {
+      const autoStudentLogin = async () => {
+        setLoading(true);
+        setErrorMsg("");
+        try {
+          const { data: classData, error: classError } = await supabase
+            .from("classes")
+            .select("id, class_name")
+            .eq("class_code", "BZ8RLA")
+            .maybeSingle();
+
+          if (classError || !classData) {
+            setErrorMsg("학급 조회 중 오류가 발생했습니다.");
+            setLoading(false);
+            return;
+          }
+
+          const { data: studentData, error: studentError } = await getSupabaseClient()
+            .from("students")
+            .select("id, gender")
+            .eq("class_id", classData.id)
+            .eq("student_name", "제니")
+            .maybeSingle();
+
+          if (studentError || !studentData) {
+            setErrorMsg("학생 조회 중 오류가 발생했습니다.");
+            setLoading(false);
+            return;
+          }
+
+          localStorage.setItem("userRole", "student");
+          localStorage.setItem("classId", classData.id);
+          localStorage.setItem("className", classData.class_name);
+          localStorage.setItem("studentId", studentData.id);
+          localStorage.setItem("studentName", "제니");
+          if (studentData.gender) {
+            localStorage.setItem("studentGender", studentData.gender);
+          }
+
+          localStorage.removeItem("custom_supabase_url");
+          localStorage.removeItem("custom_supabase_anon_key");
+
+          router.push("/student");
+        } catch (e) {
+          setErrorMsg("로그인 처리 중 오류가 발생했습니다.");
+        }
+        setLoading(false);
+      };
+      autoStudentLogin();
+    }
+  }, [searchParams, router]);
 
   const [className, setClassName] = useState("");
   const [email, setEmail] = useState("");
