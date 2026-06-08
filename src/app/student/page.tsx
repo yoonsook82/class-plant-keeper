@@ -427,9 +427,11 @@ export default function StudentDashboard() {
 
             {/* Latest Logs */}
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[40px] shadow-xl border border-white/80 flex-1">
-              <h2 className="font-title text-2xl text-brand-green mb-8 flex items-center gap-3">
-                📖 {selectedPlantId ? `'${plants.find(p => p.id === selectedPlantId)?.plant_nickname}'의 기록` : "최근 관찰 기록"}
-                <span className="text-sm font-body text-gray-400 font-normal">정성을 담아 기록해 보아요</span>
+              <h2 className="font-title text-2xl text-brand-green mb-8 flex flex-col md:flex-row md:items-center gap-1.5 md:gap-3 items-start">
+                <span className="whitespace-nowrap">
+                  📖 {selectedPlantId ? `'${plants.find(p => p.id === selectedPlantId)?.plant_nickname}'의 기록` : "최근 관찰 기록"}
+                </span>
+                <span className="text-sm font-body text-gray-400 font-normal mt-1 md:mt-0 whitespace-nowrap">정성을 담아 기록해 보아요</span>
               </h2>
 
               <div className="space-y-6">

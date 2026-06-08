@@ -242,9 +242,9 @@ export default function ReportModal({
               <div className="inline-flex items-center gap-2 bg-white/25 px-4 py-1.5 rounded-full text-xs md:text-sm font-title mb-2 backdrop-blur-md border border-white/30 tracking-wide shadow-sm print:bg-white print:border-none print:shadow-none print:mb-1 print:mr-0 print:ml-auto print:text-xs print:font-bold">
                 <span className="print:hidden">🍊</span> {className}
               </div>
-              <h3 className="font-title text-xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-black print:text-3xl">
-                <span className="text-white print:text-black font-black drop-shadow-sm print:drop-shadow-none">{studentName} 꼬마 식집사의 관찰 보고서</span>
-                <img src="/images/report-icon.png" className="w-8 h-8 md:w-12 md:h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10" alt="report" />
+              <h3 className="font-title text-[15px] sm:text-2xl md:text-3xl drop-shadow-md flex flex-wrap items-center gap-x-3 gap-y-1 print:drop-shadow-none print:text-black print:text-3xl">
+                <span className="text-white print:text-black font-black drop-shadow-sm print:drop-shadow-none whitespace-nowrap">{studentName} 꼬마 식집사의 관찰 보고서</span>
+                <img src="/images/report-icon.png" className="w-8 h-8 md:w-12 md:h-12 object-contain animate-bounce duration-[2000ms] print:animate-none print:w-10 print:h-10 shrink-0" alt="report" />
               </h3>
             </div>
             
@@ -577,13 +577,13 @@ export default function ReportModal({
                 <div className="flex justify-center gap-3 mt-4 print:hidden">
                   <button 
                     onClick={() => onSaveReflection(plant.id, reflection)}
-                    className="px-8 py-2 bg-orange-500 text-white rounded-full font-title text-lg font-black shadow-md hover:bg-orange-600 transition-all active:scale-95"
+                    className="px-4 md:px-8 py-2 bg-orange-500 text-white rounded-full font-title text-lg font-black shadow-md hover:bg-orange-600 transition-all active:scale-95 whitespace-nowrap"
                   >
                     저장하기
                   </button>
                   <button 
                     onClick={() => { setReflection(""); onSaveReflection(plant.id, ""); }}
-                    className="px-8 py-2 bg-white text-gray-700 rounded-full font-title text-lg font-bold border-2 border-gray-100 hover:bg-gray-50 transition-all"
+                    className="px-4 md:px-8 py-2 bg-white text-gray-700 rounded-full font-title text-lg font-bold border-2 border-gray-100 hover:bg-gray-50 transition-all whitespace-nowrap"
                   >
                     지우기
                   </button>

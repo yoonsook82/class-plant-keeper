@@ -348,9 +348,9 @@ export default function TeacherDashboard() {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-6 md:mb-8 border-b-4 border-brand-green pb-4 md:pb-3 gap-4">
-        <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-center md:justify-start">
-          <Image src="/images/teacher-icon.png" alt="선생님 아이콘" width={50} height={50} className="md:w-[70px] md:h-[70px] object-contain drop-shadow-md" />
-          <h1 className="font-title text-2xl md:text-4xl text-brand-brown drop-shadow-sm pt-2">
+        <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-center md:justify-start overflow-hidden">
+          <Image src="/images/teacher-icon.png" alt="선생님 아이콘" width={50} height={50} className="w-[40px] h-[40px] md:w-[70px] md:h-[70px] object-contain shrink-0 drop-shadow-md" />
+          <h1 className="font-title text-lg sm:text-2xl md:text-4xl text-brand-brown drop-shadow-sm pt-2 whitespace-nowrap overflow-hidden text-ellipsis">
             {className} 정원 통합 관리실
           </h1>
         </div>
