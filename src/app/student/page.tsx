@@ -22,6 +22,11 @@ export default function StudentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
   
+  // 날씨 연동 스마트 알림 상태
+  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [weather, setWeather] = useState<{ temp: number; icon: string; status: string } | null>(null);
+  const [weatherTip, setWeatherTip] = useState("");
+  
   // Modal States
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -64,7 +69,75 @@ export default function StudentDashboard() {
     setClassId(cId || null);
 
     fetchData(sId);
+    fetchWeather();
   }, []);
+
+  // 실시간 날씨 데이터 조회 및 초등 교과 조건 알고리즘
+  const fetchWeather = () => {
+    setWeatherLoading(true);
+    const defaultLat = 37.5665;
+    const defaultLon = 126.9780;
+
+    const getWeatherData = async (lat: number, lon: number) => {
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const data = await res.json();
+        
+        if (data && data.current_weather) {
+          const temp = Math.round(data.current_weather.temperature);
+          const code = data.current_weather.weathercode;
+          
+          // 날씨 코드 매핑
+          let icon = "🌱";
+          let status = "맑음";
+          let isRaining = false;
+          let isSnowing = false;
+
+          if (code === 0) { icon = "☀️"; status = "맑음"; }
+          else if ([1, 2, 3].includes(code)) { icon = "☁️"; status = "흐림"; }
+          else if ([45, 48].includes(code)) { icon = "🌫️"; status = "안개"; }
+          else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { icon = "☔"; status = "비"; isRaining = true; }
+          else if ([71, 73, 75, 77, 85, 86].includes(code)) { icon = "❄️"; status = "눈"; isSnowing = true; }
+          else if ([95, 96, 99].includes(code)) { icon = "⚡"; status = "뇌우"; isRaining = true; }
+
+          setWeather({ temp, icon, status });
+
+          // 초등 교과 융합 조건문 알고리즘 적용
+          if (isRaining) {
+            setWeatherTip("오늘 비가 내려요. 실내 습도가 높을 수 있으니 물 주기는 화분 흙을 손가락으로 만져본 뒤 평소보다 조금 미뤄보세요! ☔");
+          } else if (isSnowing) {
+            setWeatherTip("바깥에 눈이 오고 추워요! 화분이 너무 차가워지지 않게 창가에서 살짝 교실 안쪽으로 옮겨 냉해를 막아주세요. ❄️");
+          } else if (temp >= 28) {
+            setWeatherTip(`오늘 낮 기온이 ${temp}℃로 매우 무더워요! 햇볕이 강해 화분 흙이 평소보다 빨리 마를 수 있으니 아침/저녁으로 수분을 잘 챙겨주세요! ☀️`);
+          } else if (temp <= 10) {
+            setWeatherTip(`오늘 기온이 ${temp}℃로 쌀쌀해요. 식물이 추위를 타서 성장이 느려지지 않게 따뜻한 실내 환경과 온도(15~25℃)를 유지해 주세요. 🌡️`);
+          } else {
+            setWeatherTip(`오늘 기온은 ${temp}℃로 식물이 무럭무럭 자라기 좋은 날씨예요! 기분 좋은 하루와 함께 초록 친구에게 눈인사를 건네보세요. 🌱`);
+          }
+        }
+      } catch (err) {
+        console.error("날씨 정보 호출 실패:", err);
+        setWeather({ temp: 20, icon: "🌱", status: "적당함" });
+        setWeatherTip("반려식물이 건강하게 자라고 있나요? 오늘 날씨를 확인해보고 물과 바람, 햇빛을 챙겨주세요!");
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          getWeatherData(position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          getWeatherData(defaultLat, defaultLon);
+        },
+        { timeout: 5000 }
+      );
+    } else {
+      getWeatherData(defaultLat, defaultLon);
+    }
+  };
 
   const fetchData = async (sId: string) => {
     setIsLoading(true);
@@ -372,6 +445,32 @@ export default function StudentDashboard() {
           {/* Right Column: Observations & Logs */}
           <div className="lg:col-span-8 flex flex-col gap-6">
             
+            {/* 오늘의 초록 날씨 & 스마트 케어 알림 배너 */}
+            <div className="bg-white/80 backdrop-blur-md p-5 rounded-[30px] border border-brand-green/20 shadow-sm flex flex-col sm:flex-row items-center gap-4 text-left">
+              <div className="flex items-center gap-3 shrink-0 bg-[#f0f7ec] px-4 py-2.5 rounded-2xl border border-brand-green/10 w-full sm:w-auto justify-center sm:justify-start">
+                {weatherLoading ? (
+                  <>
+                    <div className="w-6 h-6 border-3 border-brand-green border-t-transparent rounded-full animate-spin"></div>
+                    <span className="font-title text-brand-green text-sm">기상 분석 중...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl animate-sway">{weather?.icon}</span>
+                    <div className="flex flex-col text-left">
+                      <span className="font-title text-2xl text-brand-brown leading-tight">{weather?.temp}℃</span>
+                      <span className="font-body text-[10px] text-brand-green font-bold">{weather?.status}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="font-title text-xs text-[#a65d00] mb-1 tracking-wider">🌱 오늘의 스마트 관찰 가이드</p>
+                <p className="font-body text-xs md:text-sm text-gray-600 leading-relaxed break-keep">
+                  {weatherLoading ? "오늘의 날씨 데이터를 분석하여 초록 식집사용 조건 알고리즘을 계산하는 중입니다..." : weatherTip}
+                </p>
+              </div>
+            </div>
+
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
