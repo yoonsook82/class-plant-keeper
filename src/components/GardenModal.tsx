@@ -181,16 +181,25 @@ export default function GardenModal({ onClose, className: userClassName, classId
       <div className="bg-white w-full h-full flex flex-col overflow-hidden relative" onClick={e => e.stopPropagation()}>
         
         {/* Header - Matching GardenPage */}
-        <div className="px-10 py-6 flex items-center gap-5 border-b-[6px] border-[#738b27] bg-white sticky top-0 z-50 shadow-sm">
-          <div className="w-20 h-20 flex items-center justify-center">
-            <img src="/images/garden.png" className="w-full h-full object-contain" alt="garden" />
+        <div className="px-4 py-4 md:px-10 md:py-6 flex flex-row items-center justify-between border-b-[6px] border-[#738b27] bg-white sticky top-0 z-50 shadow-sm gap-3">
+          <div className="flex items-center gap-3 md:gap-5 min-w-0">
+            <div className="w-12 h-12 md:w-20 md:h-20 shrink-0 flex items-center justify-center">
+              <img src="/images/garden.png" className="w-full h-full object-contain" alt="garden" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-title text-xl md:text-4xl text-brand-brown leading-tight break-keep">
+                {userClassName}의 정원
+              </h1>
+              <p className="text-[#738b27] font-body font-bold text-xs md:text-xl truncate md:whitespace-normal">
+                친구들의 식물 성장 일기를 함께 보아요!
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-title text-4xl text-brand-brown leading-tight">{userClassName}의 정원</h1>
-            <p className="text-[#738b27] font-body font-bold text-xl">친구들의 식물 성장 일기를 함께 보아요!</p>
-          </div>
-          <button onClick={onClose} className="ml-auto bg-gray-100 text-gray-500 px-6 py-3 rounded-2xl font-title text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-2">
-            <span>✕</span> 닫기
+          <button 
+            onClick={onClose} 
+            className="shrink-0 bg-gray-100 text-gray-500 px-3 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl font-title text-sm md:text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <span>✕</span> <span>닫기</span>
           </button>
         </div>
 
