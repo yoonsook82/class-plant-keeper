@@ -416,8 +416,9 @@ function LoginContent() {
                 priority
               />
             </div>
-            <p className="font-title text-2xl md:text-3xl text-[#2D4D1E] tracking-wide font-black drop-shadow-sm">
-              학급 식물 관찰 기록 시스템
+            <p className="font-title text-2xl md:text-3xl text-[#2D4D1E] tracking-wide font-black drop-shadow-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+              <span>학급 식물 관찰 기록 시스템</span>
+              <span>(초등 전학년)</span>
             </p>
           </div>
         </div>
