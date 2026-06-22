@@ -1400,7 +1400,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         key={block.id}
                         disabled={codingBlocks.includes(block.id)}
                         onClick={() => addBlock(block.id)}
-                        className={`p-1.5 rounded-2xl border-2 transition-all flex flex-col items-center gap-0.5 ${
+                        className={`p-1 sm:p-1.5 rounded-2xl border-2 transition-all flex flex-col items-center gap-0.5 ${
                           codingBlocks.includes(block.id)
                             ? 'bg-gray-100 border-gray-200 grayscale opacity-30'
                             : 'bg-white border-blue-400 hover:bg-blue-50 hover:scale-105 shadow-sm'
@@ -1409,7 +1409,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         <div className="w-[74px] h-[74px] flex items-center justify-center">
                           <img src={block.img} alt={block.name} className="object-contain w-[58px] h-[58px]" />
                         </div>
-                        <span className="text-[10px] sm:text-xs font-body font-bold text-gray-700 leading-tight text-center break-keep w-full px-0.5 min-h-[2rem] flex items-center justify-center">
+                        <span className="text-[9px] sm:text-xs font-body font-bold text-gray-700 leading-tight text-center break-keep whitespace-normal w-full px-0.5 min-h-[2.2rem] flex items-center justify-center">
                           {block.name}
                         </span>
                       </button>
@@ -1523,7 +1523,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                       <p>감자는 <span className="font-bold text-yellow-600">햇빛이 아주 잘 들고 바람이 잘 통하는 곳</span>을 좋아해요.</p>
                       <p>특히 <span className="font-bold text-yellow-600">감자에 꽃이 필 때는 물을 충분히 주어</span> 감자가 커질 수 있게 해주세요!</p>
                       <p className="bg-white/70 p-2 rounded-xl border border-yellow-200 mt-1.5 text-[10px] sm:text-base font-bold">
-                        💡 <span className="text-yellow-800">미션:</span> 감자에 곁순이 자라면 순지를 해서 덩이줄기에 양분이 집중되도록 해주세요!
+                        💡 <span className="text-yellow-800">미션:</span> 감자에 곁순이 자라면 순지르기를 해서 덩이줄기에 양분이 집중되도록 해주세요!
                       </p>
                     </div>
                   </div>
