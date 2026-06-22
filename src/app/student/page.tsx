@@ -1521,9 +1521,9 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                     </div>
                     <div className="space-y-1.5 sm:space-y-3 font-body text-gray-700 text-[11px] sm:text-lg leading-normal sm:leading-relaxed break-keep">
                       <p>감자는 <span className="font-bold text-yellow-600">햇빛이 아주 잘 들고 바람이 잘 통하는 곳</span>을 좋아해요.</p>
-                      <p>흙 속에 감자가 무럭무럭 자랄 수 있도록 화분을 햇빛이 가득한 <span className="font-bold text-yellow-600">창가나 실외</span>에 놓아주세요!</p>
+                      <p>특히 <span className="font-bold text-yellow-600">감자에 꽃이 필 때는 물을 충분히 주어</span> 감자가 커질 수 있게 해주세요!</p>
                       <p className="bg-white/70 p-2 rounded-xl border border-yellow-200 mt-1.5 text-[10px] sm:text-base font-bold">
-                        💡 <span className="text-yellow-800">미션:</span> 감자 화분을 햇빛과 바람이 좋은 명당자리에 놓아주세요!
+                        💡 <span className="text-yellow-800">미션:</span> 감자에 곁순이 자라면 순지를 해서 덩이줄기에 양분이 집중되도록 해주세요!
                       </p>
                     </div>
                   </div>
