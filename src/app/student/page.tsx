@@ -1409,7 +1409,9 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         <div className="w-[74px] h-[74px] flex items-center justify-center">
                           <img src={block.img} alt={block.name} className="object-contain w-[58px] h-[58px]" />
                         </div>
-                        <span className="text-xs font-body font-bold text-gray-700 leading-tight text-center">{block.name}</span>
+                        <span className="text-[10px] sm:text-xs font-body font-bold text-gray-700 leading-tight text-center break-keep w-full px-0.5 min-h-[2rem] flex items-center justify-center">
+                          {block.name}
+                        </span>
                       </button>
                     ))}
                   </div>
