@@ -12,17 +12,19 @@ const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-async function checkClassesTable() {
+async function checkClasses() {
+  console.log('--- Classes Column Check ---');
   const { data, error } = await supabase.from('classes').select('*').limit(1);
   if (error) {
-    console.error('Error:', error.message);
+    console.error('Error fetching classes:', error.message);
+    return;
+  }
+  if (data && data.length > 0) {
+    console.log('Successfully fetched classes row. Columns found:');
+    console.log(Object.keys(data[0]));
   } else {
-    if (data.length > 0) {
-      console.log('Columns in classes:', Object.keys(data[0]).join(', '));
-    } else {
-      console.log('Table classes is empty, but query succeeded.');
-    }
+    console.log('Classes table is empty, but query succeeded. No rows available.');
   }
 }
 
-checkClassesTable();
+checkClasses();

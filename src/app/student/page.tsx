@@ -1069,7 +1069,7 @@ function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNicknam
 
 function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickname: string }) {
   const [step, setStep] = useState(1); // 1: Supplies, 2: Coding, 3: Environment, 4: Final Success
-  const [method, setMethod] = useState<"seed" | "seedling" | null>(null);
+  const [method, setMethod] = useState<"seed" | "seedling" | "potato" | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [codingBlocks, setCodingBlocks] = useState<string[]>([]);
   const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
@@ -1184,8 +1184,24 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
     { id: "m6", name: "햇빛 보여주기", img: "/images/grow6.png" }
   ];
 
+  const potatoSteps = [
+    { id: "p1", name: "씨감자 자르기", img: "/images/potato1.png" },
+    { id: "p2", name: "흙에 씨감자 넣고 흙 덮기", img: "/images/potato1.png" },
+    { id: "p3", name: "물주기", img: "/images/potato1.png" },
+    { id: "p4", name: "싹이 나면 북돋우기", img: "/images/potato1.png" },
+    { id: "p5", name: "곁순지르기", img: "/images/potato1.png" },
+    { id: "p6", name: "꽃이 피면 꽃대 자르기", img: "/images/potato1.png" }
+  ];
+
   const getBlocks = () => {
-    const list = method === "seed" ? [...seedSteps] : [...seedlingSteps];
+    let list: any[] = [];
+    if (method === "seed") {
+      list = [...seedSteps];
+    } else if (method === "seedling") {
+      list = [...seedlingSteps];
+    } else if (method === "potato") {
+      list = [...potatoSteps];
+    }
     return list.sort(() => Math.random() - 0.5);
   };
 
@@ -1226,8 +1242,13 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
       if (current === JSON.stringify(darkGermination) || current === JSON.stringify(lightGermination)) {
         isCorrect = true;
       }
-    } else {
+    } else if (method === "seedling") {
       const correct = ["m1", "m2", "m3", "m4", "m5", "m6"];
+      if (JSON.stringify(codingBlocks) === JSON.stringify(correct)) {
+        isCorrect = true;
+      }
+    } else if (method === "potato") {
+      const correct = ["p1", "p2", "p3", "p4", "p5", "p6"];
       if (JSON.stringify(codingBlocks) === JSON.stringify(correct)) {
         isCorrect = true;
       }
@@ -1330,20 +1351,33 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
           {step === 1.5 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 text-center py-4 sm:py-6">
               <h4 className="font-title text-xl sm:text-2xl text-brand-brown mb-4 sm:mb-6">어떤 방법으로 식물을 심을까요?</h4>
-              <div className="flex flex-row gap-3 sm:gap-4 justify-center">
+              <div className="flex flex-row flex-wrap gap-3 sm:gap-4 justify-center">
                 <button 
                   onClick={() => { playSelectSound(); setMethod("seed"); setStep(2); }}
-                  className="bg-amber-50 hover:bg-amber-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group"
+                  className="bg-amber-50 hover:bg-amber-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
                 >
-                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center text-4xl sm:text-6xl shadow-sm">🌰</div>
-                  <span className="font-title text-lg sm:text-2xl text-amber-700 block mb-1">씨앗 심기</span>
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
+                    <Image src="/images/seed.png" alt="씨앗" width={80} height={80} className="object-contain w-full h-full" />
+                  </div>
+                  <span className="font-title text-base sm:text-2xl text-amber-700 block mb-1">씨앗 뿌리기</span>
                 </button>
                 <button 
                   onClick={() => { playSelectSound(); setMethod("seedling"); setStep(2); }}
-                  className="bg-green-50 hover:bg-green-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group"
+                  className="bg-green-50 hover:bg-green-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
                 >
-                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center text-4xl sm:text-6xl shadow-sm">🌱</div>
-                  <span className="font-title text-lg sm:text-2xl text-green-700 block mb-1">모종 심기</span>
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
+                    <Image src="/images/stem.png" alt="모종" width={80} height={80} className="object-contain w-full h-full" />
+                  </div>
+                  <span className="font-title text-base sm:text-2xl text-green-700 block mb-1">모종 심기</span>
+                </button>
+                <button 
+                  onClick={() => { playSelectSound(); setMethod("potato"); setStep(2); }}
+                  className="bg-yellow-50 hover:bg-yellow-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-yellow-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
+                >
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
+                    <Image src="/images/potato1.png" alt="감자" width={80} height={80} className="object-contain w-full h-full" />
+                  </div>
+                  <span className="font-title text-base sm:text-2xl text-yellow-700 block mb-1">감자 심기</span>
                 </button>
               </div>
             </div>
@@ -1353,7 +1387,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="text-center mb-2">
                 <h4 className="font-title text-2xl text-brand-brown">
-                  Step 2. {method === "seed" ? "씨앗" : "모종"} 심기 <span className="text-blue-500">이미지 코딩</span>
+                  Step 2. {method === "seed" ? "씨앗 뿌리기" : method === "seedling" ? "모종 심기" : "감자 심기"} <span className="text-blue-500">이미지 코딩</span>
                 </h4>
               </div>
               
@@ -1389,7 +1423,13 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   </p>
                   <div className="relative w-full flex-1 flex items-center justify-center">
                     {codingBlocks.map((blockId, index) => {
-                      const block = (method === "seed" ? seedSteps : seedlingSteps).find(s => s.id === blockId);
+                      const block = (
+                        method === "seed" 
+                          ? seedSteps 
+                          : method === "seedling" 
+                            ? seedlingSteps 
+                            : potatoSteps
+                      ).find(s => s.id === blockId);
                       const maxItems = 6;
                       const angle = (index * (360 / maxItems)) - 90;
                       const radius = isMobile ? 65 : 95; // Compact radius
@@ -1468,6 +1508,20 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                       <p>하지만 상추나 당근처럼 싹이 틀 때 <span className="font-bold text-amber-600">빛이 필요한 '광발아'</span> 씨앗도 있답니다!</p>
                       <p className="bg-white/70 p-2 rounded-xl border border-amber-200 mt-1.5 text-[10px] sm:text-base font-bold">
                         💡 <span className="text-amber-800">미션:</span> 내가 심은 식물을 검색해보고, 알맞은 장소에 놓아주세요!
+                      </p>
+                    </div>
+                  </div>
+                ) : method === "potato" ? (
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-9 h-9 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-3xl">🥔</div>
+                      <h5 className="font-title text-base sm:text-2xl text-yellow-700">감자는 어디서 잘 자랄까요?</h5>
+                    </div>
+                    <div className="space-y-1.5 sm:space-y-3 font-body text-gray-700 text-[11px] sm:text-lg leading-normal sm:leading-relaxed break-keep">
+                      <p>감자는 <span className="font-bold text-yellow-600">햇빛이 아주 잘 들고 바람이 잘 통하는 곳</span>을 좋아해요.</p>
+                      <p>흙 속에 감자가 무럭무럭 자랄 수 있도록 화분을 햇빛이 가득한 <span className="font-bold text-yellow-600">창가나 실외</span>에 놓아주세요!</p>
+                      <p className="bg-white/70 p-2 rounded-xl border border-yellow-200 mt-1.5 text-[10px] sm:text-base font-bold">
+                        💡 <span className="text-yellow-800">미션:</span> 감자 화분을 햇빛과 바람이 좋은 명당자리에 놓아주세요!
                       </p>
                     </div>
                   </div>
