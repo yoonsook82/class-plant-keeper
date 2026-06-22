@@ -1359,7 +1359,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
                     <Image src="/images/seed.png" alt="씨앗" width={80} height={80} className="object-contain w-full h-full" />
                   </div>
-                  <span className="font-title text-base sm:text-2xl text-amber-700 block mb-1">씨앗 뿌리기</span>
+                  <span className="font-title text-base sm:text-2xl text-amber-700 block mb-1">씨뿌리기</span>
                 </button>
                 <button 
                   onClick={() => { playSelectSound(); setMethod("seedling"); setStep(2); }}
@@ -1387,7 +1387,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="text-center mb-2">
                 <h4 className="font-title text-2xl text-brand-brown">
-                  Step 2. {method === "seed" ? "씨앗 뿌리기" : method === "seedling" ? "모종 심기" : "감자 심기"} <span className="text-blue-500">이미지 코딩</span>
+                  Step 2. {method === "seed" ? "씨뿌리기" : method === "seedling" ? "모종 심기" : "감자 심기"} <span className="text-blue-500">이미지 코딩</span>
                 </h4>
               </div>
               
