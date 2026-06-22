@@ -1185,12 +1185,12 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   ];
 
   const potatoSteps = [
-    { id: "p1", name: "씨감자 자르기", img: "/images/potato1.png" },
-    { id: "p2", name: "흙에 씨감자 넣고 흙 덮기", img: "/images/potato1.png" },
-    { id: "p3", name: "물주기", img: "/images/potato1.png" },
-    { id: "p4", name: "싹이 나면 북돋우기", img: "/images/potato1.png" },
-    { id: "p5", name: "곁순지르기", img: "/images/potato1.png" },
-    { id: "p6", name: "꽃이 피면 꽃대 자르기", img: "/images/potato1.png" }
+    { id: "p1", name: "씨감자 자르기", img: "/images/11.png" },
+    { id: "p2", name: "흙에 씨감자 넣고 흙 덮기", img: "/images/12.jpg" },
+    { id: "p3", name: "물주기", img: "/images/13.jpg" },
+    { id: "p4", name: "싹이 나면 북돋우기", img: "/images/14.png" },
+    { id: "p5", name: "곁순지르기", img: "/images/15.png" },
+    { id: "p6", name: "꽃이 피면 꽃대 자르기", img: "/images/16.png" }
   ];
 
   const getBlocks = () => {
@@ -1357,7 +1357,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   className="bg-amber-50 hover:bg-amber-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-amber-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
                 >
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
-                    <Image src="/images/seed.png" alt="씨앗" width={80} height={80} className="object-contain w-full h-full" />
+                    <img src="/images/seed.png" alt="씨앗" className="object-contain w-full h-full" />
                   </div>
                   <span className="font-title text-base sm:text-2xl text-amber-700 block mb-1">씨뿌리기</span>
                 </button>
@@ -1366,7 +1366,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   className="bg-green-50 hover:bg-green-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-green-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
                 >
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
-                    <Image src="/images/stem.png" alt="모종" width={80} height={80} className="object-contain w-full h-full" />
+                    <img src="/images/stem.png" alt="모종" className="object-contain w-full h-full" />
                   </div>
                   <span className="font-title text-base sm:text-2xl text-green-700 block mb-1">모종 심기</span>
                 </button>
@@ -1375,7 +1375,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                   className="bg-yellow-50 hover:bg-yellow-100 p-3 sm:p-6 rounded-[25px] sm:rounded-[40px] border-4 border-yellow-200 transition-all hover:scale-105 group w-[120px] sm:w-[180px]"
                 >
                   <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-full mx-auto mb-2 sm:mb-4 flex items-center justify-center shadow-sm overflow-hidden p-2 sm:p-3">
-                    <Image src="/images/potato1.png" alt="감자" width={80} height={80} className="object-contain w-full h-full" />
+                    <img src="/images/potato1.png" alt="감자" className="object-contain w-full h-full" />
                   </div>
                   <span className="font-title text-base sm:text-2xl text-yellow-700 block mb-1">감자 심기</span>
                 </button>
@@ -1407,7 +1407,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                         }`}
                       >
                         <div className="w-[74px] h-[74px] flex items-center justify-center">
-                          <Image src={block.img} alt={block.name} width={70} height={70} className="object-contain w-[58px] h-[58px]" />
+                          <img src={block.img} alt={block.name} className="object-contain w-[58px] h-[58px]" />
                         </div>
                         <span className="text-xs font-body font-bold text-gray-700 leading-tight text-center">{block.name}</span>
                       </button>
@@ -1459,7 +1459,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
                             ✕
                           </button>
                           <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-18 md:h-18 flex items-center justify-center bg-blue-50/50 rounded-full overflow-hidden">
-                            <Image src={block?.img || ""} width={60} height={60} alt="" className="object-contain w-7 h-7 sm:w-10 sm:h-10 md:w-14 md:h-14" />
+                            <img src={block?.img || ""} alt="" className="object-contain w-7 h-7 sm:w-10 sm:h-10 md:w-14 md:h-14" />
                           </div>
                         </div>
                       );
