@@ -112,7 +112,7 @@ export default function StudentDashboard() {
           } else if (temp <= 10) {
             setWeatherTip(`오늘 기온이 ${temp}℃로 쌀쌀해요. 식물이 추위를 타서 성장이 느려지지 않게 따뜻한 실내 환경과 온도(15~25℃)를 유지해 주세요. 🌡️`);
           } else {
-            setWeatherTip(`오늘 기온은 ${temp}℃로 식물이 무럭무럭 자라기 좋은 날씨예요! 기분 좋은 하루와 함께 초록 친구에게 눈인사를 건네보세요. 🌱`);
+            setWeatherTip(`오늘 기온은 ${temp}℃로 식물이 무럭무럭 자라기 좋은 날씨예요! 기분 좋은 하루와 함께 초록 친구에게 눈인사를 건네보세요.`);
           }
         }
       } catch (err) {
@@ -464,7 +464,7 @@ export default function StudentDashboard() {
                 )}
               </div>
               <div className="flex-1">
-                <p className="font-title text-xs text-[#a65d00] mb-1 tracking-wider">🌱 오늘의 스마트 관찰 가이드</p>
+                <p className="font-title text-xs text-[#a65d00] mb-1 tracking-wider">오늘의 스마트 관찰 가이드</p>
                 <p className="font-body text-xs md:text-sm text-gray-600 leading-relaxed break-keep">
                   {weatherLoading ? "오늘의 날씨 데이터를 분석하여 초록 식집사용 조건 알고리즘을 계산하는 중입니다..." : weatherTip}
                 </p>
