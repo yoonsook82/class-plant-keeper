@@ -647,6 +647,12 @@ export default function TeacherDashboard() {
                       <td className="p-3 border-r border-gray-200 text-left bg-white break-keep leading-relaxed">식물 정보, 관찰 일지 텍스트, 성장 수치, 관찰 사진</td>
                       <td className="p-3 text-left bg-white break-keep leading-relaxed">학년도 종료 또는 학급 폐쇄 시 즉시 파기</td>
                     </tr>
+                    <tr className="bg-gray-50/50">
+                      <td className="p-3 border-r border-gray-200 font-bold text-center whitespace-nowrap bg-gray-50/40">위치</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-gray-50/50 break-keep leading-relaxed">날씨 정보 연동 (식물 관리 환경 제공)</td>
+                      <td className="p-3 border-r border-gray-200 text-left bg-gray-50/50 break-keep leading-relaxed">기기의 현재 위치 정보 (위도·경도, 서버에 저장되지 않음)</td>
+                      <td className="p-3 text-left bg-gray-50/50 break-keep leading-relaxed">날씨 조회 후 즉시 파기 (저장 없음)</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -685,6 +691,13 @@ export default function TeacherDashboard() {
             <div>
               <h4 className="font-title text-lg text-brand-green mb-2">제7조 (개인정보 보호책임자 및 담당자)</h4>
               <p>① 개인정보 보호책임: 본 서비스의 개인정보 처리에 관한 모든 문의사항, 의견 수렴 및 불만 처리는 해당 학급 담임교사에게 연락하여 안내받으실 수 있습니다.</p>
+            </div>
+
+            <div>
+              <h4 className="font-title text-lg text-brand-green mb-2">제8조 (위치정보의 처리)</h4>
+              <p>① 본 서비스는 학생 대시보드에서 식물 관리에 도움이 되는 날씨 정보를 제공하기 위해 기기의 현재 위치 정보(위도·경도)를 일시적으로 수집합니다.</p>
+              <p>② 수집된 위치 정보는 날씨 API 조회 목적으로만 사용되며, 서버 또는 데이터베이스에 저장되지 않고 조회 즉시 파기됩니다.</p>
+              <p>③ 위치 정보 수집은 브라우저의 위치 정보 제공 동의(사용자 허용) 시에만 이루어지며, 거부 시 날씨 기능은 제공되지 않으나 나머지 서비스 이용에는 영향이 없습니다.</p>
             </div>
 
             {/* PDF 동의서 다운로드 카드 */}
