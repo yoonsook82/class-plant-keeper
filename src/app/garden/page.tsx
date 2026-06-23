@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 interface Record {
   id: string;
@@ -40,7 +40,8 @@ export default function GardenPage() {
     fetchGardenData();
 
     // Set up Realtime Subscription for automatic updates
-    const channel = supabase
+    const client = getSupabaseClient();
+    const channel = client
       .channel('garden-updates')
       .on(
         'postgres_changes',
@@ -53,14 +54,15 @@ export default function GardenPage() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, []);
 
   const fetchGardenData = async () => {
     setLoading(true);
     try {
-      const { data: allRecords, error: recordsError } = await supabase
+      const client = getSupabaseClient();
+      const { data: allRecords, error: recordsError } = await client
         .from("records")
         .select(`
           *,
