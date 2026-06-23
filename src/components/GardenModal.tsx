@@ -46,8 +46,10 @@ export default function GardenModal({ onClose, className: userClassName, classId
   const fetchGardenData = async () => {
     setLoading(true);
     try {
-      // 1. 해당 학급의 모든 학생 ID 먼저 가져오기
-      const { data: classStudents, error: studentsError } = await getSupabaseClient()
+      const client = getSupabaseClient();
+
+      // 1단계: 해당 학급의 모든 학생 가져오기
+      const { data: classStudents, error: studentsError } = await client
         .from("students")
         .select("id, student_name")
         .eq("class_id", classId);
@@ -61,43 +63,51 @@ export default function GardenModal({ onClose, className: userClassName, classId
 
       const classStudentIds = classStudents.map(s => s.id);
 
-      // 2. 해당 학생들의 식물 관찰 기록 가져오기 (INNER JOIN 효과를 위해 !inner 사용 가능하나 호환성 위해 id 필터링)
-      const { data: allRecords, error: recordsError } = await getSupabaseClient()
+      // 2단계: 해당 학생들의 식물 ID 목록 가져오기
+      const { data: classPlants, error: plantsError } = await client
+        .from("plants")
+        .select("id, plant_nickname, plant_type, student_id")
+        .in("student_id", classStudentIds);
+
+      if (plantsError) throw plantsError;
+      if (!classPlants || classPlants.length === 0) {
+        setGardenData([]);
+        setLoading(false);
+        return;
+      }
+
+      const classPlantIds = classPlants.map(p => p.id);
+
+      // 3단계: 해당 식물들의 관찰 기록 가져오기 (최신순)
+      const { data: allRecords, error: recordsError } = await client
         .from("records")
-        .select(`
-          *,
-          plants!inner (
-            id,
-            plant_nickname,
-            plant_type,
-            student_id
-          )
-        `)
-        .in("plants.student_id", classStudentIds)
+        .select("*")
+        .in("plant_id", classPlantIds)
         .order("created_at", { ascending: false });
 
       if (recordsError) throw recordsError;
 
-      // 3. 학생별 최신 기록 그룹화
+      // 4단계: 학생별 최신 기록 1건만 그룹화
       const latestMap = new Map<string, any>();
       allRecords?.forEach(record => {
-        const sId = record.plants?.student_id;
+        const plant = classPlants.find(p => p.id === record.plant_id);
+        if (!plant) return;
+        const sId = plant.student_id;
         if (sId && !latestMap.has(sId)) {
-          latestMap.set(sId, record);
+          latestMap.set(sId, { record, plant });
         }
       });
 
-      // 4. 최종 데이터 포맷팅 (존재하는 학생만 포함)
-      const formattedData: GardenCardData[] = Array.from(latestMap.values())
-        .map(record => {
-          const student = classStudents.find(s => s.id === record.plants?.student_id);
+      // 5단계: 최종 데이터 포맷팅
+      const formattedData: GardenCardData[] = Array.from(latestMap.entries())
+        .map(([sId, { record, plant }]) => {
+          const student = classStudents.find(s => s.id === sId);
           if (!student) return null;
-          
           return {
-            student_id: record.plants?.student_id,
+            student_id: sId,
             student_name: student.student_name,
-            plant_nickname: record.plants?.plant_nickname || "이름 없는 식물",
-            plant_type: record.plants?.plant_type || "기타",
+            plant_nickname: plant.plant_nickname || "이름 없는 식물",
+            plant_type: plant.plant_type || "기타",
             latest_record: record
           };
         })
@@ -109,6 +119,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
     }
     setLoading(false);
   };
+
 
   const loadInteractions = async (recordId: string) => {
     try {
