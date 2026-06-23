@@ -296,7 +296,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
                   <button onClick={() => setSelectedRecord(null)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-brand-green transition-all text-2xl">←</button>
                   <div>
                     <h3 className="font-title text-xl text-brand-brown">{selectedRecord.student_name} 식집사의 기록</h3>
-                    <p className="text-brand-green font-body font-bold text-xs">친구의 성장을 축하해주세요!</p>
+                    <p className="text-brand-green font-body font-bold text-xs">반려식물의 성장을 함께 응원해주세요!</p>
                   </div>
                 </div>
                 <button onClick={() => setSelectedRecord(null)} className="font-title text-lg text-gray-400 hover:text-red-500 transition-colors">닫기</button>
