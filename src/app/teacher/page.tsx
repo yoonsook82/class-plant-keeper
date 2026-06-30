@@ -22,7 +22,7 @@ const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-[#e6f4ea] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
+      className="bg-[#e6f4ea] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 w-[90vw] sm:w-auto max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
     >
       {/* Sprout Icon (Teacher Theme) */}
       <div className="absolute -top-6 -left-4 w-14 h-14 z-20 bg-white rounded-full border-[4px] border-[#4a3f35] flex items-center justify-center shadow-sm">
@@ -443,6 +443,11 @@ export default function TeacherDashboard() {
       continuous: true,
       callback: handleJoyrideCallback,
       tooltipComponent: CustomTooltip,
+      styles: {
+        options: {
+          arrowColor: 'transparent',
+        }
+      }
     })}
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
@@ -591,9 +596,9 @@ export default function TeacherDashboard() {
          </div>
 
         {/* Right Side: Student Grid */}
-        <div id="tutorial-step-2" className="flex-1">
+        <div className="flex-1">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="font-title text-2xl text-brand-green">우리 반 식집사들 ({students.length}명)</h2>
+            <h2 id="tutorial-step-2" className="font-title text-2xl text-brand-green">우리 반 식집사들 ({students.length}명)</h2>
             {selectedStudent && (
               <div className="animate-in slide-in-from-right fade-in bg-brand-green/10 px-4 py-1.5 rounded-full border border-brand-green/30 flex items-center gap-2">
                 <span className="font-title text-brand-green">선택됨:</span>

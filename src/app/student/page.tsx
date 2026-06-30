@@ -23,7 +23,7 @@ const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-[#ffebf0] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
+      className="bg-[#ffebf0] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 w-[90vw] sm:w-auto max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
     >
       {/* Star Icon */}
       <div className="absolute -top-6 -left-4 w-12 h-12 z-20 transform -rotate-12">
@@ -420,6 +420,11 @@ export default function StudentDashboard() {
       continuous: true,
       callback: handleJoyrideCallback,
       tooltipComponent: CustomTooltip,
+      styles: {
+        options: {
+          arrowColor: 'transparent',
+        }
+      }
     })}
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
