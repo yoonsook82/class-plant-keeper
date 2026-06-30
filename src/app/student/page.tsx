@@ -8,6 +8,8 @@ import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ReportModal, { Plant, Record } from "@/components/ReportModal";
 import GardenModal from "@/components/GardenModal";
+import React from "react";
+import { Joyride, STATUS } from "react-joyride";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -26,6 +28,67 @@ export default function StudentDashboard() {
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weather, setWeather] = useState<{ temp: number; icon: string; status: string } | null>(null);
   const [weatherTip, setWeatherTip] = useState("");
+
+  // Tutorial state
+  const [runTutorial, setRunTutorial] = useState(false);
+
+  const tutorialSteps = [
+    {
+      target: "body",
+      content: (
+        <div className="text-left space-y-2 font-body text-base text-gray-700 leading-relaxed break-keep">
+          <p><strong>안녕하세요! 우리 반 식집사에 온 것을 환영해요! 🌱</strong></p>
+          <p>식물이 잘 자라는 환경 조건을 알아보고 올바른 가꾸기 방법을 실천해 보아요.</p>
+          <p>식물의 성장과정을 관찰하고 기록하는 과정에서 과학적 탐구심과 생명의 소중함을 배워요.</p>
+          <p className="pt-2 text-brand-green font-bold">먼저 사용방법을 알아볼까요?</p>
+        </div>
+      ),
+      placement: "center",
+    },
+    {
+      target: "#tutorial-step-1",
+      content: "가장 먼저 식물 마스터에 들어가서 식물 가꾸는 방법을 배워보자!",
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-2",
+      content: "안녕! 여기가 네가 키울 식물의 자리야. 먼저 귀여운 내 식물을 등록하고 예쁜 별명도 지어볼까?",
+      placement: "right",
+    },
+    {
+      target: "#tutorial-step-3",
+      content: "물을 주었거나 새잎이 돋았다면? 여기를 눌러서 식물의 변화를 사진과 글로 기록해 줘!",
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-4",
+      content: "그동안 기록한 식물의 변화를 한눈에 볼 수 있어! 관찰 보고서를 확인해 봐.",
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-5",
+      content: "식물이 아프거나 궁금한 점이 있으면 AI 식물 진단을 통해 물어볼 수 있어!",
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-6",
+      content: "친구들의 식물은 어떻게 자라고 있을까? 우리 반 정원에서 친구 식물도 구경하고 응원 메시지도 남겨보자!",
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-7",
+      content: "오늘의 날씨를 확인하고 식물이 햇빛과 물을 얼마나 필요로 할지 생각해 볼 수도 있어. 이제 진짜 식집사가 될 준비 완료!",
+      placement: "bottom",
+    }
+  ];
+
+  const handleJoyrideCallback = (data: any) => {
+    const { status } = data;
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setRunTutorial(false);
+      localStorage.setItem("tutorialCompleted", "true");
+    }
+  };
   
   // Modal States
   const [isLogOpen, setIsLogOpen] = useState(false);
@@ -60,6 +123,11 @@ export default function StudentDashboard() {
       alert("학생 로그인이 필요합니다.");
       router.push("/");
       return;
+    }
+
+    const hasSeenTutorial = localStorage.getItem("tutorialCompleted");
+    if (!hasSeenTutorial) {
+      setRunTutorial(true);
     }
 
     setStudentId(sId);
@@ -285,6 +353,42 @@ export default function StudentDashboard() {
 
   return (
     <>
+    {React.createElement(Joyride as any, {
+      steps: tutorialSteps,
+      run: runTutorial,
+      continuous: true,
+      showProgress: true,
+      showSkipButton: true,
+      callback: handleJoyrideCallback,
+      styles: {
+        options: {
+          primaryColor: '#738b27',
+          zIndex: 10000,
+        },
+        tooltipContainer: {
+          fontFamily: "var(--font-dohyeon)",
+          fontSize: "1.1rem",
+        },
+        buttonNext: {
+          backgroundColor: '#738b27',
+          fontFamily: "var(--font-dohyeon)",
+        },
+        buttonBack: {
+          color: '#738b27',
+          fontFamily: "var(--font-dohyeon)",
+        },
+        buttonSkip: {
+          color: '#999',
+          fontFamily: "var(--font-dohyeon)",
+        }
+      },
+      locale: {
+        last: '마지막',
+        next: '다음',
+        back: '이전',
+        skip: '건너뛰기'
+      }
+    })}
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
       style={{ backgroundImage: "url('/images/bg-student.jpg')" }}
@@ -310,7 +414,7 @@ export default function StudentDashboard() {
             </div>
           </div>
           <div className="flex gap-2 md:gap-4 w-full md:w-auto">
-             <button onClick={() => setIsGardenOpen(true)} className="flex-1 md:flex-none bg-brand-green text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm">
+             <button id="tutorial-step-6" onClick={() => setIsGardenOpen(true)} className="flex-1 md:flex-none bg-brand-green text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm">
                 우리 반 정원
              </button>
              <button onClick={handleLogout} className="flex-1 md:flex-none bg-orange-500 text-white px-4 md:px-6 py-2 rounded-full text-base md:text-lg font-title hover:bg-orange-600 transition-all active:scale-95 shadow-sm">
@@ -367,15 +471,24 @@ export default function StudentDashboard() {
                 ))}
 
                 {!isAddingPlant ? (
-                  <button 
-                    onClick={() => setIsAddingPlant(true)}
-                    className="w-full py-6 mt-2 rounded-[30px] border-4 border-dashed border-gray-200 text-gray-400 font-title text-xl hover:border-brand-green hover:text-brand-green hover:bg-brand-green/5 transition-all flex flex-col items-center gap-2 group"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-colors">
-                      <span className="text-3xl">+</span>
-                    </div>
-                    새 식물 등록하기
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      id="tutorial-step-2"
+                      onClick={() => setIsAddingPlant(true)}
+                      className="w-full py-6 mt-2 rounded-[30px] border-4 border-dashed border-gray-200 text-gray-400 font-title text-xl hover:border-brand-green hover:text-brand-green hover:bg-brand-green/5 transition-all flex flex-col items-center gap-2 group"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-colors">
+                        <span className="text-3xl">+</span>
+                      </div>
+                      새 식물 등록하기
+                    </button>
+                    <button 
+                      onClick={() => setRunTutorial(true)}
+                      className="w-full py-2 rounded-[20px] bg-gray-100 text-gray-500 font-title text-sm hover:bg-gray-200 transition-all"
+                    >
+                      ❓ 튜토리얼 다시보기
+                    </button>
+                  </div>
                 ) : (
                   <form onSubmit={handleRegisterPlant} className="bg-brand-bg rounded-[30px] p-6 border-2 border-brand-green/30 animate-in zoom-in-95 duration-200">
                     <h3 className="font-title text-xl text-brand-green mb-4 text-center">새로운 초록 친구 등록</h3>
@@ -446,7 +559,7 @@ export default function StudentDashboard() {
           <div className="lg:col-span-8 flex flex-col gap-6">
             
             {/* 오늘의 초록 날씨 & 스마트 케어 알림 배너 */}
-            <div className="bg-white/80 backdrop-blur-md p-5 rounded-[30px] border border-brand-green/20 shadow-sm flex flex-col sm:flex-row items-center gap-4 text-left">
+            <div id="tutorial-step-7" className="bg-white/80 backdrop-blur-md p-5 rounded-[30px] border border-brand-green/20 shadow-sm flex flex-col sm:flex-row items-center gap-4 text-left">
               <div className="flex items-center gap-3 shrink-0 bg-[#f0f7ec] px-4 py-2.5 rounded-2xl border border-brand-green/10 w-full sm:w-auto justify-center sm:justify-start">
                 {weatherLoading ? (
                   <>
@@ -474,6 +587,7 @@ export default function StudentDashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div 
+                id="tutorial-step-1"
                 onMouseEnter={playPopSound}
                 onClick={() => {
                   setIsCareOpen(true);
@@ -486,6 +600,7 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-pink-700">식물 마스터</span>
               </div>
               <div 
+                id="tutorial-step-3"
                 onMouseEnter={playPopSound}
                 onClick={() => {
                   setIsLogOpen(true);
@@ -498,6 +613,7 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#5a4a42]">새 관찰일지</span>
               </div>
               <div 
+                id="tutorial-step-4"
                 onMouseEnter={playPopSound}
                 onClick={async () => {
                   if (studentId) await fetchData(studentId);
@@ -511,6 +627,7 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#424a5a]">관찰 보고서</span>
               </div>
               <div 
+                id="tutorial-step-5"
                 onMouseEnter={playPopSound}
                 onClick={() => {
                   setIsAiOpen(true);
@@ -980,7 +1097,7 @@ function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNicknam
     { id: 3, problem: "식물이 시들시들해요", solution: "물이 부족하거나 뿌리가 상했을 수 있어요. 흙을 확인해보고 물을 충분히 주거나, 물 빠짐이 잘 되는지 확인하세요.", icon: "🥀" },
     { id: 4, problem: "하얀 가루가 생겼어요", solution: "흰가루병일 가능성이 커요. 통풍이 잘 되는 곳으로 옮기고, 심한 잎은 따주거나 전용 약제를 사용하세요.", icon: "❄️" },
     { id: 5, problem: "벌레가 생겼어요", solution: "진딧물이나 응애일 수 있어요. 잎 뒷면을 잘 닦아주고, 친환경 살충제나 비눗물을 살짝 뿌려주세요.", icon: "🐛" },
-    { id: 6, problem: "성장이 너무 느려요", solution: "햇빛이 부족하거나 화분이 너무 작을 수 있어요. 좀 더 밝은 곳으로 옮기거나 큰 화분으로 분갈이를 해주세요.", icon: "🐢" },
+    { id: 6, problem: "성장이 너무 느려요", solution: "햇빛이 부족하거나 화분이 너무 작을 수 있어요. 좀 더 밝은 곳으로 옮거나 큰 화분으로 분갈이를 해주세요.", icon: "🐢" },
     { id: 7, problem: "흙에 곰팡이가 생겼어요", solution: "흙이 너무 습하고 통풍이 안 되는 상태예요. 물 주기를 멈추고 흙을 말려주세요. 통풍이 아주 중요해요!", icon: "🍄" },
     { id: 8, problem: "잎이 툭툭 떨어져요", solution: "갑작스러운 온도 변화나 환경 변화 때문일 수 있어요. 식물을 자주 옮기지 말고 일정한 온도를 유지해 주세요.", icon: "🍃" },
     { id: 9, problem: "꽃이 피지 않아요", solution: "꽃을 피울 영양(인산)이 부족하거나 햇빛이 더 필요해요. 꽃눈이 생길 때는 햇빛을 충분히 보여주세요.", icon: "🌸" },
