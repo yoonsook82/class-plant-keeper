@@ -7,6 +7,65 @@ import { QRCodeCanvas } from "qrcode.react";
 import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 import ReportModal, { Plant, Record } from "@/components/ReportModal";
 import GardenModal from "@/components/GardenModal";
+import React from "react";
+import { Joyride, STATUS } from "react-joyride";
+
+const CustomTooltip = ({
+  index,
+  step,
+  backProps,
+  primaryProps,
+  skipProps,
+  tooltipProps,
+  isLastStep,
+}: any) => {
+  return (
+    <div
+      {...tooltipProps}
+      className="bg-[#e6f4ea] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
+    >
+      {/* Sprout Icon (Teacher Theme) */}
+      <div className="absolute -top-6 -left-4 w-14 h-14 z-20 bg-white rounded-full border-[4px] border-[#4a3f35] flex items-center justify-center shadow-sm">
+         <span className="text-3xl drop-shadow-sm -translate-y-0.5">🌱</span>
+      </div>
+
+      {/* Tail merging with the box (Only show if not center placement) */}
+      {step.placement !== 'center' && (
+        <>
+          <div className="absolute -bottom-[15px] right-[40px] w-8 h-8 bg-[#4a3f35] transform rotate-45 rounded-sm z-[-1]"></div>
+          <div className="absolute -bottom-[10px] right-[40px] w-8 h-8 bg-[#e6f4ea] transform rotate-45 z-[1]"></div>
+        </>
+      )}
+
+      {/* Content */}
+      <div className="font-body text-[#4a3f35] text-base md:text-lg leading-relaxed break-keep text-center mb-6 z-10 relative font-bold tracking-wide">
+        {step.content}
+      </div>
+
+      {/* Buttons */}
+      <div className="flex items-center justify-between z-10 relative">
+        {!isLastStep ? (
+          <button {...skipProps} className="text-[#888] font-title text-sm hover:text-[#555] transition-colors">
+            건너뛰기
+          </button>
+        ) : <div />}
+        <div className="flex items-center gap-3">
+          {index > 0 && (
+            <button {...backProps} className="text-[#4a3f35] font-title text-sm hover:text-black transition-colors">
+              이전
+            </button>
+          )}
+          <button
+            {...primaryProps}
+            className="bg-[#4a3f35] text-white px-5 py-2 rounded-full font-title text-sm md:text-base hover:bg-black transition-all shadow-[0_3px_0_#222] active:translate-y-1 active:shadow-none"
+          >
+            {isLastStep ? '시작하기!' : '다음'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface StudentStat {
   id: string;
@@ -50,6 +109,53 @@ export default function TeacherDashboard() {
   
   const [appUrl, setAppUrl] = useState("");
 
+  // Tutorial state
+  const [runTutorial, setRunTutorial] = useState(false);
+  const [tutorialKey, setTutorialKey] = useState(0);
+
+  const tutorialSteps = [
+    {
+      target: "body",
+      content: (
+        <div className="text-left space-y-2 font-body text-base md:text-lg text-[#4a3f35] leading-relaxed break-keep">
+          <p><strong>선생님, 환영합니다! ☕</strong></p>
+          <p>아이들이 식물과 교감하며 생명의 소중함을 배울 수 있도록, '우리 반 식집사'가 든든한 보조 교사가 되어 드릴게요.</p>
+          <p className="pt-2 text-brand-green font-bold text-center">어떻게 학급 정원을 관리할 수 있는지<br/>함께 알아볼까요?</p>
+        </div>
+      ),
+      placement: "center",
+    },
+    {
+      target: "#tutorial-step-1",
+      content: <div className="break-keep">가장 먼저 여기에 우리 반 학생을 추가해 주세요! 추가된 학생은 오른쪽 목록에 나타납니다. QR 코드를 띄워주면 학생들이 스스로 로그인할 수도 있습니다.</div>,
+      placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-2",
+      content: <div className="break-keep">등록된 학생들은 이 목록에 나타납니다. 학생 카드를 클릭하면 식물의 상세 정보와 성장 과정을 모니터링할 수 있어요.</div>,
+      placement: "top",
+    },
+    {
+      target: "#tutorial-step-2",
+      content: <div className="break-keep">학생의 관찰 일지를 읽고 따뜻한 칭찬과 피드백을 남겨주세요! 작성된 관찰보고서는 PDF로 저장하고, 출력할 수도 있답니다.</div>,
+      placement: "top",
+    },
+    {
+      target: "#tutorial-step-4",
+      content: <div className="break-keep">쉬는 시간이나 아침 조회 시간에 '우리 반 정원'을 교실 화면에 띄워두고 다 함께 식물들의 성장을 응원해 보는 건 어떨까요?</div>,
+      placement: "bottom",
+    }
+  ];
+
+  const handleJoyrideCallback = (data: any) => {
+    const { status } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    if (finishedStatuses.includes(status)) {
+      setRunTutorial(false);
+      localStorage.setItem("teacherTutorialCompleted", "true");
+    }
+  };
+
   useEffect(() => {
     setAppUrl(window.location.origin);
     const role = localStorage.getItem("userRole");
@@ -61,6 +167,11 @@ export default function TeacherDashboard() {
       alert("선생님 로그인이 필요합니다.");
       router.push("/");
       return;
+    }
+
+    const completed = localStorage.getItem("teacherTutorialCompleted");
+    if (!completed) {
+      setRunTutorial(true);
     }
 
     setClassId(storedClassId);
@@ -320,6 +431,14 @@ export default function TeacherDashboard() {
 
   return (
     <>
+    {React.createElement(Joyride as any, {
+      key: tutorialKey,
+      steps: tutorialSteps,
+      run: runTutorial,
+      continuous: true,
+      callback: handleJoyrideCallback,
+      tooltipComponent: CustomTooltip,
+    })}
     <div 
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
       style={{ backgroundImage: "url('/images/bg-teacher.jpg')" }}
@@ -356,6 +475,7 @@ export default function TeacherDashboard() {
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <button 
+            id="tutorial-step-4"
             onClick={() => setIsGardenOpen(true)}
             className="flex-1 md:flex-none bg-brand-green text-white px-4 md:px-5 py-2 rounded-full text-base md:text-lg font-title hover:bg-[#5e741e] hover:shadow-md transition-all active:scale-95 shadow-sm"
           >
@@ -388,7 +508,7 @@ export default function TeacherDashboard() {
             </div>
           </div>
           
-          <div className="bg-[#f4e8d3] p-6 rounded-3xl shadow-md border-2 border-[#5a4a42]">
+          <div id="tutorial-step-1" className="bg-[#f4e8d3] p-6 rounded-3xl shadow-md border-2 border-[#5a4a42]">
              <h3 className="font-title text-xl text-[#5a4a42] mb-3 text-center">학생 직접 추가</h3>
              <form onSubmit={handleAddStudent} className="flex flex-col gap-3">
                <input 
@@ -433,6 +553,21 @@ export default function TeacherDashboard() {
              <span className="text-gray-400 group-hover:text-brand-green group-hover:translate-x-1 transition-all">➔</span>
            </div>
 
+           {/* 튜토리얼 다시보기 메뉴 */}
+           <div 
+             onClick={() => {
+               setTutorialKey(prev => prev + 1);
+               setRunTutorial(true);
+             }}
+             className="bg-white p-5 rounded-3xl shadow-md border-2 border-brand-green/30 hover:border-brand-green hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group mt-2"
+           >
+             <div className="flex items-center gap-3">
+               <span className="text-2xl group-hover:scale-110 transition-transform">💡</span>
+               <span className="font-title text-base md:text-lg text-brand-brown">튜토리얼 다시보기</span>
+             </div>
+             <span className="text-gray-400 group-hover:text-brand-green group-hover:translate-x-1 transition-all">➔</span>
+           </div>
+
            {/* 학급 폐쇄 메뉴 */}
            <div 
              onClick={() => {
@@ -450,7 +585,7 @@ export default function TeacherDashboard() {
          </div>
 
         {/* Right Side: Student Grid */}
-        <div className="flex-1">
+        <div id="tutorial-step-2" className="flex-1">
           <div className="flex justify-between items-center mb-6">
             <h2 className="font-title text-2xl text-brand-green">우리 반 식집사들 ({students.length}명)</h2>
             {selectedStudent && (
