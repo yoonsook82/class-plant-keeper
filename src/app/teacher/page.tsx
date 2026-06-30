@@ -127,7 +127,7 @@ export default function TeacherDashboard() {
     },
     {
       target: "#tutorial-step-1",
-      content: <div className="break-keep">가장 먼저 여기에 우리 반 학생을 추가해 주세요! 추가된 학생은 오른쪽 목록에 나타납니다. QR 코드를 띄워주면 학생들이 스스로 로그인할 수도 있습니다.</div>,
+      content: <div className="break-keep">가장 먼저 여기에 우리 반 학생을 추가해 주세요! 추가된 학생은 오른쪽 목록에 나타납니다. QR 코드를 띄워주면 우리 반 학급 코드가 자동으로 뜨며, 이름을 정확히 입력하면 로그인됩니다.</div>,
       placement: "bottom",
     },
     {
@@ -144,6 +144,11 @@ export default function TeacherDashboard() {
       target: "#tutorial-step-4",
       content: <div className="break-keep">쉬는 시간이나 아침 조회 시간에 '우리 반 정원'을 교실 화면에 띄워두고 다 함께 식물들의 성장을 응원해 보는 건 어떨까요?</div>,
       placement: "bottom",
+    },
+    {
+      target: "#tutorial-step-5",
+      content: <div className="break-keep">또한 '개인정보 처리방침' 메뉴에서 학부모님께 안내할 '학생 가입동의서' 양식을 확인하실 수 있습니다.</div>,
+      placement: "top",
     }
   ];
 
@@ -543,6 +548,7 @@ export default function TeacherDashboard() {
 
            {/* 개인정보 처리방침 메뉴 */}
            <div 
+             id="tutorial-step-5"
              onClick={() => setIsPrivacyOpen(true)}
              className="bg-white p-5 rounded-3xl shadow-md border-2 border-brand-green/30 hover:border-brand-green hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group"
            >
