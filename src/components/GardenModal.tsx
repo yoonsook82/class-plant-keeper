@@ -78,23 +78,28 @@ export default function GardenModal({ onClose, className: userClassName, classId
 
       const classPlantIds = classPlants.map(p => p.id);
 
-      // 3단계: 해당 식물들의 관찰 기록 가져오기 (최신순)
-      const { data: allRecords, error: recordsError } = await client
-        .from("records")
-        .select("*")
-        .in("plant_id", classPlantIds)
-        .order("created_at", { ascending: false });
+      // 3단계: 각 식물의 최신 관찰 기록 개별 조회 (RLS 타임아웃 방지를 위한 병렬 처리)
+      const recordPromises = classPlants.map(plant =>
+        client
+          .from("records")
+          .select("*")
+          .eq("plant_id", plant.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+      );
 
-      if (recordsError) throw recordsError;
+      const results = await Promise.all(recordPromises);
 
-      // 4단계: 학생별 최신 기록 1건만 그룹화
+      // 4단계: 학생별 최신 기록 그룹화
       const latestMap = new Map<string, any>();
-      allRecords?.forEach(record => {
-        const plant = classPlants.find(p => p.id === record.plant_id);
-        if (!plant) return;
-        const sId = plant.student_id;
-        if (sId && !latestMap.has(sId)) {
-          latestMap.set(sId, { record, plant });
+      results.forEach((res, index) => {
+        if (res.data && res.data.length > 0) {
+          const record = res.data[0];
+          const plant = classPlants[index];
+          const sId = plant.student_id;
+          if (sId && !latestMap.has(sId)) {
+            latestMap.set(sId, { record, plant });
+          }
         }
       });
 
