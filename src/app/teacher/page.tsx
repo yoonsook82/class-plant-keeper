@@ -24,19 +24,6 @@ const CustomTooltip = ({
       {...tooltipProps}
       className="bg-[#e6f4ea] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 w-[90vw] sm:w-auto max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
     >
-      {/* Sprout Icon (Teacher Theme) */}
-      <div className="absolute -top-6 -left-4 w-14 h-14 z-20 bg-white rounded-full border-[4px] border-[#4a3f35] flex items-center justify-center shadow-sm">
-         <span className="text-3xl drop-shadow-sm -translate-y-0.5">🌱</span>
-      </div>
-
-      {/* Tail merging with the box (Only show if not center placement) */}
-      {step.placement !== 'center' && (
-        <>
-          <div className="absolute -bottom-[15px] right-[40px] w-8 h-8 bg-[#4a3f35] transform rotate-45 rounded-sm z-[-1]"></div>
-          <div className="absolute -bottom-[10px] right-[40px] w-8 h-8 bg-[#e6f4ea] transform rotate-45 z-[1]"></div>
-        </>
-      )}
-
       {/* Content */}
       <div className="font-body text-[#4a3f35] text-base md:text-lg leading-relaxed break-keep text-center mb-6 z-10 relative font-bold tracking-wide">
         {step.content}
@@ -149,6 +136,17 @@ export default function TeacherDashboard() {
       target: "#tutorial-step-5",
       content: <div className="break-keep">또한 '개인정보 처리방침' 메뉴에서 학부모님께 안내할 '학생 가입동의서' 양식을 확인하실 수 있습니다.</div>,
       placement: "top",
+    },
+    {
+      target: "body",
+      content: (
+        <div className="text-left space-y-2 font-body text-base md:text-lg text-[#4a3f35] leading-relaxed break-keep">
+          <p><strong>💡 팁: 데이터베이스 일시정지 복구</strong></p>
+          <p>Supabase 무료 플랜이 일시정지(Pause) 되면, Supabase 대시보드에 로그인해서 <b>'Restore'</b> 버튼만 누르면 몇 분 내로 데이터베이스가 다시 정상 작동합니다.</p>
+          <p className="pt-2 text-brand-green font-bold text-center">방학 등 장기간 미사용 시 접속이 안 되면<br/>Supabase에 로그인해 복구 버튼을 눌러주세요!</p>
+        </div>
+      ),
+      placement: "center",
     }
   ];
 
@@ -443,6 +441,7 @@ export default function TeacherDashboard() {
       continuous: true,
       callback: handleJoyrideCallback,
       tooltipComponent: CustomTooltip,
+      floaterProps: { hideArrow: true },
       styles: {
         options: {
           arrowColor: 'transparent',

@@ -25,21 +25,6 @@ const CustomTooltip = ({
       {...tooltipProps}
       className="bg-[#ffebf0] border-[5px] border-[#4a3f35] rounded-[35px] p-6 pt-8 w-[90vw] sm:w-auto max-w-[340px] md:max-w-[400px] relative shadow-[0_6px_0_#4a3f35] mx-auto z-[10000]"
     >
-      {/* Star Icon */}
-      <div className="absolute -top-6 -left-4 w-12 h-12 z-20 transform -rotate-12">
-         <svg viewBox="0 0 24 24" fill="#ffb6c1" stroke="#4a3f35" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" className="w-full h-full drop-shadow-sm">
-           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-         </svg>
-      </div>
-
-      {/* Tail merging with the box (Only show if not center placement) */}
-      {step.placement !== 'center' && (
-        <>
-          <div className="absolute -bottom-[15px] right-[40px] w-8 h-8 bg-[#4a3f35] transform rotate-45 rounded-sm z-[-1]"></div>
-          <div className="absolute -bottom-[10px] right-[40px] w-8 h-8 bg-[#ffebf0] transform rotate-45 z-[1]"></div>
-        </>
-      )}
-
       {/* Content */}
       <div className="font-body text-[#4a3f35] text-base md:text-lg leading-relaxed break-keep text-center mb-6 z-10 relative">
         {step.content}
@@ -420,6 +405,7 @@ export default function StudentDashboard() {
       continuous: true,
       callback: handleJoyrideCallback,
       tooltipComponent: CustomTooltip,
+      floaterProps: { hideArrow: true },
       styles: {
         options: {
           arrowColor: 'transparent',
