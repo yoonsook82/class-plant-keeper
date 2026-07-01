@@ -112,7 +112,7 @@ export default function StudentDashboard() {
     },
     {
       target: "#tutorial-step-5",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">식물이 아프거나 궁금한 점이 있으면 AI 식물 진단을 통해 물어볼 수 있어!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">식물이 아프거나 궁금한 점이 있으면 AI 식물 진단을 통해 확인할 수 있어!</div>,
       placement: "bottom",
     },
     {
