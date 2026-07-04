@@ -92,37 +92,37 @@ export default function StudentDashboard() {
     },
     {
       target: "#tutorial-step-1",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">가장 먼저 식물 마스터에 들어가서 식물 가꾸는 방법을 배워보자!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">가장 먼저 식물 마스터에 들어가서 식물 가꾸는 방법을 배워보아요!</div>,
       placement: "bottom",
     },
     {
       target: "#tutorial-step-2",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">안녕! 여기가 네가 키울 식물의 자리야. 먼저 귀여운 내 식물을 등록하고 예쁜 별명도 지어볼까?</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">안녕하세요! 여기가 우리가 키울 식물의 자리예요. 먼저 귀여운 반려식물을 등록하고 예쁜 별명도 지어볼까요?</div>,
       placement: "right",
     },
     {
       target: "#tutorial-step-3",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">물을 주었거나 새잎이 돋았다면? 여기를 눌러서 식물의 변화를 사진과 글로 기록해 줘!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">물을 주었거나 새잎이 돋았다면? 여기를 눌러서 식물의 변화를 사진과 글로 기록해 주세요!</div>,
       placement: "bottom",
     },
     {
       target: "#tutorial-step-4",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">그동안 기록한 식물의 변화를 한눈에 볼 수 있어! 관찰 보고서를 확인해 봐.</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">그동안 기록한 식물의 변화를 한눈에 볼 수 있어요! 관찰 보고서를 확인해 보아요.</div>,
       placement: "bottom",
     },
     {
       target: "#tutorial-step-5",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">식물이 아프거나 궁금한 점이 있으면 AI 식물 진단을 통해 확인할 수 있어!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">식물이 아프거나 궁금한 점이 있으면 AI 식물 진단을 통해 확인할 수 있어요!</div>,
       placement: "bottom",
     },
     {
       target: "#tutorial-step-6",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">친구들의 식물은 어떻게 자라고 있을까? 우리 반 정원에서 친구 식물도 구경하고 응원 메시지도 남겨보자!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">친구들의 식물은 어떻게 자라고 있을까요? 우리 반 정원에서 친구 식물도 구경하고 응원 메시지도 남겨보아요!</div>,
       placement: "bottom",
     },
     {
       target: "#tutorial-step-7",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">오늘의 날씨를 확인하고 식물이 햇빛과 물을 얼마나 필요로 할지 생각해 볼 수도 있어. 이제 진짜 식집사가 될 준비 완료!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">오늘의 날씨를 확인하고 식물이 햇빛과 물을 얼마나 필요로 할지 생각해 볼 수도 있어요. 이제 진짜 식집사가 될 준비 완료!</div>,
       placement: "bottom",
     }
   ];
