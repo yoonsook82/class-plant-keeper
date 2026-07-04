@@ -1331,7 +1331,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
     { id: "p1", name: "씨감자 자르기", img: "/images/11.png" },
     { id: "p2", name: "흙에 씨감자 넣고 흙 덮기", img: "/images/12.jpg" },
     { id: "p3", name: "물주기", img: "/images/13.jpg" },
-    { id: "p4", name: "싹이 나면 북돋우기", img: "/images/14.png" },
+    { id: "p4", name: "싹이 나면 북주기", img: "/images/14.png" },
     { id: "p5", name: "곁순지르기", img: "/images/15.png" },
     { id: "p6", name: "꽃이 피면 꽃대 자르기", img: "/images/16.png" }
   ];
