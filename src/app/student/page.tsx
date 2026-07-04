@@ -181,7 +181,7 @@ export default function StudentDashboard() {
     setClassName(cName || "");
     setClassId(cId || null);
 
-    fetchData(sId);
+    fetchData(sId, true);
     fetchWeather();
   }, []);
 
@@ -252,8 +252,8 @@ export default function StudentDashboard() {
     }
   };
 
-  const fetchData = async (sId: string) => {
-    setIsLoading(true);
+  const fetchData = async (sId: string, isInitial = false) => {
+    if (isInitial) setIsLoading(true);
     
     try {
       // 1. Fetch Plants
@@ -288,7 +288,7 @@ export default function StudentDashboard() {
       console.error("데이터 불러오기 오류:", error);
     }
     
-    setIsLoading(false);
+    if (isInitial) setIsLoading(false);
   };
 
   const handleRegisterPlant = async (e: React.FormEvent) => {
@@ -995,7 +995,7 @@ function ObservationModal({ onClose, plantId, plantNickname, onSuccess }: { onCl
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/60 z-[20000] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
       <div className="bg-white w-full max-w-[500px] rounded-[35px] p-6 shadow-2xl animate-in zoom-in-95 duration-300 my-4" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -1133,7 +1133,7 @@ function AiModal({ onClose, plantNickname }: { onClose: () => void, plantNicknam
   const selectedDiagnosis = diagnosisData.find(d => d.id === selectedId);
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-start md:items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/60 z-[20000] flex items-start md:items-center justify-center p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
       <div className="bg-white w-full max-w-[850px] rounded-[40px] p-6 md:p-10 shadow-2xl flex flex-col my-auto" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
@@ -1424,7 +1424,7 @@ function CareModal({ onClose, plantNickname }: { onClose: () => void, plantNickn
   const hasOnlyEssentials = selectedEssentials.length === essentialSupplies.length && selectedDistractors.length === 0;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-2 md:p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/60 z-[20000] flex items-center justify-center p-2 md:p-4 backdrop-blur-md overflow-y-auto" onClick={onClose}>
       <div className="bg-white w-full max-w-[950px] rounded-[30px] p-3 sm:p-4 md:p-6 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[95vh] overflow-hidden" onClick={e => e.stopPropagation()}>
         
         {/* Header */}

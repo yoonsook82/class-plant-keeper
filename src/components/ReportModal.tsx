@@ -212,7 +212,7 @@ export default function ReportModal({
   };
 
   return (
-    <div id="print-modal-container" className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-start p-2 md:p-10 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:overflow-visible" onClick={onClose}>
+    <div id="print-modal-container" className="fixed inset-0 bg-black/60 z-[20000] flex flex-col items-center justify-start p-2 md:p-10 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:overflow-visible" onClick={onClose}>
       <div 
         ref={scrollRef} 
         className="bg-[#fdfbf7] w-full max-w-[1200px] max-h-[95vh] rounded-[30px] md:rounded-[50px] shadow-2xl overflow-hidden flex flex-col relative z-20 animate-in zoom-in-95 duration-300 border-[4px] md:border-[8px] border-white print:max-h-none print:max-w-none print:rounded-none print:border-none print:shadow-none print:block print:min-h-0 print:overflow-visible" 

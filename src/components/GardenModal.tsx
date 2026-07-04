@@ -193,7 +193,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
   };
 
   return (
-    <div className="fixed inset-0 bg-[#f9f8f0]/95 z-[100] flex items-center justify-center p-0 backdrop-blur-md" onClick={onClose}>
+    <div className="fixed inset-0 bg-[#f9f8f0]/95 z-[20000] flex items-center justify-center p-0 backdrop-blur-md" onClick={onClose}>
       <div className="bg-white w-full h-full flex flex-col overflow-hidden relative" onClick={e => e.stopPropagation()}>
         
         {/* Header - Matching GardenPage */}
