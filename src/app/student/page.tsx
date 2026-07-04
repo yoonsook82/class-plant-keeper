@@ -117,7 +117,7 @@ export default function StudentDashboard() {
     },
     {
       target: "#tutorial-step-6",
-      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">친구들의 식물은 어떻게 자라고 있을까요? 우리 반 정원에서 친구 식물도 구경하고 응원 메시지도 남겨보아요!</div>,
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">친구들의 식물은 어떻게 자라고 있을까요? 우리 반 정원에서 친구의 반려 식물도 구경하고 응원 메시지도 남겨보아요!</div>,
       placement: "bottom",
     },
     {
