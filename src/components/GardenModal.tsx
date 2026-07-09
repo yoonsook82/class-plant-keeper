@@ -272,7 +272,7 @@ export default function GardenModal({ onClose, className: userClassName, classId
           {/* 퀘스트 게이지 바 */}
           <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2 mt-2 md:mt-0">
             <div className="flex justify-between items-center w-full mb-2 md:mb-3 px-2">
-              <span className="font-title text-sm md:text-lg text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+              <span className="font-title text-sm md:text-lg text-brand-brown">우리 반 소통 퀘스트 진행 중!</span>
               <span className="font-title text-sm md:text-lg text-brand-green flex items-center gap-1.5">
                 {commentedStudents.size === Math.max(1, gardenData.length) && gardenData.length > 0 && (
                   <span className="text-xl md:text-2xl animate-bounce drop-shadow-sm">🎉</span>
