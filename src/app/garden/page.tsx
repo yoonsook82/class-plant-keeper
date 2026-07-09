@@ -123,6 +123,31 @@ export default function GardenPage() {
       }
 
       setGardenData(formattedData);
+
+      // 내가 오늘 남긴 댓글 조회해서 게이지 바 초기화
+      const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem("studentName") || "") : "";
+      if (currentUserName) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const { data: myInteractions, error: intError } = await client
+          .from("interactions")
+          .select("record_id")
+          .eq("author_name", currentUserName)
+          .gte("created_at", today.toISOString());
+
+        if (!intError && myInteractions) {
+          const myInteractedRecordIds = myInteractions.map((i: any) => i.record_id);
+          const interactedStudentIds = new Set<string>();
+          formattedData.forEach(card => {
+            if (myInteractedRecordIds.includes(card.latest_record.id)) {
+              interactedStudentIds.add(card.student_id);
+            }
+          });
+          setCommentedStudents(interactedStudentIds);
+        }
+      }
+
     } catch (err) {
       console.error("정원 데이터 로드 오류:", err);
     }

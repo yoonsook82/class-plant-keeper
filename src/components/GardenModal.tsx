@@ -122,6 +122,31 @@ export default function GardenModal({ onClose, className: userClassName, classId
         .filter((item): item is GardenCardData => item !== null);
 
       setGardenData(formattedData);
+
+      // 6단계: 오늘 남긴 나의 소통 기록을 가져와 게이지 바(commentedStudents) 초기화
+      const currentUserName = mode === "teacher" ? "선생님" : (localStorage.getItem("studentName") || "");
+      if (currentUserName) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // 오늘의 시작 시간
+        
+        const { data: myInteractions, error: intError } = await client
+          .from("interactions")
+          .select("record_id")
+          .eq("author_name", currentUserName)
+          .gte("created_at", today.toISOString());
+
+        if (!intError && myInteractions) {
+          const myInteractedRecordIds = myInteractions.map(i => i.record_id);
+          const interactedStudentIds = new Set<string>();
+          formattedData.forEach(card => {
+            if (myInteractedRecordIds.includes(card.latest_record.id)) {
+              interactedStudentIds.add(card.student_id);
+            }
+          });
+          setCommentedStudents(interactedStudentIds);
+        }
+      }
+
     } catch (err) {
       console.error("정원 데이터 로드 오류:", err);
     }
