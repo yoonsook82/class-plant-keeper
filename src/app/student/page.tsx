@@ -83,7 +83,7 @@ export default function StudentDashboard() {
       content: (
         <div className="text-left space-y-3 font-body text-base text-gray-700 leading-relaxed break-keep">
           <p><strong>안녕하세요! 우리 반 식집사에 온 것을 환영해요!</strong></p>
-          <p className="indent-4">여러분은 새콤달콤한 딸기나 키가&nbsp;큰&nbsp;해바라기처럼 특별히 좋아하는 식물이 있나요? 어제 먹은 음식 중에는 어떤 채소가 있었나요?</p>
+          <p className="indent-4">여러분은 새콤달콤한 딸기나 노란 해바라기처럼 특별히 좋아하는 식물이 있나요? 어제 먹은 음식 중에는 어떤 채소가 있었나요?</p>
           <p className="indent-4">내가 좋아하는 식물이 어떻게 싹을 틔우고 쑥쑥 자라나는지 직접 키우면서 알아보아요. 작은 씨앗이 커다란 생명으로 자라나는 신기한 마법 같은 여정, 지금부터 시작해 볼까요?</p>
           <p className="pt-2 text-brand-green font-bold text-center">먼저 사용법을 알아볼까요?</p>
         </div>
