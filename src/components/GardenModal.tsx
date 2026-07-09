@@ -151,12 +151,11 @@ export default function GardenModal({ onClose, className: userClassName, classId
   useEffect(() => {
     if (gardenData.length > 0 && commentedStudents.size === gardenData.length && !showQuestSuccess) {
       setShowQuestSuccess(true);
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#22c55e', '#eab308', '#ec4899', '#3b82f6', '#f97316']
-      });
+      const defaults = { origin: { y: 0.7 }, zIndex: 10000 };
+      confetti({ ...defaults, particleCount: 200, spread: 80 });
+      setTimeout(() => confetti({ ...defaults, particleCount: 150, spread: 100 }), 300);
+      setTimeout(() => confetti({ ...defaults, particleCount: 250, spread: 120 }), 600);
+      setTimeout(() => confetti({ ...defaults, particleCount: 300, spread: 140 }), 900);
     }
   }, [commentedStudents.size, gardenData.length, showQuestSuccess]);
 
@@ -244,20 +243,19 @@ export default function GardenModal({ onClose, className: userClassName, classId
           </div>
           
           {/* 퀘스트 게이지 바 */}
-          <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2">
-            <div className="flex justify-between w-full mb-1 md:mb-2 px-2">
-              <span className="font-title text-xs md:text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
-              <span className="font-title text-xs md:text-sm text-brand-green">{commentedStudents.size} / {Math.max(1, gardenData.length)}</span>
+          <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2 mt-2 md:mt-0">
+            <div className="flex justify-between w-full mb-2 md:mb-3 px-2">
+              <span className="font-title text-sm md:text-lg text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+              <span className="font-title text-sm md:text-lg text-brand-green">{commentedStudents.size} / {Math.max(1, gardenData.length)}</span>
             </div>
-            <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
+            <div className="flex w-full h-6 md:h-8 bg-gray-100 rounded-full overflow-hidden gap-1 p-1 shadow-inner">
               {Array.from({ length: Math.max(1, gardenData.length) }).map((_, i) => (
                 <div 
                   key={i} 
-                  className={`flex-1 h-full rounded-full transition-all duration-500 ${
-                    i < commentedStudents.size 
-                      ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
-                      : "bg-transparent"
+                  className={`flex-1 h-full rounded-full transition-all duration-500 shadow-sm ${
+                    i < commentedStudents.size ? "" : "bg-transparent shadow-none"
                   }`}
+                  style={i < commentedStudents.size ? { backgroundColor: `hsl(${(i * 360) / Math.max(1, gardenData.length)}, 90%, 65%)` } : {}}
                 />
               ))}
             </div>
