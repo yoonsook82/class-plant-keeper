@@ -177,42 +177,46 @@ export default function GardenPage() {
   return (
     <div className="min-h-screen bg-[#fdfcf5] flex flex-col font-body">
       {/* Header */}
-      <header className="px-8 py-6 bg-white border-b-4 border-brand-green shadow-sm flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-5">
-          <div className="w-20 h-20 flex items-center justify-center">
+      <header className="px-4 md:px-8 py-4 md:py-6 bg-white border-b-4 border-brand-green shadow-sm flex flex-wrap md:flex-nowrap justify-between items-center gap-4 sticky top-0 z-50">
+        <div className="flex items-center gap-3 md:gap-5 shrink-0">
+          <div className="w-12 h-12 md:w-20 md:h-20 flex items-center justify-center">
             <Image src="/images/garden.png" alt="garden" width={80} height={80} className="object-contain" />
           </div>
           <div>
-            <h1 className="font-title text-4xl text-brand-brown leading-tight">{className}의 정원</h1>
-            <p className="text-brand-green font-body font-bold text-lg">친구들의 식물 성장 일기를 함께 보아요!</p>
+            <h1 className="font-title text-2xl md:text-4xl text-brand-brown leading-tight">{className}의 정원</h1>
+            <p className="text-brand-green font-body font-bold text-sm md:text-lg hidden sm:block">친구들의 식물 성장 일기를 함께 보아요!</p>
           </div>
         </div>
 
         {/* 퀘스트 게이지 바 */}
-        {gardenData.length > 0 && (
-          <div className="flex flex-col items-center mx-auto flex-1 max-w-[200px] md:max-w-xl px-4 md:px-8">
-            <div className="flex justify-between w-full mb-2">
-              <span className="font-title text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
-              <span className="font-title text-sm text-brand-green">{commentedStudents.size} / {gardenData.length}</span>
-            </div>
-            <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
-              {Array.from({ length: gardenData.length }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className={`flex-1 h-full rounded-full transition-all duration-500 ${
-                    i < commentedStudents.size 
-                      ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
-                      : "bg-transparent"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2">
+          {gardenData.length > 0 ? (
+            <>
+              <div className="flex justify-between w-full mb-1 md:mb-2 px-2">
+                <span className="font-title text-xs md:text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+                <span className="font-title text-xs md:text-sm text-brand-green">{commentedStudents.size} / {gardenData.length}</span>
+              </div>
+              <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
+                {Array.from({ length: gardenData.length }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={`flex-1 h-full rounded-full transition-all duration-500 ${
+                      i < commentedStudents.size 
+                        ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
+                        : "bg-transparent"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="h-10"></div>
+          )}
+        </div>
 
         <button 
           onClick={() => router.back()} 
-          className="bg-gray-100 text-gray-500 px-6 py-3 rounded-2xl font-title text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-2"
+          className="bg-gray-100 text-gray-500 px-4 md:px-6 py-2 md:py-3 rounded-2xl font-title text-sm md:text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-2 shrink-0"
         >
           <span>✕</span> 닫기
         </button>
