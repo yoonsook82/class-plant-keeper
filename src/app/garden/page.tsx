@@ -190,7 +190,7 @@ export default function GardenPage() {
 
         {/* 퀘스트 게이지 바 */}
         {gardenData.length > 0 && (
-          <div className="hidden md:flex flex-col items-center mx-auto flex-1 max-w-xl px-8">
+          <div className="flex flex-col items-center mx-auto flex-1 max-w-[200px] md:max-w-xl px-4 md:px-8">
             <div className="flex justify-between w-full mb-2">
               <span className="font-title text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
               <span className="font-title text-sm text-brand-green">{commentedStudents.size} / {gardenData.length}</span>
