@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
+import confetti from "canvas-confetti";
 
 interface Record {
   id: string;
@@ -36,6 +37,8 @@ export default function GardenModal({ onClose, className: userClassName, classId
   const [selectedRecord, setSelectedRecord] = useState<GardenCardData | null>(null);
   const [comment, setComment] = useState("");
   const [interactions, setInteractions] = useState<any[]>([]);
+  const [commentedStudents, setCommentedStudents] = useState<Set<string>>(new Set());
+  const [showQuestSuccess, setShowQuestSuccess] = useState(false);
 
   useEffect(() => {
     if (classId) {
@@ -145,6 +148,18 @@ export default function GardenModal({ onClose, className: userClassName, classId
     loadInteractions(data.latest_record.id);
   };
 
+  useEffect(() => {
+    if (gardenData.length > 0 && commentedStudents.size === gardenData.length && !showQuestSuccess) {
+      setShowQuestSuccess(true);
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#22c55e', '#eab308', '#ec4899', '#3b82f6', '#f97316']
+      });
+    }
+  }, [commentedStudents.size, gardenData.length, showQuestSuccess]);
+
   const handleAddComment = async () => {
     if (!comment.trim() || !selectedRecord) return;
     const authorName = mode === "teacher" ? "선생님" : (localStorage.getItem("studentName") || "친구");
@@ -160,6 +175,14 @@ export default function GardenModal({ onClose, className: userClassName, classId
     const optimisticInt = { ...newInt, id: Date.now().toString() };
     setInteractions(prev => [...prev, optimisticInt]);
     setComment("");
+    
+    if (selectedRecord) {
+      setCommentedStudents(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedRecord.student_id);
+        return newSet;
+      });
+    }
 
     try {
       await getSupabaseClient().from("interactions").insert(newInt);
@@ -184,6 +207,14 @@ export default function GardenModal({ onClose, className: userClassName, classId
     const optimisticInt = { ...newInt, id: Date.now().toString() };
     setInteractions(prev => [...prev, optimisticInt]);
 
+    if (selectedRecord) {
+      setCommentedStudents(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedRecord.student_id);
+        return newSet;
+      });
+    }
+
     try {
       await getSupabaseClient().from("interactions").insert(newInt);
       loadInteractions(selectedRecord.latest_record.id);
@@ -197,8 +228,8 @@ export default function GardenModal({ onClose, className: userClassName, classId
       <div className="bg-white w-full h-full flex flex-col overflow-hidden relative" onClick={e => e.stopPropagation()}>
         
         {/* Header - Matching GardenPage */}
-        <div className="px-4 py-4 md:px-10 md:py-6 flex flex-row items-center justify-between border-b-[6px] border-[#738b27] bg-white sticky top-0 z-50 shadow-sm gap-3">
-          <div className="flex items-center gap-3 md:gap-5 min-w-0">
+        <div className="px-4 py-4 md:px-8 md:py-6 flex flex-wrap md:flex-nowrap items-center justify-between border-b-[6px] border-brand-green bg-white sticky top-0 z-50 shadow-sm gap-4">
+          <div className="flex items-center gap-3 md:gap-5 shrink-0">
             <div className="w-12 h-12 md:w-20 md:h-20 shrink-0 flex items-center justify-center">
               <img src="/images/garden.png" className="w-full h-full object-contain" alt="garden" />
             </div>
@@ -206,18 +237,47 @@ export default function GardenModal({ onClose, className: userClassName, classId
               <h1 className="font-title text-xl md:text-4xl text-brand-brown leading-tight break-keep">
                 {userClassName}의 정원
               </h1>
-              <p className="text-[#738b27] font-body font-bold text-xs md:text-xl truncate md:whitespace-normal">
+              <p className="text-brand-green font-body font-bold text-xs md:text-lg truncate md:whitespace-normal hidden sm:block">
                 친구들의 식물 성장 일기를 함께 보아요!
               </p>
             </div>
           </div>
+          
+          {/* 퀘스트 게이지 바 */}
+          <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2">
+            <div className="flex justify-between w-full mb-1 md:mb-2 px-2">
+              <span className="font-title text-xs md:text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+              <span className="font-title text-xs md:text-sm text-brand-green">{commentedStudents.size} / {Math.max(1, gardenData.length)}</span>
+            </div>
+            <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
+              {Array.from({ length: Math.max(1, gardenData.length) }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`flex-1 h-full rounded-full transition-all duration-500 ${
+                    i < commentedStudents.size 
+                      ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
+                      : "bg-transparent"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
           <button 
             onClick={onClose} 
-            className="shrink-0 bg-gray-100 text-gray-500 px-3 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl font-title text-sm md:text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-1.5"
+            className="shrink-0 bg-gray-100 text-gray-500 px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl font-title text-sm md:text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-1.5"
           >
             <span>✕</span> <span>닫기</span>
           </button>
         </div>
+
+        {/* 퀘스트 달성 팝업 */}
+        {showQuestSuccess && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-white px-8 py-4 rounded-full shadow-2xl z-[60] border-2 border-brand-green animate-in slide-in-from-top-10 fade-in duration-500 flex items-center gap-3">
+            <span className="text-3xl">🎉</span>
+            <p className="font-title text-xl text-brand-brown">목표 달성! 우리 반 모든 식물에 응원이 도착했어요!</p>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-10 bg-[#fdfcf5]">
