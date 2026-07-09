@@ -124,23 +124,24 @@ export default function GardenPage() {
 
       setGardenData(formattedData);
 
-      // 내가 오늘 남긴 댓글 조회해서 게이지 바 초기화
-      const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem("studentName") || "") : "";
-      if (currentUserName) {
+      // 오늘 우리 반 전체 소통 기록 조회해서 게이지 바 초기화
+      const classRecordIds = formattedData.map(d => d.latest_record.id);
+      
+      if (classRecordIds.length > 0) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        const { data: myInteractions, error: intError } = await client
+        const { data: classInteractions, error: intError } = await client
           .from("interactions")
           .select("record_id")
-          .eq("author_name", currentUserName)
+          .in("record_id", classRecordIds)
           .gte("created_at", today.toISOString());
 
-        if (!intError && myInteractions) {
-          const myInteractedRecordIds = myInteractions.map((i: any) => i.record_id);
+        if (!intError && classInteractions) {
+          const interactedRecordIds = classInteractions.map((i: any) => i.record_id);
           const interactedStudentIds = new Set<string>();
           formattedData.forEach(card => {
-            if (myInteractedRecordIds.includes(card.latest_record.id)) {
+            if (interactedRecordIds.includes(card.latest_record.id)) {
               interactedStudentIds.add(card.student_id);
             }
           });

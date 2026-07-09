@@ -123,23 +123,25 @@ export default function GardenModal({ onClose, className: userClassName, classId
 
       setGardenData(formattedData);
 
-      // 6단계: 오늘 남긴 나의 소통 기록을 가져와 게이지 바(commentedStudents) 초기화
-      const currentUserName = mode === "teacher" ? "선생님" : (localStorage.getItem("studentName") || "");
-      if (currentUserName) {
+      // 6단계: 오늘 우리 반 전체 소통 기록을 가져와 게이지 바(commentedStudents) 초기화
+      const classRecordIds = formattedData.map(d => d.latest_record.id);
+      
+      if (classRecordIds.length > 0) {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // 오늘의 시작 시간
         
-        const { data: myInteractions, error: intError } = await client
+        // chunking in case there are many records
+        const { data: classInteractions, error: intError } = await client
           .from("interactions")
           .select("record_id")
-          .eq("author_name", currentUserName)
+          .in("record_id", classRecordIds)
           .gte("created_at", today.toISOString());
 
-        if (!intError && myInteractions) {
-          const myInteractedRecordIds = myInteractions.map(i => i.record_id);
+        if (!intError && classInteractions) {
+          const interactedRecordIds = classInteractions.map(i => i.record_id);
           const interactedStudentIds = new Set<string>();
           formattedData.forEach(card => {
-            if (myInteractedRecordIds.includes(card.latest_record.id)) {
+            if (interactedRecordIds.includes(card.latest_record.id)) {
               interactedStudentIds.add(card.student_id);
             }
           });
