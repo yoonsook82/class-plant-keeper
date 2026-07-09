@@ -214,9 +214,14 @@ export default function GardenPage() {
 
         {/* 퀘스트 게이지 바 */}
         <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2 mt-2 md:mt-0">
-          <div className="flex justify-between w-full mb-2 md:mb-3 px-2">
+          <div className="flex justify-between items-center w-full mb-2 md:mb-3 px-2">
             <span className="font-title text-sm md:text-lg text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
-            <span className="font-title text-sm md:text-lg text-brand-green">{commentedStudents.size} / {Math.max(1, gardenData.length)}</span>
+            <span className="font-title text-sm md:text-lg text-brand-green flex items-center gap-1.5">
+              {commentedStudents.size === Math.max(1, gardenData.length) && gardenData.length > 0 && (
+                <span className="text-xl md:text-2xl animate-bounce drop-shadow-sm">🎉</span>
+              )}
+              {commentedStudents.size} / {Math.max(1, gardenData.length)}
+            </span>
           </div>
           <div className="flex w-full h-6 md:h-8 bg-gray-100 rounded-full overflow-hidden gap-1 p-1 shadow-inner">
             {Array.from({ length: Math.max(1, gardenData.length) }).map((_, i) => (
@@ -238,14 +243,6 @@ export default function GardenPage() {
           <span>✕</span> 닫기
         </button>
       </header>
-
-      {/* 퀘스트 달성 팝업 */}
-      {showQuestSuccess && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-white px-8 py-4 rounded-full shadow-2xl z-[60] border-2 border-brand-green animate-in slide-in-from-top-10 fade-in duration-500 flex items-center gap-3">
-          <span className="text-3xl">🎉</span>
-          <p className="font-title text-xl text-brand-brown">목표 달성! 우리 반 모든 식물에 응원이 도착했어요!</p>
-        </div>
-      )}
 
       {/* Main Content */}
       <main className="flex-1 p-8 max-w-[1500px] mx-auto w-full">
