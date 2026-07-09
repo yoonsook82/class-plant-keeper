@@ -725,7 +725,7 @@ export default function ReportModal({
             justify-content: space-between !important;
             width: 100% !important;
             font-size: 11px !important;
-            color: #9ca3af !important; /* text-gray-400 */
+            color: #000000 !important; /* text-black */
             font-weight: bold !important;
             border-bottom: 1px solid #f3f4f6 !important;
             padding-bottom: 8px !important;
