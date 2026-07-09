@@ -529,22 +529,22 @@ export default function ReportModal({
                 관찰 후 느낀 점
               </h4>
               <div className="relative group/reflect">
-                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base print:p-1 print:text-[10px] print:min-h-0 print:bg-transparent">
+                <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 font-body text-base print:p-1 print:text-sm print:text-black print:min-h-0 print:bg-transparent">
                   {mode === "student" ? (
                     <textarea 
                       value={reflection}
                       onChange={(e) => setReflection(e.target.value)}
                       placeholder="아직 작성된 내용이 없습니다."
-                      className="w-full min-h-[100px] bg-transparent resize-none outline-none text-gray-700 leading-relaxed placeholder:text-gray-400 placeholder:italic print:hidden"
+                      className="w-full min-h-[100px] bg-transparent resize-none outline-none text-black leading-relaxed placeholder:text-gray-400 placeholder:italic print:hidden"
                     />
                   ) : reflection ? (
-                    <p className="text-gray-700 leading-relaxed text-left">"{reflection}"</p>
+                    <p className="text-black leading-relaxed text-left">"{reflection}"</p>
                   ) : (
                     <p className="text-gray-400 italic text-center py-2">아직 작성된 내용이 없습니다.</p>
                   )}
                   {/* Print version of textarea text */}
                   {mode === "student" && reflection && (
-                    <p className="hidden print:block text-gray-700 leading-relaxed text-left">"{reflection}"</p>
+                    <p className="hidden print:block text-black leading-relaxed text-left">"{reflection}"</p>
                   )}
                   {mode === "student" && !reflection && (
                     <p className="hidden print:block text-gray-400 italic text-center py-2">아직 작성된 내용이 없습니다.</p>
@@ -604,10 +604,10 @@ export default function ReportModal({
                     <textarea 
                       value={feedback}
                       onChange={e => setFeedback(e.target.value)}
-                      className="w-full h-40 bg-white rounded-3xl p-6 pr-12 pb-24 font-body text-base outline-none border-2 border-transparent focus:border-orange-500 transition-all resize-none shadow-inner print:hidden"
+                      className="w-full h-40 bg-white rounded-3xl p-6 pr-12 pb-24 font-body text-base text-black outline-none border-2 border-transparent focus:border-orange-500 transition-all resize-none shadow-inner print:hidden"
                       placeholder="선생님의 따뜻한 격려를 남겨주세요."
                     />
-                    <div className="hidden print:block w-full min-h-[40px] bg-white rounded-xl p-1 font-body text-[10px] border border-gray-50">
+                    <div className="hidden print:block w-full min-h-[40px] bg-white rounded-xl p-1 font-body text-sm text-black border border-gray-50">
                       {feedback || "아직 작성된 내용이 없습니다."}
                     </div>
                     {stamp && (
@@ -663,11 +663,11 @@ export default function ReportModal({
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 pr-12 pb-24 font-body text-base relative z-10 print:p-1 print:text-[10px] print:min-h-0 print:border-none">
+                  <div className="w-full min-h-[100px] bg-white/50 rounded-3xl p-6 pr-12 pb-24 font-body text-base relative z-10 print:p-1 print:text-sm print:text-black print:min-h-0 print:border-none">
                     {feedback ? (
-                      <p className="text-gray-700 leading-relaxed text-left font-medium text-lg print:text-[10px]">"{feedback}"</p>
+                      <p className="text-black leading-relaxed text-left font-medium text-lg print:text-sm">"{feedback}"</p>
                     ) : (
-                      <p className="text-gray-400 italic text-center py-10 print:py-1 print:text-[10px]">선생님의 따뜻한 한마디를 기다려 보아요.</p>
+                      <p className="text-gray-400 italic text-center py-10 print:py-1 print:text-sm">선생님의 따뜻한 한마디를 기다려 보아요.</p>
                     )}
                   </div>
                   {feedback && stamp && (

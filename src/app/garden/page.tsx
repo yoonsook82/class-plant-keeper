@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import confetti from "canvas-confetti";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
 interface Record {
@@ -33,6 +34,8 @@ export default function GardenPage() {
   const [selectedRecord, setSelectedRecord] = useState<GardenCardData | null>(null);
   const [comment, setComment] = useState("");
   const [interactions, setInteractions] = useState<any[]>([]);
+  const [commentedStudents, setCommentedStudents] = useState<Set<string>>(new Set());
+  const [showQuestSuccess, setShowQuestSuccess] = useState(false);
 
   useEffect(() => {
     const storedClassName = localStorage.getItem("className");
@@ -138,7 +141,38 @@ export default function GardenPage() {
     if (!comment.trim()) return;
     setInteractions([...interactions, { id: Date.now().toString(), name: "나", text: comment, emoji: "📝" }]);
     setComment("");
+    
+    if (selectedRecord) {
+      setCommentedStudents(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedRecord.student_id);
+        return newSet;
+      });
+    }
   };
+
+  const handleAddEmoji = (e: string) => {
+    setInteractions([...interactions, { id: Date.now().toString(), name: "나", text: "", emoji: e }]);
+    if (selectedRecord) {
+      setCommentedStudents(prev => {
+        const newSet = new Set(prev);
+        newSet.add(selectedRecord.student_id);
+        return newSet;
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (gardenData.length > 0 && commentedStudents.size === gardenData.length && !showQuestSuccess) {
+      setShowQuestSuccess(true);
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#22c55e', '#eab308', '#ec4899', '#3b82f6', '#f97316']
+      });
+    }
+  }, [commentedStudents.size, gardenData.length, showQuestSuccess]);
 
   return (
     <div className="min-h-screen bg-[#fdfcf5] flex flex-col font-body">
@@ -153,6 +187,29 @@ export default function GardenPage() {
             <p className="text-brand-green font-body font-bold text-lg">친구들의 식물 성장 일기를 함께 보아요!</p>
           </div>
         </div>
+
+        {/* 퀘스트 게이지 바 */}
+        {gardenData.length > 0 && (
+          <div className="hidden md:flex flex-col items-center mx-auto flex-1 max-w-xl px-8">
+            <div className="flex justify-between w-full mb-2">
+              <span className="font-title text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+              <span className="font-title text-sm text-brand-green">{commentedStudents.size} / {gardenData.length}</span>
+            </div>
+            <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
+              {Array.from({ length: gardenData.length }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`flex-1 h-full rounded-full transition-all duration-500 ${
+                    i < commentedStudents.size 
+                      ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
+                      : "bg-transparent"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         <button 
           onClick={() => router.back()} 
           className="bg-gray-100 text-gray-500 px-6 py-3 rounded-2xl font-title text-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-2"
@@ -160,6 +217,14 @@ export default function GardenPage() {
           <span>✕</span> 닫기
         </button>
       </header>
+
+      {/* 퀘스트 달성 팝업 */}
+      {showQuestSuccess && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-white px-8 py-4 rounded-full shadow-2xl z-[60] border-2 border-brand-green animate-in slide-in-from-top-10 fade-in duration-500 flex items-center gap-3">
+          <span className="text-3xl">🎉</span>
+          <p className="font-title text-xl text-brand-brown">목표 달성! 우리 반 모든 식물에 응원이 도착했어요!</p>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 p-8 max-w-[1500px] mx-auto w-full">
@@ -306,7 +371,7 @@ export default function GardenPage() {
 
                   <div className="flex justify-between mb-4 bg-brand-bg/30 p-3 rounded-2xl">
                     {['❤️', '👏', '🔥', '🌱', '🌟'].map(e => (
-                      <button key={e} onClick={() => setInteractions([...interactions, { id: Date.now().toString(), name: "나", text: "", emoji: e }])} className="text-xl hover:scale-125 transition-all">{e}</button>
+                      <button key={e} onClick={() => handleAddEmoji(e)} className="text-xl hover:scale-125 transition-all">{e}</button>
                     ))}
                   </div>
 
