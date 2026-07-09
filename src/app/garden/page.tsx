@@ -190,28 +190,22 @@ export default function GardenPage() {
 
         {/* 퀘스트 게이지 바 */}
         <div className="flex flex-col items-center flex-1 w-full order-last md:order-none min-w-[280px] max-w-[600px] mx-auto px-2">
-          {gardenData.length > 0 ? (
-            <>
-              <div className="flex justify-between w-full mb-1 md:mb-2 px-2">
-                <span className="font-title text-xs md:text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
-                <span className="font-title text-xs md:text-sm text-brand-green">{commentedStudents.size} / {gardenData.length}</span>
-              </div>
-              <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
-                {Array.from({ length: gardenData.length }).map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`flex-1 h-full rounded-full transition-all duration-500 ${
-                      i < commentedStudents.size 
-                        ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
-                        : "bg-transparent"
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="h-10"></div>
-          )}
+          <div className="flex justify-between w-full mb-1 md:mb-2 px-2">
+            <span className="font-title text-xs md:text-sm text-brand-brown">우리 반 소통 퀘스트 진행 중! 💬</span>
+            <span className="font-title text-xs md:text-sm text-brand-green">{commentedStudents.size} / {Math.max(1, gardenData.length)}</span>
+          </div>
+          <div className="flex w-full h-4 bg-gray-100 rounded-full overflow-hidden gap-1 p-0.5 shadow-inner">
+            {Array.from({ length: Math.max(1, gardenData.length) }).map((_, i) => (
+              <div 
+                key={i} 
+                className={`flex-1 h-full rounded-full transition-all duration-500 ${
+                  i < commentedStudents.size 
+                    ? "bg-gradient-to-r from-brand-green to-emerald-400 shadow-sm" 
+                    : "bg-transparent"
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         <button 
