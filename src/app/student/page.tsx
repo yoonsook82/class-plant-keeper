@@ -81,11 +81,11 @@ export default function StudentDashboard() {
     {
       target: "body",
       content: (
-        <div className="text-left space-y-2 font-body text-base text-gray-700 leading-relaxed break-keep">
-          <p><strong>안녕하세요! 우리 반 식집사에 온 것을 환영해요!</strong></p>
-          <p>식물이 잘 자라는 환경 조건을 알아보고 올바른 가꾸기 방법을 실천해 보아요.</p>
-          <p>식물의 성장과정을 관찰하고 기록하는 과정에서 과학적 탐구심과 생명의 소중함을 배워요.</p>
-          <p className="pt-2 text-brand-green font-bold">먼저 사용방법을 알아볼까요?</p>
+        <div className="text-left space-y-3 font-body text-base text-gray-700 leading-relaxed break-keep">
+          <p><strong>안녕하세요! 우리 반 식집사에 온 것을 환영해요! 🌱</strong></p>
+          <p>여러분은 새콤달콤한 딸기나 키가 큰 해바라기처럼 특별히 좋아하는 식물이 있나요? 어제 식탁에는 어떤 채소가 나왔나요?</p>
+          <p>내가 좋아하는 식물이 어떻게 싹을 틔우고 쑥쑥 자라나는지 직접 키우면서 알아보아요. 작은 씨앗이 커다란 생명으로 자라나는 신기한 마법 같은 여정, 지금부터 시작해 볼까요?</p>
+          <p className="pt-2 text-brand-green font-bold text-center">먼저 꼬마 식집사 사용법을 알아볼까요?</p>
         </div>
       ),
       placement: "center",
