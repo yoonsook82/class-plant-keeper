@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     plantNetFormData.append("images", imageFile);
     plantNetFormData.append("organs", "auto");
 
-    const response = await fetch(`https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`, {
+    const response = await fetch(`https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}&lang=ko`, {
       method: "POST",
       body: plantNetFormData,
     });
