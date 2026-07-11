@@ -672,8 +672,8 @@ export default function StudentDashboard() {
                 onClick={() => setIsSearchOpen(true)}
                 className="col-span-2 md:col-span-1 bg-[#f0f5ff] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#dceaff] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
               >
-                <div className="transition-transform group-hover:scale-110 duration-300 flex items-center justify-center">
-                  <span className="text-[40px] md:text-[50px] leading-none drop-shadow-sm">📸🌿</span>
+                <div className="transition-transform group-hover:scale-110 duration-300">
+                  <Image src="/images/search.png" alt="search" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
                 <span className="font-title text-base md:text-lg text-[#424d5a]">AI 식물 찾기</span>
               </div>
