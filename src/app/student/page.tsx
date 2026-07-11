@@ -8,6 +8,7 @@ import { supabase, getSupabaseClient } from "@/lib/supabaseClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ReportModal, { Plant, Record } from "@/components/ReportModal";
 import GardenModal from "@/components/GardenModal";
+import PlantSearchModal from "@/components/PlantSearchModal";
 import React from "react";
 import { Joyride, STATUS } from "react-joyride";
 
@@ -141,6 +142,7 @@ export default function StudentDashboard() {
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isCareOpen, setIsCareOpen] = useState(false);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // New Plant Form State
   const [isAddingPlant, setIsAddingPlant] = useState(false);
@@ -611,7 +613,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
               <div 
                 id="tutorial-step-1"
                 onMouseEnter={playPopSound}
@@ -664,6 +666,16 @@ export default function StudentDashboard() {
                   <Image src="/images/ai-icon.png" alt="ai" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
                 <span className="font-title text-base md:text-lg text-[#4a5a42]">AI 식물 진단</span>
+              </div>
+              <div 
+                onMouseEnter={playPopSound}
+                onClick={() => setIsSearchOpen(true)}
+                className="col-span-2 md:col-span-1 bg-[#f0f5ff] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#dceaff] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
+              >
+                <div className="transition-transform group-hover:scale-110 duration-300 flex items-center justify-center">
+                  <span className="text-[40px] md:text-[50px] leading-none drop-shadow-sm">📸🌿</span>
+                </div>
+                <span className="font-title text-base md:text-lg text-[#424d5a]">AI 식물 찾기</span>
               </div>
             </div>
 
@@ -815,6 +827,9 @@ export default function StudentDashboard() {
         mode="student"
         onClose={() => setIsGardenOpen(false)}
       />
+    )}
+    {isSearchOpen && (
+      <PlantSearchModal onClose={() => setIsSearchOpen(false)} />
     )}
   </>
 );
