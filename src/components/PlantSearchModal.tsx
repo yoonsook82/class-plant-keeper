@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
+import searchImg from "../../public/images/search.png";
 
 interface PlantSearchModalProps {
   onClose: () => void;
@@ -102,7 +104,7 @@ export default function PlantSearchModal({ onClose, className = "" }: PlantSearc
         <header className="bg-gradient-to-r from-brand-green to-[#7a9624] px-6 py-5 flex items-center justify-between relative overflow-hidden shrink-0">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3"></div>
           <div className="flex items-center gap-3 relative z-10">
-            <Image src="/images/search.png" alt="search" width={32} height={32} className="drop-shadow-md object-contain" />
+            <Image src={searchImg} alt="search" width={32} height={32} className="drop-shadow-md object-contain" />
             <h2 className="font-title text-2xl text-white drop-shadow-sm">AI 식물 찾기</h2>
           </div>
           <button 
