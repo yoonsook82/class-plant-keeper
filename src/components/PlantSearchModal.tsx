@@ -51,16 +51,12 @@ export default function PlantSearchModal({ onClose, className = "" }: PlantSearc
     setError(null);
 
     try {
-      // Vercel 환경변수 인식 오류에 대비하여 fallback으로 실제 키를 지정합니다.
-      const apiKey = process.env.NEXT_PUBLIC_PLANTNET_API_KEY && process.env.NEXT_PUBLIC_PLANTNET_API_KEY !== "YOUR_PLANTNET_API_KEY_HERE"
-        ? process.env.NEXT_PUBLIC_PLANTNET_API_KEY 
-        : "2b109BnBKM6D9mzTIyLrIYx8";
-      
       const formData = new FormData();
       formData.append("images", imageFile);
-      formData.append("organs", "auto"); // 'auto' allows the API to automatically detect the plant organ
 
-      const response = await fetch(`https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`, {
+      // 클라이언트에서 직접 외부 API를 호출하면 CORS 및 키 노출 문제가 발생할 수 있으므로
+      // 자체 프록시 API(/api/identify)를 통해 우회하여 요청합니다.
+      const response = await fetch('/api/identify', {
         method: "POST",
         body: formData,
       });
