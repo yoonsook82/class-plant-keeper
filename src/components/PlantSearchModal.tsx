@@ -51,7 +51,10 @@ export default function PlantSearchModal({ onClose, className = "" }: PlantSearc
     setError(null);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_PLANTNET_API_KEY || "YOUR_API_KEY_HERE";
+      // Vercel 환경변수 인식 오류에 대비하여 fallback으로 실제 키를 지정합니다.
+      const apiKey = process.env.NEXT_PUBLIC_PLANTNET_API_KEY && process.env.NEXT_PUBLIC_PLANTNET_API_KEY !== "YOUR_PLANTNET_API_KEY_HERE"
+        ? process.env.NEXT_PUBLIC_PLANTNET_API_KEY 
+        : "2b109BnBKM6D9mzTIyLrIYx8";
       
       const formData = new FormData();
       formData.append("images", imageFile);
