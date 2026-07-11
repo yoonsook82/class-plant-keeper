@@ -117,6 +117,11 @@ export default function StudentDashboard() {
       placement: "bottom",
     },
     {
+      target: "#tutorial-step-search",
+      content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">길가에 피어난 예쁜 식물의 이름이 궁금할 땐? 카메라로 사진을 찍어 AI에게 물어보세요!</div>,
+      placement: "bottom",
+    },
+    {
       target: "#tutorial-step-6",
       content: <div className="break-keep font-body leading-relaxed text-sm md:text-base">친구들의 식물은 어떻게 자라고 있을까요? 우리 반 정원에서 친구의 반려 식물도 구경하고 응원 메시지도 남겨보아요!</div>,
       placement: "bottom",
@@ -668,6 +673,7 @@ export default function StudentDashboard() {
                 <span className="font-title text-base md:text-lg text-[#4a5a42]">AI 식물 진단</span>
               </div>
               <div 
+                id="tutorial-step-search"
                 onMouseEnter={playPopSound}
                 onClick={() => setIsSearchOpen(true)}
                 className="col-span-2 md:col-span-1 bg-[#f0f5ff] p-4 md:p-6 rounded-[30px] md:rounded-[40px] shadow-sm border border-[#dceaff] flex flex-col items-center justify-center gap-2 md:gap-4 cursor-pointer hover:scale-105 transition-all hover:shadow-md group"
