@@ -631,7 +631,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/plant.png" alt="plant" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-pink-700">식물 마스터</span>
+                <span className="font-title text-base md:text-lg text-pink-700 whitespace-nowrap tracking-tight sm:tracking-normal">식물 마스터</span>
               </div>
               <div 
                 id="tutorial-step-3"
@@ -644,7 +644,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/log-icon.png" alt="log" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-[#5a4a42]">새 관찰일지</span>
+                <span className="font-title text-base md:text-lg text-[#5a4a42] whitespace-nowrap tracking-tight sm:tracking-normal">새 관찰일지</span>
               </div>
               <div 
                 id="tutorial-step-4"
@@ -658,7 +658,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/report-icon.png" alt="report" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-[#424a5a]">관찰 보고서</span>
+                <span className="font-title text-base md:text-lg text-[#424a5a] whitespace-nowrap tracking-tight sm:tracking-normal">관찰 보고서</span>
               </div>
               <div 
                 id="tutorial-step-5"
@@ -671,7 +671,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src="/images/ai-icon.png" alt="ai" width={48} height={48} className="md:w-16 md:h-16 drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-[#4a5a42]">AI 식물 진단</span>
+                <span className="font-title text-base md:text-lg text-[#4a5a42] whitespace-nowrap tracking-tight sm:tracking-normal">AI 식물 진단</span>
               </div>
               <div 
                 id="tutorial-step-search"
@@ -682,7 +682,7 @@ export default function StudentDashboard() {
                 <div className="transition-transform group-hover:scale-110 duration-300">
                   <Image src={searchImg} alt="search" width={48} height={48} className="md:w-16 md:h-16 object-contain drop-shadow-sm" />
                 </div>
-                <span className="font-title text-base md:text-lg text-[#424d5a]">AI 식물 찾기</span>
+                <span className="font-title text-base md:text-lg text-[#424d5a] whitespace-nowrap tracking-tight sm:tracking-normal">AI 식물 찾기</span>
               </div>
             </div>
 
