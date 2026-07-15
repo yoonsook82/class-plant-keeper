@@ -424,7 +424,7 @@ export default function StudentDashboard() {
       className="min-h-screen bg-cover bg-fixed bg-center relative dashboard-root print:hidden"
       style={{ backgroundImage: "url('/images/bg-student.jpg')" }}
     >
-      <div className="absolute inset-0 bg-[#f9f8f0]/80 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-[#e4edd9]/90 backdrop-blur-[3px]"></div>
 
       <div className="relative z-10 p-6 max-w-[1200px] mx-auto animate-in fade-in duration-700">
         
