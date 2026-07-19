@@ -420,6 +420,22 @@ function LoginContent() {
               <span className="whitespace-nowrap">학급 식물 관찰 기록 시스템</span>
               <span className="whitespace-nowrap">(초등 전학년)</span>
             </p>
+            
+            {/* 심사위원 전용 프리패스 버튼 */}
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6 translate-x-0 lg:translate-x-24 animate-in fade-in duration-700 delay-300">
+              <button 
+                onClick={() => router.push("/?bypass=jenny")}
+                className="text-sm font-title text-[#4d6b24] hover:text-white border-2 border-[#5C7C31] hover:bg-[#5C7C31] bg-[#fbfdf9]/90 px-5 py-2.5 rounded-full transition-all shadow-md active:scale-95"
+              >
+                🔎 심사용 학생 대시보드
+              </button>
+              <button 
+                onClick={() => router.push("/?bypass=teacher01")}
+                className="text-sm font-title text-[#8c4f00] hover:text-white border-2 border-[#a65d00] hover:bg-[#a65d00] bg-[#fffbf2]/90 px-5 py-2.5 rounded-full transition-all shadow-md active:scale-95"
+              >
+                🔎 심사용 교사 대시보드
+              </button>
+            </div>
           </div>
         </div>
 
@@ -621,22 +637,6 @@ function LoginContent() {
                 </form>
               </div>
             )}
-            
-            {/* 심사위원 전용 프리패스 버튼 */}
-            <div className="w-full flex justify-center gap-3 mt-5 animate-in fade-in duration-700 delay-300">
-              <button 
-                onClick={() => router.push("/?bypass=jenny")}
-                className="text-xs font-title text-gray-500 hover:text-brand-green border border-gray-300 hover:border-brand-green bg-white/50 hover:bg-white px-4 py-2 rounded-full transition-all shadow-sm"
-              >
-                🔎 심사용 학생 대시보드
-              </button>
-              <button 
-                onClick={() => router.push("/?bypass=teacher01")}
-                className="text-xs font-title text-gray-500 hover:text-brand-brown border border-gray-300 hover:border-brand-brown bg-white/50 hover:bg-white px-4 py-2 rounded-full transition-all shadow-sm"
-              >
-                🔎 심사용 교사 대시보드
-              </button>
-            </div>
           </div>
         </div>
       </div>
