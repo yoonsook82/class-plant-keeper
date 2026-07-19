@@ -621,6 +621,22 @@ function LoginContent() {
                 </form>
               </div>
             )}
+            
+            {/* 심사위원 전용 프리패스 버튼 */}
+            <div className="w-full flex justify-center gap-3 mt-5 animate-in fade-in duration-700 delay-300">
+              <button 
+                onClick={() => router.push("/?bypass=jenny")}
+                className="text-xs font-title text-gray-500 hover:text-brand-green border border-gray-300 hover:border-brand-green bg-white/50 hover:bg-white px-4 py-2 rounded-full transition-all shadow-sm"
+              >
+                🔎 심사용 학생 대시보드
+              </button>
+              <button 
+                onClick={() => router.push("/?bypass=teacher01")}
+                className="text-xs font-title text-gray-500 hover:text-brand-brown border border-gray-300 hover:border-brand-brown bg-white/50 hover:bg-white px-4 py-2 rounded-full transition-all shadow-sm"
+              >
+                🔎 심사용 교사 대시보드
+              </button>
+            </div>
           </div>
         </div>
       </div>
