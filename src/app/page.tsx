@@ -488,7 +488,7 @@ function LoginContent() {
                           <>
                             <InputGroup label="학급 이름" value={className} onChange={setClassName} placeholder="예: 3학년 2반" disabled={loading} />
                             
-                            {/* 비용 걱정 없는 우리 반 전용 100% 무료 서버 개설 가이드 */}
+                            {/* 비용 걱정 없는 선생님 전용 100% 무료 서버 개설 가이드 */}
                             <div className="mt-4 border border-brand-green/30 bg-[#fbfdf9] rounded-2xl overflow-hidden text-left">
                               <button
                                 type="button"
@@ -496,7 +496,7 @@ function LoginContent() {
                                 className="w-full px-4 py-3 flex justify-between items-center bg-[#f0f7ec] hover:bg-[#e7f2e1] transition-colors gap-3"
                               >
                                 <span className="font-title text-sm md:text-base text-brand-green text-left break-keep leading-snug">
-                                  우리 반 전용 100% 무료 서버 개설 가이드
+                                  선생님 전용 100% 무료 서버 개설 가이드
                                 </span>
                                 <span className="text-gray-400 font-bold text-xs whitespace-nowrap shrink-0">{isAccordionOpen ? "▲ 접기" : "▼ 펼치기"}</span>
                               </button>
