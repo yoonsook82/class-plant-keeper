@@ -485,7 +485,7 @@ export default function ReportModal({
               전체 관찰 기록
             </h4>
             <div className="space-y-6 print:space-y-3">
-              {[...records].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(r => (
+              {[...records].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(r => (
                 <div key={r.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 relative group print:break-inside-avoid print:shadow-none print:border-2 print:p-3 print:gap-4 print:flex-row">
                   {/* Delete Button (Student Mode Only) */}
                   {mode === "student" && onDeleteRecord && (
