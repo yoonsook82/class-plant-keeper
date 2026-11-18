@@ -288,8 +288,23 @@ function LoginContent() {
 
   const handleCreateClass = async () => {
     setErrorMsg("");
-    if (!email || !password || !className) {
+    const trimmedEmail = email.trim();
+    const trimmedClassName = className.trim();
+    const trimmedUrl = customUrl.trim();
+    const trimmedAnonKey = customAnonKey.trim();
+
+    if (!trimmedEmail || !password || !trimmedClassName) {
       setErrorMsg("이메일, 비밀번호, 학급 이름을 모두 입력해주세요.");
+      return;
+    }
+
+    if (!trimmedUrl || !trimmedAnonKey) {
+      setErrorMsg("선생님 전용 무료 서버(Supabase)의 Project URL과 Key를 모두 입력해주세요.");
+      return;
+    }
+
+    if (!trimmedUrl.startsWith("https://") || !trimmedUrl.includes(".supabase.co")) {
+      setErrorMsg("올바른 Supabase Project URL 형식(https://xxxx.supabase.co)을 입력해주세요.");
       return;
     }
 
@@ -299,7 +314,7 @@ function LoginContent() {
       const { data: existingClass, error: checkError } = await supabase
         .from("classes")
         .select("id")
-        .ilike("teacher_email", email.trim())
+        .ilike("teacher_email", trimmedEmail)
         .maybeSingle();
 
       if (checkError) {
@@ -316,7 +331,7 @@ function LoginContent() {
 
       // 1. Supabase Auth 계정 생성
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
+        email: trimmedEmail,
         password,
       });
 
@@ -325,7 +340,7 @@ function LoginContent() {
         if (authError.message.includes("already registered") || authError.status === 422) {
           // 입력한 비밀번호가 맞는지 검증하기 위해 로그인을 시도합니다.
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
+            email: trimmedEmail,
             password,
           });
 
@@ -350,12 +365,12 @@ function LoginContent() {
       const { data: classData, error: classError } = await supabase
         .from("classes")
         .insert({ 
-          class_name: className, 
-          teacher_email: email.trim(), 
+          class_name: trimmedClassName, 
+          teacher_email: trimmedEmail, 
           teacher_password: password, // NOT NULL 제약 조건 우회/충족
           class_code: newClassCode,
-          custom_supabase_url: customUrl.trim() || null,
-          custom_supabase_anon_key: customAnonKey.trim() || null
+          custom_supabase_url: trimmedUrl,
+          custom_supabase_anon_key: trimmedAnonKey
         })
         .select().single();
         
@@ -366,24 +381,14 @@ function LoginContent() {
         return; 
       }
       
-      // 3. 개인 Supabase 정보 입력 여부에 따른 분기 처리
-      if (customUrl.trim() && customAnonKey.trim()) {
-        localStorage.setItem("custom_supabase_url", customUrl.trim());
-        localStorage.setItem("custom_supabase_anon_key", customAnonKey.trim());
-        setCreatedClassCode(newClassCode);
-        setCreatedClassId(classData.id);
-        
-        // 마법 팝업 모달창 오픈 (세션 임시 셋팅은 팝업 확인 버튼 클릭 시 완료됨)
-        setIsSqlModalOpen(true);
-      } else {
-        localStorage.removeItem("custom_supabase_url");
-        localStorage.removeItem("custom_supabase_anon_key");
-        localStorage.setItem("userRole", "teacher");
-        localStorage.setItem("classId", classData.id);
-        localStorage.setItem("className", className);
-        localStorage.setItem("classCode", newClassCode);
-        router.push("/teacher");
-      }
+      // 3. 개인 Supabase 정보 등록 및 1초 마법 세팅 모달 팝업
+      localStorage.setItem("custom_supabase_url", trimmedUrl);
+      localStorage.setItem("custom_supabase_anon_key", trimmedAnonKey);
+      setCreatedClassCode(newClassCode);
+      setCreatedClassId(classData.id);
+      
+      // 마법 팝업 모달창 오픈 (세션 임시 셋팅은 팝업 확인 버튼 클릭 시 완료됨)
+      setIsSqlModalOpen(true);
     } catch (e: any) { 
       console.error(e);
       setErrorMsg("시스템 오류가 발생했습니다."); 
@@ -536,29 +541,27 @@ function LoginContent() {
                               )}
                             </div>
 
-                            {/* 커스텀 Supabase 입력 양식 */}
-                            {isAccordionOpen && (
-                              <div className="bg-[#fdfbf7] p-4 rounded-2xl border border-[#f5e1c8] space-y-2 mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                                <p className="font-title text-xs text-[#a65d00] text-left">🌱 개인 전용 서버 연동 (선택 사항)</p>
-                                <InputGroup 
-                                  label="나의 Supabase Project URL" 
-                                  value={customUrl} 
-                                  onChange={setCustomUrl} 
-                                  placeholder="예: https://abcdxyz.supabase.co" 
-                                  disabled={loading} 
-                                />
-                                <InputGroup 
-                                  label="나의 Supabase Publishable key" 
-                                  value={customAnonKey} 
-                                  onChange={setCustomAnonKey} 
-                                  placeholder="sb_publishable_..." 
-                                  disabled={loading} 
-                                />
-                                <p className="text-[11px] text-red-500 font-medium font-body text-left leading-normal break-keep">
-                                  * 입력하지 않고 비워두면 기본 제공 무료 공용 서버를 이용하여 즉시 개설됩니다.
-                                </p>
-                              </div>
-                            )}
+                            {/* 커스텀 Supabase 입력 양식 (필수) */}
+                            <div className="bg-[#fdfbf7] p-4 rounded-2xl border border-[#f5e1c8] space-y-2 mt-2">
+                              <p className="font-title text-xs text-[#a65d00] text-left">🌱 선생님 전용 무료 서버 연동 (필수 🔒)</p>
+                              <InputGroup 
+                                label="나의 Supabase Project URL" 
+                                value={customUrl} 
+                                onChange={setCustomUrl} 
+                                placeholder="예: https://abcdxyz.supabase.co" 
+                                disabled={loading} 
+                              />
+                              <InputGroup 
+                                label="나의 Supabase Publishable key" 
+                                value={customAnonKey} 
+                                onChange={setCustomAnonKey} 
+                                placeholder="sb_publishable_..." 
+                                disabled={loading} 
+                              />
+                              <p className="text-[11px] text-[#a65d00] font-medium font-body text-left leading-normal break-keep">
+                                * 학급별 독립된 무제한 용량 확보와 데이터 보안을 위해 개인 Supabase 연동이 필수입니다.
+                              </p>
+                            </div>
                           </>
                         )}
                       </>
